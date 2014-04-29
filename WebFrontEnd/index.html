@@ -3,8 +3,17 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title>Hello</title>
+    <script>
+        var ws = new WebSocket("ws://localhost:8528");
+        console.log(ws);
+
+        function fuck(){
+            ws.send("abc");
+        }
+
+    </script>
 </head>
 <body>
-    <h1>This is WebFrontEnd!</h1>
+    <h1 onclick="fuck()">This is WebFrontEnd!</h1>
 </body>
 </html>

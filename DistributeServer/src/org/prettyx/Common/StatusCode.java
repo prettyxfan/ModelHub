@@ -10,7 +10,7 @@
 package org.prettyx.Common;
 
 /**
- * Provide Global StatusCode
+ * Provide MIMS StatusCode
  */
 public class StatusCode {
 
@@ -72,7 +72,7 @@ public class StatusCode {
     public static int HTTP_NETWORK_AUTHENTICATION_REQUIRED = 511;
 
 
-    // 
+    //
 
 
 }

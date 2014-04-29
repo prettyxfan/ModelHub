@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="DistributeServer">
+    <output-path>$PROJECT_DIR$/out/artifacts/DistributeServer</output-path>
+    <root id="archive" name="DistributeServer.jar">
+      <element id="module-output" name="DistributeServer" />
+    </root>
+  </artifact>
+</component>
