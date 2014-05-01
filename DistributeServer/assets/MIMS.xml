@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<Configurations>
+
+    <Development>
+        <DEBUG>true</DEBUG>
+    </Development>
+
+    <Network>
+
+    </Network>
+
+    <Runnig>
+
+    </Runnig>
+
+</Configurations>
