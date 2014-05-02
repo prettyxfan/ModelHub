@@ -9,18 +9,35 @@
 // +----------------------------------------------------------------------
 package org.prettyx.DistributeServer;
 
+import org.prettyx.Common.StatusCodes;
 import org.prettyx.DistributeServer.Settings.SettingsCenter;
 
 public class DistributeServer {
 
-    private void initializeSettings(){
-        SettingsCenter settingsCenter = new SettingsCenter();
-        settingsCenter.loadSettings();
+    private SettingsCenter settingsCenter;
+
+    /**
+     * Initialize the Application Running Environment
+     *
+     * @return SUCCESS/FAIL
+     */
+    private int initialize(){
+        settingsCenter = new SettingsCenter();
+        if (settingsCenter.loadSettings() != StatusCodes.SUCCESS) {
+            return StatusCodes.FAIL;
+        }
+
+        return StatusCodes.SUCCESS;
     }
 
+    /**
+     * The Main Application
+     * @param args
+     *          Command Line Parameters
+     */
     public static void main(String[] args) {
         DistributeServer distributeServer = new DistributeServer();
-        distributeServer.initializeSettings();
+        distributeServer.initialize();
 
     }
 }

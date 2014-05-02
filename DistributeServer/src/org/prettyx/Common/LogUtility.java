@@ -27,13 +27,17 @@ import java.util.Date;
 public class LogUtility {
 
     /**
-     * Single Pattern
+     * Single Pattern LogUtility Class to Handle All Log Operations
      */
     private static LogUtility logUtility = null;
 
     public LogUtility(){
-        configured = false;
+        level = -1;
     }
+
+    /**
+     * Construct Method
+     */
     public static synchronized LogUtility logUtility(){
         if (logUtility == null) {
             logUtility = new LogUtility();
@@ -41,16 +45,24 @@ public class LogUtility {
         return logUtility;
     }
 
+    /**
+     * -1 => Not Configured
+     *  0 => No Log
+     *  1 => Log to File
+     *  2 => Log to Console
+     *  3 => Log to Both File & Console
+     */
+    private int level ;
+    public static int LOG_NO = 0;
+    public static int LOG_TO_FILE = 1;
+    public static int LOG_TO_STD = 2;
+    public static int LOG_TO_ALL = 3;
+
     // Properties
     private PrintWriter stdOut ;
     private PrintWriter stdErr ;
     private FileWriter file;
 
-    private boolean configured ;
-
-    /**
-     * Empty Construct Method
-     */
 
     /**
      * Construct Method
@@ -58,7 +70,18 @@ public class LogUtility {
      * @param fileName
      *              path to storage the Log
      */
-    public void configure(String fileName){
+    public void configure(String fileName, int logLevel){
+
+        if (level != -1) {
+            try {
+                file.close();
+            } catch (IOException e){
+                log2stdErr(e.getMessage());
+            }
+            stdOut.close();
+            stdErr.close();
+        }
+
         stdOut = new PrintWriter(System.out, true);
         stdErr = new PrintWriter(System.err, true);
         try {
@@ -67,7 +90,91 @@ public class LogUtility {
             log2stdErr(e.getMessage());
         }
 
-        configured = true;
+        level = logLevel;
+    }
+
+    /**
+     * Deconstruct Method
+     */
+    protected void finalize() throws Throwable{
+
+        super.finalize();
+
+        try {
+            file.close();
+        } catch (IOException e){
+            log2stdErr(e.getMessage());
+        }
+        stdOut.close();
+        stdErr.close();
+    }
+
+    /**
+     * wrapper for log2fileOut & log2stdOut
+     *
+     * @param message
+     *              message to display
+     */
+    public void log2out(String message){
+
+        switch (level) {
+            case -1: {
+                break;
+            }
+            case 0: {
+                break;
+            }
+            case 1:{
+                log2fileOut(message);
+                break;
+            }
+            case 2:{
+                log2stdOut(message);
+                break;
+            }
+            case 3:{
+                log2fileOut(message);
+                log2stdOut(message);
+                break;
+            }
+            default:{
+                break;
+            }
+        }
+    }
+
+    /**
+     * wrapper for log2fileErr & log2stdErr
+     *
+     * @param message
+     *              message to display
+     */
+    public void log2err(String message){
+
+        switch (level) {
+            case -1: {
+                break;
+            }
+            case 0: {
+                break;
+            }
+            case 1:{
+                log2fileErr(message);
+                break;
+            }
+            case 2:{
+                log2stdErr(message);
+                break;
+            }
+            case 3:{
+                log2fileErr(message);
+                log2stdErr(message);
+                break;
+            }
+            default:{
+                break;
+            }
+        }
     }
 
     /**
@@ -76,8 +183,8 @@ public class LogUtility {
      * @param message
      *              message to display
      */
-    public void log2fileOut(String message){
-        if (!configured) {
+    private void log2fileOut(String message){
+        if (level == -1) {
             return;
         }
         try {
@@ -86,7 +193,7 @@ public class LogUtility {
                             Thread.currentThread().getStackTrace()[2].getMethodName() + "] " + "\t\t"
                           + message + "\n" );
             file.flush();
-        } catch (Exception e) {
+        } catch (IOException e) {
             log2stdErr(e.getMessage());
         }
     }
@@ -97,8 +204,8 @@ public class LogUtility {
      * @param message
      *              message to display
      */
-    public void log2fileErr(String message){
-        if (!configured) {
+    private void log2fileErr(String message){
+        if (level == -1) {
             return;
         }
         try {
@@ -107,7 +214,7 @@ public class LogUtility {
                              Thread.currentThread().getStackTrace()[2].getMethodName() + "] " + "\t\t"
                            + message + "\n" );
             file.flush();
-        } catch (Exception e) {
+        } catch (IOException e) {
             log2stdErr(e.getMessage());
         }
     }
@@ -118,8 +225,8 @@ public class LogUtility {
      * @param message
      *              message to display
      */
-    public void log2stdOut(String message){
-        if (!configured) {
+    private void log2stdOut(String message){
+        if (level == -1) {
             return;
         }
         stdOut.print( prefixTime() + " [INFO]\t" +
@@ -136,8 +243,8 @@ public class LogUtility {
      * @param message
      *              message to display
      */
-    public void log2stdErr(String message){
-        if (!configured) {
+    private void log2stdErr(String message){
+        if (level == -1) {
             return;
         }
         stdErr.print( prefixTime() + " [ERROR]\t" +

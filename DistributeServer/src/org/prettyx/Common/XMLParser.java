@@ -8,96 +8,104 @@
 // | Author: XieFan <xiefan1228@gmail.com>
 // +----------------------------------------------------------------------
 package org.prettyx.Common;
-/**
- * Parse the XML document or XML string to a List
- */
 
 import java.io.InputStream;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.DocumentHelper;
 import org.dom4j.io.SAXReader;
 
-public class XMLParser {
-    private static List elemList = new ArrayList();
+/**
+ * XML Parser
+ * provide two public static methods :parserXmlFromString & parserXmlFromFile
+ * parse two kinds of xml : xml string & xml document
+ *
+ */
 
-    public static synchronized List parserXmlFromString(String xmlStr) throws Exception {
-        elemList.clear();
-        Document doc = (Document) DocumentHelper.parseText(xmlStr);
-        Element rootElt = doc.getRootElement();
-        getElementList(rootElt);
-        return  elemList;
+public class XMLParser {
+
+    private static Map elementMap = new HashMap<String, String>();
+
+    /**
+     * parse xml string
+     *
+     * @param xmlString
+     *              string contains a xml
+     * @return elementlist
+     */
+
+    public static synchronized Map parserXmlFromString(String xmlString) throws Exception {
+        elementMap.clear();
+        Document document = DocumentHelper.parseText(xmlString);
+        Element rootElement = document.getRootElement();
+        getElementList(rootElement);
+
+        return elementMap;
     }
 
-    public static synchronized List parserXmlFromFile(String fileName) {
-        elemList.clear();
+    /**
+     * parse xml document
+     *
+     * @param fileName
+     *              a xml file int the resource directory
+     * @return elementlist
+     */
+
+    public static synchronized Map parserXmlFromResourceFile(String fileName) throws Exception {
+        elementMap.clear();
         InputStream inputStream = Thread.currentThread().getClass().getResourceAsStream("/org/prettyx/Resource/" + fileName);
         SAXReader reader = new SAXReader();
-        try {
-            Document document = reader.read(inputStream);
-            Element rootElt = document.getRootElement();
-            getElementList(rootElt);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return elemList;
+        Document document = reader.read(inputStream);
+        Element rootElt = document.getRootElement();
+        getElementList(rootElt);
+        inputStream.close();
+
+        return elementMap;
     }
 
+
+    /**
+     * parse xml document
+     *
+     * @param filePath
+     *              a xml file at anywhere
+     * @return elementlist
+     */
+
+    public static synchronized Map parserXmlFromFile(String filePath) throws Exception {
+        elementMap.clear();
+        SAXReader reader = new SAXReader();
+        Document document = reader.read(filePath);
+        Element rootElement = document.getRootElement();
+        getElementList(rootElement);
+
+        return elementMap;
+    }
+
+    /**
+     * traverse the xml document by recursion
+     *
+     * @param element
+     *              the rootElement
+     */
+    @SuppressWarnings("unchecked")
     private static void getElementList(Element element) {
         List elements = element.elements();
         if (elements.size() == 0) {
             String xpath = element.getPath();
             String value = element.getTextTrim();
-            elemList.add(new Leaf(xpath, value));
+            elementMap.put(xpath, value);
         } else {
-            for (Iterator it = elements.iterator(); it.hasNext();) {
-                Element elem = (Element) it.next();
+            for (Iterator item = elements.iterator(); item.hasNext();) {
+                Element elem = (Element) item.next();
                 getElementList(elem);
             }
         }
     }
 
-    public static String showListString(List elemList) {
-        StringBuffer sb = new StringBuffer();
-        for (Iterator it = elemList.iterator(); it.hasNext();) {
-            Leaf leaf = (Leaf) it.next();
-            sb.append(leaf.getXpath()).append(" = ").append(leaf.getValue()).append("\n");
-        }
-        return sb.toString();
-    }
-
 }
-
-class Leaf {
-    private String xpath;
-    private String value;
-
-    public Leaf(String xpath, String value) {
-        this.xpath = xpath;
-        this.value = value;
-    }
-
-    public String getXpath() {
-        return xpath;
-    }
-
-    public void setXpath(String xpath) {
-        this.xpath = xpath;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-}
-
-
-
-
-
-
-

@@ -1,12 +1,13 @@
 <?xml version="1.0"?>
 <Configurations>
 
-    <Network>
-        <PORT>8528</PORT>
-    </Network>
-
-    <Runnig>
+    <Running>
         <ServerName>PrettyX_Distribute</ServerName>
-    </Runnig>
+        <LogLevel>3</LogLevel>
+    </Running>
+
+    <Network>
+        <Port>8528</Port>
+    </Network>
 
 </Configurations>
