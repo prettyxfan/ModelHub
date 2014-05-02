@@ -1,16 +1,12 @@
 <?xml version="1.0"?>
 <Configurations>
 
-    <Development>
-        <DEBUG>true</DEBUG>
-    </Development>
-
     <Network>
-
+        <PORT>8528</PORT>
     </Network>
 
     <Runnig>
-
+        <ServerName>PrettyX_Distribute</ServerName>
     </Runnig>
 
 </Configurations>

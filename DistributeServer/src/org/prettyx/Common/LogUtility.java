@@ -9,52 +9,159 @@
 // +----------------------------------------------------------------------
 package org.prettyx.Common;
 
+import sun.rmi.runtime.Log;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Log Utilities
+ *
+ * Two Log Levels : INFO & ERROR
+ *
+ * Log output will be like this:
+ *  [yyyy-MM-dd HH:mm:ss] [INFO/ERROR] LOG_MESSAGE [CLASS_NAME - METHOD_NAME]
+ *
  */
 public class LogUtility {
 
+    /**
+     * Single Pattern
+     */
+    private static LogUtility logUtility = null;
+
+    public LogUtility(){
+        configured = false;
+    }
+    public static synchronized LogUtility logUtility(){
+        if (logUtility == null) {
+            logUtility = new LogUtility();
+        }
+        return logUtility;
+    }
+
+    // Properties
     private PrintWriter stdOut ;
     private PrintWriter stdErr ;
-    private FileWriter fileOut;
-    private FileWriter fileErr;
+    private FileWriter file;
 
-    public LogUtility(String p_fileOut, String p_fileError){
+    private boolean configured ;
+
+    /**
+     * Empty Construct Method
+     */
+
+    /**
+     * Construct Method
+     *
+     * @param fileName
+     *              path to storage the Log
+     */
+    public void configure(String fileName){
         stdOut = new PrintWriter(System.out, true);
         stdErr = new PrintWriter(System.err, true);
         try {
-            fileOut = new FileWriter(p_fileOut, true);
-            fileErr = new FileWriter(p_fileError, true);
+            file = new FileWriter(fileName, true);
         } catch (IOException e){
-            e.printStackTrace();
-
+            log2stdErr(e.getMessage());
         }
 
+        configured = true;
     }
 
-
+    /**
+     * Output Information to File
+     *
+     * @param message
+     *              message to display
+     */
     public void log2fileOut(String message){
-
-    }
-
-    public void log2fileErr(String message){
+        if (!configured) {
+            return;
+        }
         try {
-            fileErr.append(message);
-            fileErr.flush();
+            file.write( prefixTime() + " [INFO]\t" + message + "\t\t" +
+                    "[" + Thread.currentThread().getStackTrace()[2].getClassName() + " - " +
+                    Thread.currentThread().getStackTrace()[2].getMethodName() + "] "
+                    + "\n" );
+
+            file.flush();
         } catch (Exception e) {
-            e.printStackTrace();
+            log2stdErr(e.getMessage());
         }
     }
 
+    /**
+     * Output Error to File
+     *
+     * @param message
+     *              message to display
+     */
+    public void log2fileErr(String message){
+        if (!configured) {
+            return;
+        }
+        try {
+            file.write( prefixTime() + " [ERROR]\t" + message + "\t\t" +
+                        "[" + Thread.currentThread().getStackTrace()[2].getClassName() + " - " +
+                              Thread.currentThread().getStackTrace()[2].getMethodName() + "] "
+                        + "\n" );
+
+            file.flush();
+        } catch (Exception e) {
+            log2stdErr(e.getMessage());
+        }
+    }
+
+    /**
+     * Output Information to StdOut
+     *
+     * @param message
+     *              message to display
+     */
     public void log2stdOut(String message){
+        if (!configured) {
+            return;
+        }
+        stdOut.print( prefixTime() + " [INFO]\t" + message + "\t\t" +
+                        "[" + Thread.currentThread().getStackTrace()[2].getClassName() + " - " +
+                              Thread.currentThread().getStackTrace()[2].getMethodName() + "] "
+                        + "\n");
+        stdOut.flush();
 
     }
 
+    /**
+     * Output Error to StdErr
+     *
+     * @param message
+     *              message to display
+     */
     public void log2stdErr(String message){
-
+        if (!configured) {
+            return;
+        }
+        stdErr.print( prefixTime() + " [ERROR]\t" + message + "\t\t" +
+                        "[" + Thread.currentThread().getStackTrace()[2].getClassName() + " - " +
+                              Thread.currentThread().getStackTrace()[2].getMethodName() + "] "
+                        + "\n");
+        stdErr.flush();
     }
+
+    /**
+     * Provide Prefix of Current Time
+     *
+     * @return String
+     *              date will be format like this [yyyy-MM-dd HH:mm:ss]
+     */
+    private String prefixTime(){
+        Date now = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("[yyyy-MM-dd HH:mm:ss]");
+
+        return dateFormat.format(now);
+    }
+
 }
