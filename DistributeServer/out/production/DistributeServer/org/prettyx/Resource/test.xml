@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config>
+
+    <action name="user">
+        <result name="success">suc.jsp</result>
+        <result name="error">404.jsp</result>
+    </action>
+
+    <action name="book">
+        <result name="success">book.jsp</result>
+        <result name="error" >bookerror.jsp</result>
+    </action>
+
+    <action name="person">
+        <result name="ok">suc.jsp</result>
+    </action>
+
+</config>
