@@ -10,10 +10,7 @@
 package org.prettyx.Common;
 
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -101,9 +98,9 @@ public class XMLParser {
             String value = element.getTextTrim();
             elementMap.put(xpath, value);
         } else {
-            for (Iterator item = elements.iterator(); item.hasNext();) {
-                Element elem = (Element) item.next();
-                getElementList(elem);
+            for (Object object : element.elements() ) {
+                Element local = (Element) object ;
+                getElementList(local);
             }
         }
     }
