@@ -16,10 +16,12 @@ package org.prettyx.DistributeServer.Settings;
 public class DefaultConfs {
     /* Init Settings, Cannot Be Override */
     public static String KIND = "DistributeServer";
-    public static boolean DEBUG = true;
 
     public static String BasePath = "/.MIMS";
-    public static String ConfigFileNAME = "/MIMS.xml";
+    public static String ConfigFileNAME = BasePath + "/MIMS.xml";
+    public static String LogPath = BasePath + "/log";
+    public static String LogOutFileName = LogPath + "/DistributeServer_Out.log";
+    public static String LogErrFileName = LogPath + "/DistributeServer_Err.log";
 
 
     /* Different Categories of Configurations */
