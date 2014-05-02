@@ -10,7 +10,7 @@
 package org.prettyx.Common;
 
 /**
- * Provide DefaultConfs StatusCodes
+ * Provide StatusCodes
  */
 public class StatusCodes {
 
@@ -75,5 +75,6 @@ public class StatusCodes {
     // Common Status Code
     public static int SUCCESS = 1000;
     public static int FAIL = 1001;
+    public static int Error = 1002;
 
 }

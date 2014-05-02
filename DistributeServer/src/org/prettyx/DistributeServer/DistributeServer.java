@@ -11,16 +11,24 @@ package org.prettyx.DistributeServer;
 
 import org.prettyx.Common.LogUtility;
 import org.prettyx.DistributeServer.Settings.DefaultConfs;
+import org.prettyx.DistributeServer.Settings.Settings;
+import org.prettyx.DistributeServer.Settings.SettingsCenter;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class DistributeServer {
 
+    private void initializeSettings(){
+        SettingsCenter settingsCenter = new SettingsCenter();
+        settingsCenter.loadSettings();
+    }
 
     public static void main(String[] args) {
-
-        LogUtility logUtility = new LogUtility( System.getProperty("user.home") + DefaultConfs.LogOutFileName,
-                                                System.getProperty("user.home") + DefaultConfs.LogOutFileName );
-        logUtility.log2fileErr("FUCK");
-
+        DistributeServer distributeServer = new DistributeServer();
+        distributeServer.initializeSettings();
 
     }
 }
