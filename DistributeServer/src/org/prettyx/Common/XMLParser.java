@@ -58,7 +58,7 @@ public class XMLParser {
         }
     }
 
-    private static String getListString(List elemList) {
+    public static String showListString(List elemList) {
         StringBuffer sb = new StringBuffer();
         for (Iterator it = elemList.iterator(); it.hasNext();) {
             Leaf leaf = (Leaf) it.next();

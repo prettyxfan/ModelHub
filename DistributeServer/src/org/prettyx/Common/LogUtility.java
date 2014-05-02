@@ -9,8 +9,6 @@
 // +----------------------------------------------------------------------
 package org.prettyx.Common;
 
-import sun.rmi.runtime.Log;
-
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -23,7 +21,7 @@ import java.util.Date;
  * Two Log Levels : INFO & ERROR
  *
  * Log output will be like this:
- *  [yyyy-MM-dd HH:mm:ss] [INFO/ERROR] LOG_MESSAGE [CLASS_NAME - METHOD_NAME]
+ *  [yyyy-MM-dd HH:mm:ss] [INFO/ERROR] [CLASS_NAME - METHOD_NAME] LOG_MESSAGE
  *
  */
 public class LogUtility {
@@ -83,11 +81,10 @@ public class LogUtility {
             return;
         }
         try {
-            file.write( prefixTime() + " [INFO]\t" + message + "\t\t" +
-                    "[" + Thread.currentThread().getStackTrace()[2].getClassName() + " - " +
-                    Thread.currentThread().getStackTrace()[2].getMethodName() + "] "
-                    + "\n" );
-
+            file.write( prefixTime() + " [INFO]\t" +
+                      "[" + Thread.currentThread().getStackTrace()[2].getClassName() + " - " +
+                            Thread.currentThread().getStackTrace()[2].getMethodName() + "] " + "\t\t"
+                          + message + "\n" );
             file.flush();
         } catch (Exception e) {
             log2stdErr(e.getMessage());
@@ -105,11 +102,10 @@ public class LogUtility {
             return;
         }
         try {
-            file.write( prefixTime() + " [ERROR]\t" + message + "\t\t" +
-                        "[" + Thread.currentThread().getStackTrace()[2].getClassName() + " - " +
-                              Thread.currentThread().getStackTrace()[2].getMethodName() + "] "
-                        + "\n" );
-
+            file.write( prefixTime() + " [ERROR]\t" +
+                       "[" + Thread.currentThread().getStackTrace()[2].getClassName() + " - " +
+                             Thread.currentThread().getStackTrace()[2].getMethodName() + "] " + "\t\t"
+                           + message + "\n" );
             file.flush();
         } catch (Exception e) {
             log2stdErr(e.getMessage());
@@ -126,10 +122,10 @@ public class LogUtility {
         if (!configured) {
             return;
         }
-        stdOut.print( prefixTime() + " [INFO]\t" + message + "\t\t" +
-                        "[" + Thread.currentThread().getStackTrace()[2].getClassName() + " - " +
-                              Thread.currentThread().getStackTrace()[2].getMethodName() + "] "
-                        + "\n");
+        stdOut.print( prefixTime() + " [INFO]\t" +
+                    "[" + Thread.currentThread().getStackTrace()[2].getClassName() + " - " +
+                          Thread.currentThread().getStackTrace()[2].getMethodName() + "] " + "\t\t"
+                        + message + "\n" );
         stdOut.flush();
 
     }
@@ -144,10 +140,10 @@ public class LogUtility {
         if (!configured) {
             return;
         }
-        stdErr.print( prefixTime() + " [ERROR]\t" + message + "\t\t" +
-                        "[" + Thread.currentThread().getStackTrace()[2].getClassName() + " - " +
-                              Thread.currentThread().getStackTrace()[2].getMethodName() + "] "
-                        + "\n");
+        stdErr.print( prefixTime() + " [ERROR]\t" +
+                    "[" + Thread.currentThread().getStackTrace()[2].getClassName() + " - " +
+                          Thread.currentThread().getStackTrace()[2].getMethodName() + "] " + "\t\t"
+                        + message + "\n" );
         stdErr.flush();
     }
 

@@ -9,7 +9,6 @@
 // +----------------------------------------------------------------------
 package org.prettyx.DistributeServer.Settings;
 
-import org.prettyx.Common.LogUtility;
 import org.prettyx.Common.StatusCodes;
 
 import java.io.File;
@@ -38,7 +37,7 @@ public class SettingsCenter {
 
         // Check Directories
         File basePath = new File(System.getProperty("user.home") + DefaultConfs.BasePath);
-        File logPath = new File(System.getProperty("user.home") + DefaultConfs.LogPath);
+        File logPath = new File(System.getProperty("user.home") + DefaultConfs.LogPathPath);
 
         if (basePath.isDirectory() && logPath.isDirectory()) {
             return StatusCodes.SUCCESS;
@@ -63,7 +62,7 @@ public class SettingsCenter {
             return StatusCodes.FAIL;
         }
 
-        File logPath = new File(System.getProperty("user.home") + DefaultConfs.LogPath);
+        File logPath = new File(System.getProperty("user.home") + DefaultConfs.LogPathPath);
         if (!logPath.mkdir()) {
             return StatusCodes.FAIL;
         }

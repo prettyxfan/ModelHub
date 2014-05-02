@@ -9,15 +9,7 @@
 // +----------------------------------------------------------------------
 package org.prettyx.DistributeServer;
 
-import org.prettyx.Common.LogUtility;
-import org.prettyx.DistributeServer.Settings.DefaultConfs;
-import org.prettyx.DistributeServer.Settings.Settings;
 import org.prettyx.DistributeServer.Settings.SettingsCenter;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 public class DistributeServer {
 

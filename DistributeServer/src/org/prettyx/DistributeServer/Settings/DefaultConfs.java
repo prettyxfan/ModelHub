@@ -18,9 +18,12 @@ public class DefaultConfs {
     public static String KIND = "DistributeServer";
 
     public static String BasePath = "/.MIMS";
-    public static String ConfigFileNAME = BasePath + "/DistributeServer.xml";
-    public static String LogPath = BasePath + "/log";
-    public static String LogFileName = LogPath + "/DistributeServer.log";
+    public static String ConfigFileNAME = "DistributeServer.xml";
+    public static String ConfigFilePath = BasePath + "/" + ConfigFileNAME;
+    public static String LogPathName = "log";
+    public static String LogPathPath = BasePath + "/" + LogPathName;
+    public static String LogFileName = "DistributeServer.log";
+    public static String LogFilePath = LogPathPath + "/" + LogFileName;
 
 
     /* Different Categories of Configurations */
