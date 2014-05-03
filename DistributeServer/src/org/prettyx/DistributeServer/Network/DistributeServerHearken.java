@@ -16,9 +16,8 @@ import org.prettyx.Common.LogUtility;
 import org.prettyx.Common.StatusCodes;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.Socket;
+import java.net.ServerSocket;
 
 /**
  * Hearken to InComing Request.
@@ -56,13 +55,14 @@ public class DistributeServerHearken extends WebSocketServer{
 
 
     /**
+     * A Wrapper for start() method
      * Check & Start Listening at Given Port
      *
      * @return
      *      SUCCESS/FAIL
      */
     public int checkAndStart() {
-        if (!isPortAvailable("127.0.0.1", getPort())) {
+        if (!isPortAvailable(getPort())) {
             return StatusCodes.FAIL;
         }
         start();
@@ -72,18 +72,22 @@ public class DistributeServerHearken extends WebSocketServer{
     /**
      * Check Port Available
      *
+     * @param port
+     *          port to test
      * @return
      *      true/false
      */
-    private boolean isPortAvailable(String host,int port){
+    private boolean isPortAvailable(int port){
         boolean flag = false;
         try {
-            InetAddress theAddress = InetAddress.getByName(host);
-            Socket socket = new Socket(theAddress,port);
+            ServerSocket serverSocket = new ServerSocket(port);
             flag = true;
-            socket.close();
-        } catch (Exception e) {
-            LogUtility.logUtility().log2err("Port " + port + " on " + host + " is unavailable. " + e.getMessage());
+            serverSocket.close();
+
+            LogUtility.logUtility().log2out("Port " + port + " is available.");
+
+        } catch (IOException e) {
+            LogUtility.logUtility().log2err("Port " + port + " is unavailable. " + e.getMessage());
         }
         return flag;
     }

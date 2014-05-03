@@ -42,9 +42,7 @@ public class DistributeServer {
         DistributeServer distributeServer = new DistributeServer();
         distributeServer.initialize();
 
-//        DistributeServerHearken distributeServerHearken = new DistributeServerHearken(Integer.valueOf(distributeServer.settingsCenter.getSetting("Network", "Port")));
-        DistributeServerHearken distributeServerHearken = new DistributeServerHearken(22);
+        DistributeServerHearken distributeServerHearken = new DistributeServerHearken(Integer.valueOf(distributeServer.settingsCenter.getSetting("Network", "Port")));
         distributeServerHearken.checkAndStart();
-        LogUtility.logUtility().log2out("WebSocket Start Listening");
     }
 }
