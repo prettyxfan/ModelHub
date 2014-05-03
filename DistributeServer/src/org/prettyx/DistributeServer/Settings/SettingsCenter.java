@@ -119,6 +119,7 @@ public class SettingsCenter {
             LogUtility.logUtility().configure(System.getProperty("user.home") +
                                                 DefaultSettings.Init_DistributeServerLogFilePath,
                                                                                         Integer.valueOf(logLevel));
+            LogUtility.logUtility().log2out("Application is Starting!");
             LogUtility.logUtility().log2out("Configurations load successfully.");
         }
 
@@ -203,7 +204,8 @@ public class SettingsCenter {
 
             File outputFile = new File(System.getProperty("user.home") +
                                                     DefaultSettings.Init_DistributeServerConfigFilePath);
-            if (outputFile.createNewFile()) {
+            outputFile.createNewFile();
+            if (!outputFile.exists()) {
                 return StatusCodes.FAIL;
             }
             OutputStream outputStream = new FileOutputStream(System.getProperty("user.home") +

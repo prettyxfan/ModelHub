@@ -9,6 +9,7 @@
 // +----------------------------------------------------------------------
 package org.prettyx.DistributeServer;
 
+import org.prettyx.Common.LogUtility;
 import org.prettyx.Common.StatusCodes;
 import org.prettyx.DistributeServer.Settings.SettingsCenter;
 
