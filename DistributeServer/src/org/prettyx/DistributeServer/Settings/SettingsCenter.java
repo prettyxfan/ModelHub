@@ -95,7 +95,10 @@ public class SettingsCenter {
                 String value = (String) entry.getValue();
 
                 String[] keyBreak = key.split("/");
-                key = keyBreak[2] + "." + keyBreak[3];
+
+                if (keyBreak.length >= 4) {
+                    key = keyBreak[2] + "." + keyBreak[3];
+                }
 
                 settingsMap.put(key, value);
             }
@@ -103,9 +106,6 @@ public class SettingsCenter {
             LogUtility.logUtility().log2err(e.getMessage());
             return StatusCodes.FAIL;
         }
-
-
-
 
         // Check Log File Exists
         File logFile = new File(System.getProperty("user.home") + DefaultSettings.Init_LogPathPath);
@@ -126,7 +126,7 @@ public class SettingsCenter {
     }
 
     /**
-     * Get Settings from settingsMap
+     * Get Settings from defaultSettingsMap
      * @return string_value/null
      */
     public String getSetting(String category, String item){
@@ -134,6 +134,10 @@ public class SettingsCenter {
         if (settingsMap.size() != 0) {
 
             String value = (String) settingsMap.get(category + "." + item);
+
+            if (value == null || value.isEmpty()){
+                value = (String) DefaultSettings.defaultSettingsMap.get(category + "." + item);
+            }
 
             LogUtility.logUtility().log2out("GetSetting, key:" + category + "." + item + " value:" + value);
 

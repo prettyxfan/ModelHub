@@ -9,6 +9,9 @@
 // +----------------------------------------------------------------------
 package org.prettyx.DistributeServer.Settings;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Provide Global Default Settings for MINE
  * Only Use this Const in "Settings" Package
@@ -27,16 +30,13 @@ public class DefaultSettings {
 
 
     /* Different Categories of Configurations */
+    protected static Map defaultSettingsMap = new HashMap<String, String>(){{
 
-    // Running Settings
-    protected static String Running_ServerName = "PrettyX_Distribute";
-    protected static String Running_LogLevel = "3";
+        // Running Settings
+        put("Running.ServerName", "PrettyX_Distribute");
+        put("Running.LogLevel", "3");
 
-    // Network Settings
-    protected static String Network_Port = "8528";
-
-
-
-
-
+        // Network Settings
+        put("Network.Port", "8528");
+    }};
 }

@@ -22,6 +22,7 @@ public class DistributeServer {
      * @return SUCCESS/FAIL
      */
     private int initialize(){
+        // Initialize Settings
         settingsCenter = new SettingsCenter();
         if (settingsCenter.loadSettings() != StatusCodes.SUCCESS) {
             return StatusCodes.FAIL;
@@ -38,6 +39,5 @@ public class DistributeServer {
     public static void main(String[] args) {
         DistributeServer distributeServer = new DistributeServer();
         distributeServer.initialize();
-
     }
 }
