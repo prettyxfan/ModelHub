@@ -11,6 +11,7 @@ package org.prettyx.DistributeServer;
 
 import org.prettyx.Common.LogUtility;
 import org.prettyx.Common.StatusCodes;
+import org.prettyx.DistributeServer.Network.DistributeServerHearken;
 import org.prettyx.DistributeServer.Settings.SettingsCenter;
 
 public class DistributeServer {
@@ -40,5 +41,10 @@ public class DistributeServer {
     public static void main(String[] args) {
         DistributeServer distributeServer = new DistributeServer();
         distributeServer.initialize();
+
+//        DistributeServerHearken distributeServerHearken = new DistributeServerHearken(Integer.valueOf(distributeServer.settingsCenter.getSetting("Network", "Port")));
+        DistributeServerHearken distributeServerHearken = new DistributeServerHearken(22);
+        distributeServerHearken.checkAndStart();
+        LogUtility.logUtility().log2out("WebSocket Start Listening");
     }
 }

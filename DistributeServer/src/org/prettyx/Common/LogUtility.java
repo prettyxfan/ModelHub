@@ -189,8 +189,8 @@ public class LogUtility {
         }
         try {
             file.write( prefixTime() + " [INFO]\t" +
-                      "[" + Thread.currentThread().getStackTrace()[2].getClassName() + " - " +
-                            Thread.currentThread().getStackTrace()[2].getMethodName() + "] " + "\t\t"
+                      "[" + Thread.currentThread().getStackTrace()[3].getClassName() + " - " +
+                            Thread.currentThread().getStackTrace()[3].getMethodName() + "] " + "\t\t"
                           + message + "\n" );
             file.flush();
         } catch (IOException e) {
@@ -210,8 +210,8 @@ public class LogUtility {
         }
         try {
             file.write( prefixTime() + " [ERROR]\t" +
-                       "[" + Thread.currentThread().getStackTrace()[2].getClassName() + " - " +
-                             Thread.currentThread().getStackTrace()[2].getMethodName() + "] " + "\t\t"
+                       "[" + Thread.currentThread().getStackTrace()[3].getClassName() + " - " +
+                             Thread.currentThread().getStackTrace()[3].getMethodName() + "] " + "\t\t"
                            + message + "\n" );
             file.flush();
         } catch (IOException e) {
@@ -230,8 +230,8 @@ public class LogUtility {
             return;
         }
         stdOut.print( prefixTime() + " [INFO]\t" +
-                    "[" + Thread.currentThread().getStackTrace()[2].getClassName() + " - " +
-                          Thread.currentThread().getStackTrace()[2].getMethodName() + "] " + "\t\t"
+                    "[" + Thread.currentThread().getStackTrace()[3].getClassName() + " - " +
+                          Thread.currentThread().getStackTrace()[3].getMethodName() + "] " + "\t\t"
                         + message + "\n" );
         stdOut.flush();
 
@@ -248,8 +248,8 @@ public class LogUtility {
             return;
         }
         stdErr.print( prefixTime() + " [ERROR]\t" +
-                    "[" + Thread.currentThread().getStackTrace()[2].getClassName() + " - " +
-                          Thread.currentThread().getStackTrace()[2].getMethodName() + "] " + "\t\t"
+                    "[" + Thread.currentThread().getStackTrace()[3].getClassName() + " - " +
+                          Thread.currentThread().getStackTrace()[3].getMethodName() + "] " + "\t\t"
                         + message + "\n" );
         stdErr.flush();
     }
