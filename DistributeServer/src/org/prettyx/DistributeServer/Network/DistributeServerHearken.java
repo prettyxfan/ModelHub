@@ -29,7 +29,7 @@ public class DistributeServerHearken extends WebSocketServer{
 
     public DistributeServerHearken( int port ) {
         super( new InetSocketAddress( port ) );
-        LogUtility.logUtility().log2out("Initializing WebSocket Listener.");
+        LogUtility.logUtility().log2out("Initializing WebSocket Hearken.");
     }
 
     @Override
@@ -66,6 +66,7 @@ public class DistributeServerHearken extends WebSocketServer{
             return StatusCodes.FAIL;
         }
         start();
+        LogUtility.logUtility().log2out("WebSocket Hearken Started!");
         return StatusCodes.SUCCESS;
     }
 

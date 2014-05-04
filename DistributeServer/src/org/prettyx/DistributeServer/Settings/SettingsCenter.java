@@ -160,8 +160,9 @@ public class SettingsCenter {
         // Check Directories
         File basePath = new File(System.getProperty("user.home") + DefaultSettings.Init_BasePath);
         File logPath = new File(System.getProperty("user.home") + DefaultSettings.Init_LogPathPath);
+        File runtimePath = new File(System.getProperty("user.home") + DefaultSettings.Init_RuntimePathPath);
 
-        if (basePath.isDirectory() && logPath.isDirectory()) {
+        if (basePath.isDirectory() && logPath.isDirectory() && runtimePath.isDirectory()) {
             return StatusCodes.SUCCESS;
         }
 
@@ -192,6 +193,14 @@ public class SettingsCenter {
         File logPath = new File(System.getProperty("user.home") + DefaultSettings.Init_LogPathPath);
         if (!logPath.isDirectory()) {
             if (!logPath.mkdirs()) {
+                return StatusCodes.FAIL;
+            }
+        }
+
+        // Install RuntimePath
+        File runtimePath = new File(System.getProperty("user.home") + DefaultSettings.Init_RuntimePathPath);
+        if (!runtimePath.isDirectory()) {
+            if (!runtimePath.mkdirs()) {
                 return StatusCodes.FAIL;
             }
         }

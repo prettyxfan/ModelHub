@@ -23,10 +23,14 @@ public class DefaultSettings {
     public static String Init_BasePath = "/.MIMS";
     public static String Init_DistributeServerConfigFileNAME = "DistributeServer.xml";
     public static String Init_DistributeServerConfigFilePath = Init_BasePath + "/" + Init_DistributeServerConfigFileNAME;
-    public static String Init_LogPathName = "log";
+
+    public static String Init_LogPathName = "Log";
     public static String Init_LogPathPath = Init_BasePath + "/" + Init_LogPathName;
     public static String Init_DistributeServerLogFileName = "DistributeServer.log";
     public static String Init_DistributeServerLogFilePath = Init_LogPathPath + "/" + Init_DistributeServerLogFileName;
+
+    public static String Init_RuntimePathName = "Runtime";
+    public static String Init_RuntimePathPath = Init_BasePath + "/" + Init_RuntimePathName;
 
 
     /* Different Categories of Configurations */

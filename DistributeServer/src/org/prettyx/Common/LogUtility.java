@@ -188,10 +188,10 @@ public class LogUtility {
             return;
         }
         try {
-            file.write( prefixTime() + " [INFO]\t" +
-                      "[" + Thread.currentThread().getStackTrace()[3].getClassName() + " - " +
-                            Thread.currentThread().getStackTrace()[3].getMethodName() + "] " + "\t\t"
-                          + message + "\n" );
+            file.write( prefixTime() + " [INFO] " +
+                        "[" + formatStringToSeventy(Thread.currentThread().getStackTrace()[3].getClassName() + " - " +
+                                                Thread.currentThread().getStackTrace()[3].getMethodName()) + "] " + "\t"
+                        + message + "\n" );
             file.flush();
         } catch (IOException e) {
             log2stdErr(e.getMessage());
@@ -209,10 +209,10 @@ public class LogUtility {
             return;
         }
         try {
-            file.write( prefixTime() + " [ERROR]\t" +
-                       "[" + Thread.currentThread().getStackTrace()[3].getClassName() + " - " +
-                             Thread.currentThread().getStackTrace()[3].getMethodName() + "] " + "\t\t"
-                           + message + "\n" );
+            file.write( prefixTime() + " [ERROR]" +
+                        "[" + formatStringToSeventy(Thread.currentThread().getStackTrace()[3].getClassName() + " - " +
+                                                Thread.currentThread().getStackTrace()[3].getMethodName()) + "] " + "\t"
+                            + message + "\n" );
             file.flush();
         } catch (IOException e) {
             log2stdErr(e.getMessage());
@@ -229,9 +229,9 @@ public class LogUtility {
         if (level == -1) {
             return;
         }
-        stdOut.print( prefixTime() + " [INFO]\t" +
-                    "[" + Thread.currentThread().getStackTrace()[3].getClassName() + " - " +
-                          Thread.currentThread().getStackTrace()[3].getMethodName() + "] " + "\t\t"
+        stdOut.print( prefixTime() + " [INFO] " +
+                    "[" + formatStringToSeventy(Thread.currentThread().getStackTrace()[3].getClassName() + " - " +
+                                            Thread.currentThread().getStackTrace()[3].getMethodName()) + "] " + "\t"
                         + message + "\n" );
         stdOut.flush();
 
@@ -247,9 +247,9 @@ public class LogUtility {
         if (level == -1) {
             return;
         }
-        stdErr.print( prefixTime() + " [ERROR]\t" +
-                    "[" + Thread.currentThread().getStackTrace()[3].getClassName() + " - " +
-                          Thread.currentThread().getStackTrace()[3].getMethodName() + "] " + "\t\t"
+        stdErr.print( prefixTime() + " [ERROR]" +
+                    "[" + formatStringToSeventy(Thread.currentThread().getStackTrace()[3].getClassName() + " - " +
+                                            Thread.currentThread().getStackTrace()[3].getMethodName()) + "] " + "\t"
                         + message + "\n" );
         stdErr.flush();
     }
@@ -267,4 +267,28 @@ public class LogUtility {
         return dateFormat.format(now);
     }
 
+    /**
+     * Format String to Seventy Byte Length
+     * @param source
+     *              source String to format
+     * @return String
+     */
+    private String formatStringToSeventy(String source){
+
+        int targetLength = 70;
+
+        int length = source.length();
+
+        if (length <= targetLength) {
+            int fillUp = targetLength - length;
+            for (int i=0; i<fillUp; i++) {
+                source =  " " + source;
+            }
+        } else {
+            int cutUp = length - targetLength;
+            source = source.substring(cutUp, length);
+        }
+
+        return source;
+    }
 }
