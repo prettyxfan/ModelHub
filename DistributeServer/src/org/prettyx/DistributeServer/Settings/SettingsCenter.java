@@ -57,29 +57,34 @@ public class SettingsCenter {
             }
         }
 
+        if (isEnvironmentOK() == StatusCodes.FAIL) {
+            System.out.println("Error Happens, Check and Restart...");
+            System.exit(-1);
+        }
+
         // Set the Fixed Init Settings
-        settingsMap.put("Init.Kind", DefaultSettings.Init_Kind);
+        settingsMap.put("Init.Kind", DefaultConfs.Init_Kind);
         settingsMap.put("Init.BasePath", System.getProperty("user.home") +
-                DefaultSettings.Init_BasePath);
+                DefaultConfs.Init_BasePath);
         settingsMap.put("Init.DistributeServerConfigFileNAME", System.getProperty("user.home") +
-                DefaultSettings.Init_DistributeServerConfigFileNAME);
+                DefaultConfs.Init_DistributeServerConfigFileNAME);
         settingsMap.put("Init.DistributeServerConfigFilePath", System.getProperty("user.home") +
-                DefaultSettings.Init_DistributeServerConfigFilePath);
+                DefaultConfs.Init_DistributeServerConfigFilePath);
         settingsMap.put("Init.LogPathName", System.getProperty("user.home") +
-                DefaultSettings.Init_LogPathName);
+                DefaultConfs.Init_LogPathName);
         settingsMap.put("Init.LogPathPath", System.getProperty("user.home") +
-                DefaultSettings.Init_LogPathPath);
+                DefaultConfs.Init_LogPathPath);
         settingsMap.put("Init.DistributeServerLogFileName", System.getProperty("user.home") +
-                DefaultSettings.Init_DistributeServerLogFileName);
+                DefaultConfs.Init_DistributeServerLogFileName);
         settingsMap.put("Init.DistributeServerLogFilePath", System.getProperty("user.home") +
-                DefaultSettings.Init_DistributeServerLogFilePath);
+                DefaultConfs.Init_DistributeServerLogFilePath);
 
 
         // Load Configurations
         Map configuresMap = null;
         try {
             configuresMap = XMLParser.parserXmlFromFile(System.getProperty("user.home") +
-                                                        DefaultSettings.Init_DistributeServerConfigFilePath);
+                                                        DefaultConfs.Init_DistributeServerConfigFilePath);
         } catch (Exception e) {
             LogUtility.logUtility().log2err(e.getMessage());
             return StatusCodes.FAIL;
@@ -108,7 +113,7 @@ public class SettingsCenter {
         }
 
         // Check Log File Exists
-        File logFile = new File(System.getProperty("user.home") + DefaultSettings.Init_LogPathPath);
+        File logFile = new File(System.getProperty("user.home") + DefaultConfs.Init_LogPathPath);
         if (!logFile.exists()) {
             return StatusCodes.FILE_NOT_FOUND;
         }
@@ -117,7 +122,7 @@ public class SettingsCenter {
         String logLevel = (String) settingsMap.get("Running.LogLevel");
         if (logLevel != null) {
             LogUtility.logUtility().configure(System.getProperty("user.home") +
-                                                DefaultSettings.Init_DistributeServerLogFilePath,
+                                                DefaultConfs.Init_DistributeServerLogFilePath,
                                                                                         Integer.valueOf(logLevel));
             LogUtility.logUtility().log2out("Application is Starting!");
             LogUtility.logUtility().log2out("Configurations load successfully.");
@@ -127,7 +132,7 @@ public class SettingsCenter {
     }
 
     /**
-     * Get Settings from defaultSettingsMap
+     * Get Settings from DefaultConfsMapDistributeServer
      * @return string_value/null
      */
     public String getSetting(String category, String item){
@@ -137,7 +142,7 @@ public class SettingsCenter {
             String value = (String) settingsMap.get(category + "." + item);
 
             if (value == null || value.isEmpty()){
-                value = (String) DefaultSettings.defaultSettingsMap.get(category + "." + item);
+                value = (String) DefaultConfs.defaultSettingsMapDistributeServer.get(category + "." + item);
             }
 
             LogUtility.logUtility().log2out("GetSetting, key:" + category + "." + item + " value:" + value);
@@ -157,17 +162,44 @@ public class SettingsCenter {
      */
     private int isConfigured(){
 
+        // Check Files
+        File configFile = new File(System.getProperty("user.home") + DefaultConfs.Init_DistributeServerConfigFilePath);
         // Check Directories
-        File basePath = new File(System.getProperty("user.home") + DefaultSettings.Init_BasePath);
-        File logPath = new File(System.getProperty("user.home") + DefaultSettings.Init_LogPathPath);
-        File runtimePath = new File(System.getProperty("user.home") + DefaultSettings.Init_RuntimePathPath);
+        File basePath = new File(System.getProperty("user.home") + DefaultConfs.Init_BasePath);
+        File logPath = new File(System.getProperty("user.home") + DefaultConfs.Init_LogPathPath);
+        File runtimePath = new File(System.getProperty("user.home") + DefaultConfs.Init_RuntimePathPath);
 
-        if (basePath.isDirectory() && logPath.isDirectory() && runtimePath.isDirectory()) {
+        if (basePath.isDirectory() && logPath.isDirectory() && runtimePath.isDirectory()
+                && configFile.isFile()) {
             return StatusCodes.SUCCESS;
         }
 
 
         return StatusCodes.FAIL;
+    }
+
+    /**
+     * Check System Runtime Environment
+     *
+     * @return SUCCESS/FAIL
+     */
+    private int isEnvironmentOK(){
+
+        if (System.getProperty("java.home")  == null) {
+            System.out.println("You need to install the latest JDK and set 'JAVA_HOME' to your JDK install directory.\n"
+                    + "Please start again ...");
+            return StatusCodes.FAIL;
+        }
+
+        try{
+            String.class.getMethod("isEmpty", (Class[])null);
+        } catch (Exception e) {
+            System.out.println("You are using an older Java version, however JDK 1.6 is needed!\n" +
+                    "Please install the right JDK, start again ...");
+            return StatusCodes.FAIL;
+        }
+
+        return StatusCodes.SUCCESS;
     }
 
     /**
@@ -179,10 +211,10 @@ public class SettingsCenter {
 
         System.out.println("Application starts first time.");
         System.out.println("Installing application support files will be in " +
-                                System.getProperty("user.home") + DefaultSettings.Init_BasePath);
+                                System.getProperty("user.home") + DefaultConfs.Init_BasePath);
 
         // Install Init_BasePath
-        File basePath = new File(System.getProperty("user.home") + DefaultSettings.Init_BasePath);
+        File basePath = new File(System.getProperty("user.home") + DefaultConfs.Init_BasePath);
         if (!basePath.isDirectory()) {
             if (!basePath.mkdirs()) {
                 return StatusCodes.FAIL;
@@ -190,7 +222,7 @@ public class SettingsCenter {
         }
 
         // Install LogPath
-        File logPath = new File(System.getProperty("user.home") + DefaultSettings.Init_LogPathPath);
+        File logPath = new File(System.getProperty("user.home") + DefaultConfs.Init_LogPathPath);
         if (!logPath.isDirectory()) {
             if (!logPath.mkdirs()) {
                 return StatusCodes.FAIL;
@@ -198,7 +230,7 @@ public class SettingsCenter {
         }
 
         // Install RuntimePath
-        File runtimePath = new File(System.getProperty("user.home") + DefaultSettings.Init_RuntimePathPath);
+        File runtimePath = new File(System.getProperty("user.home") + DefaultConfs.Init_RuntimePathPath);
         if (!runtimePath.isDirectory()) {
             if (!runtimePath.mkdirs()) {
                 return StatusCodes.FAIL;
@@ -209,16 +241,16 @@ public class SettingsCenter {
         try {
             InputStream inputStream = Thread.currentThread().getClass().
                                             getResourceAsStream("/org/prettyx/Resource/" +
-                                                    DefaultSettings.Init_DistributeServerConfigFileNAME);
+                                                    DefaultConfs.Init_DistributeServerConfigFileNAME);
 
             File outputFile = new File(System.getProperty("user.home") +
-                                                    DefaultSettings.Init_DistributeServerConfigFilePath);
+                                                    DefaultConfs.Init_DistributeServerConfigFilePath);
             outputFile.createNewFile();
             if (!outputFile.exists()) {
                 return StatusCodes.FAIL;
             }
             OutputStream outputStream = new FileOutputStream(System.getProperty("user.home") +
-                                                                DefaultSettings.Init_DistributeServerConfigFilePath);
+                                                                DefaultConfs.Init_DistributeServerConfigFilePath);
             byte[] bytes = new byte[1];
             while (inputStream.read(bytes) != -1) {
                 outputStream.write(bytes);
