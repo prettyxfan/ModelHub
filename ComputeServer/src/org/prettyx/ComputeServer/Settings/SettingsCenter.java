@@ -60,35 +60,15 @@ public class SettingsCenter {
 
         if (isEnvironmentOK() == StatusCodes.FAIL) {
             System.out.println("Error Happens, Check and Restart...");
-            System.exit(-1);
-        }
+            return StatusCodes.FAIL;
+        }        Iterator itf = null;
+
 
         // Set the Fixed Init Settings
-        settingsMap.put("Init.Kind", DefaultConfs.Init_Kind);
-        settingsMap.put("Init.BasePath", DEPF.userHome() + DefaultConfs.Init_BasePath);
-        settingsMap.put("Init.ComputeServerConfigFileNAME", DEPF.userHome() + DefaultConfs.Init_ComputeServerConfigFileNAME);
-        settingsMap.put("Init.ComputeServerConfigFilePath", DEPF.userHome() + DefaultConfs.Init_ComputeServerConfigFilePath);
-        settingsMap.put("Init.LogPathName", DEPF.userHome() + DefaultConfs.Init_LogPathName);
-        settingsMap.put("Init.LogPathPath", DEPF.userHome() + DefaultConfs.Init_LogPathPath);
-        settingsMap.put("Init.ComputeServerLogFileName", DEPF.userHome() + DefaultConfs.Init_ComputeServerLogFileName);
-        settingsMap.put("Init.ComputeServerLogFilePath", DEPF.userHome() + DefaultConfs.Init_ComputeServerLogFilePath);
-
-
-        // Load Configurations
-        Map configuresMap = null;
         try {
-            configuresMap = XMLParser.parserXmlFromFile(DEPF.userHome() + DefaultConfs.Init_ComputeServerConfigFilePath);
-        } catch (Exception e) {
-            LogUtility.logUtility().log2err(e.getMessage());
-            return StatusCodes.FAIL;
-        }
-
-        // Set the Alterable Settings
-        Iterator iterator = null;
-        try {
-            iterator = configuresMap.entrySet().iterator();
-            while (iterator.hasNext()){
-                Map.Entry entry = (Map.Entry)iterator.next();
+            itf = DefaultConfs.fixSettingsMap.entrySet().iterator();
+            while (itf.hasNext()){
+                Map.Entry entry = (Map.Entry)itf.next();
                 String key = (String) entry.getKey();
                 String value = (String) entry.getValue();
 
@@ -101,21 +81,56 @@ public class SettingsCenter {
                 settingsMap.put(key, value);
             }
         } catch (NullPointerException e) {
-            LogUtility.logUtility().log2err(e.getMessage());
+            System.out.println("Load Settings Failed, Check and Restart...");
+            return StatusCodes.FAIL;
+        }
+
+        //TODO NOT COMMON
+        // Load Configurations
+        Map configuresMap = null;
+        try {
+            configuresMap = XMLParser.parserXmlFromFile(DEPF.userHome() +
+                                            DefaultConfs.fixSettingsMap.get("Init.ComputeServerConfigFilePath"));
+        } catch (Exception e) {
+            System.out.println("Load Conf File Failed, Check and Restart...");
+            return StatusCodes.FAIL;
+        }
+
+        // Set the Alterable Settings
+        Iterator ita = null;
+        try {
+            ita = configuresMap.entrySet().iterator();
+            while (ita.hasNext()){
+                Map.Entry entry = (Map.Entry)ita.next();
+                String key = (String) entry.getKey();
+                String value = (String) entry.getValue();
+
+                String[] keyBreak = key.split("/");
+
+                if (keyBreak.length >= 4) {
+                    key = keyBreak[2] + "." + keyBreak[3];
+                }
+
+                settingsMap.put(key, value);
+            }
+        } catch (NullPointerException e) {
+            System.out.println("Load Settings Failed, Check and Restart...");
             return StatusCodes.FAIL;
         }
 
         // Check Log File Exists
-        File logFile = new File(DEPF.userHome() + DefaultConfs.Init_LogPathPath);
+        File logFile = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.LogPathPath"));
         if (!logFile.exists()) {
             return StatusCodes.FILE_NOT_FOUND;
         }
 
+        //TODO NOT COMMON
         // Init the LogUtility
         String logLevel = (String) settingsMap.get("Running.LogLevel");
         if (logLevel != null) {
             LogUtility.logUtility().configure(DEPF.userHome() +
-                                                DefaultConfs.Init_ComputeServerLogFilePath, Integer.valueOf(logLevel));
+                                                DefaultConfs.fixSettingsMap.get("Init.ComputeServerLogFilePath"),
+                                                Integer.valueOf(logLevel));
             LogUtility.logUtility().log2out("Application is Starting!");
             LogUtility.logUtility().log2out("Configurations load successfully.");
         }
@@ -123,6 +138,7 @@ public class SettingsCenter {
         return StatusCodes.SUCCESS;
     }
 
+    //TODO NOT COMMON
     /**
      * Get Settings from defaultSettingsMapComputeServer
      * @return string_value/null
@@ -154,14 +170,15 @@ public class SettingsCenter {
      */
     private int isInstalled(){
 
+        //TODO NOT COMMON
         // Check Files
-        File configFile = new File(DEPF.userHome() + DefaultConfs.Init_ComputeServerConfigFilePath);
+        File configFile = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.ComputeServerConfigFilePath"));
 
         // Check Directories
-        File basePath = new File(DEPF.userHome() + DefaultConfs.Init_BasePath);
-        File logPath = new File(DEPF.userHome() + DefaultConfs.Init_LogPathPath);
-        File runtimePath = new File(DEPF.userHome() + DefaultConfs.Init_RuntimePathPath);
-        File runtimeOMSPath = new File(DEPF.userHome() + DefaultConfs.Init_RuntimeOMSPathPath);
+        File basePath = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.BasePath"));
+        File logPath = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.LogPathPath"));
+        File runtimePath = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.RuntimePathPath"));
+        File runtimeOMSPath = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.RuntimeOMSPathPath"));
 
         if (
             // Files
@@ -212,10 +229,10 @@ public class SettingsCenter {
 
         System.out.println("Application starts first time.");
         System.out.println("Installing application support files will be in " +
-                                DEPF.userHome() + DefaultConfs.Init_BasePath);
+                                DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.BasePath"));
 
         // Install Init_BasePath
-        File basePath = new File(DEPF.userHome() + DefaultConfs.Init_BasePath);
+        File basePath = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.BasePath"));
         if (!basePath.isDirectory()) {
             if (!basePath.mkdirs()) {
                 return StatusCodes.FAIL;
@@ -223,7 +240,7 @@ public class SettingsCenter {
         }
 
         // Install LogPath
-        File logPath = new File(DEPF.userHome() + DefaultConfs.Init_LogPathPath);
+        File logPath = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.LogPathPath"));
         if (!logPath.isDirectory()) {
             if (!logPath.mkdirs()) {
                 return StatusCodes.FAIL;
@@ -231,29 +248,32 @@ public class SettingsCenter {
         }
 
         // Install RuntimePath
-        File runtimePath = new File(DEPF.userHome() + DefaultConfs.Init_RuntimePathPath);
+        File runtimePath = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.RuntimePathPath"));
         if (!runtimePath.isDirectory()) {
             if (!runtimePath.mkdirs()) {
                 return StatusCodes.FAIL;
             }
         }
-        File runtimeOMSPath = new File(DEPF.userHome() + DefaultConfs.Init_RuntimeOMSPathPath);
+        File runtimeOMSPath = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.RuntimeOMSPathPath"));
         if (!runtimeOMSPath.isDirectory()) {
             if (!runtimeOMSPath.mkdirs()) {
                 return StatusCodes.FAIL;
             }
         }
 
+        //TODO NOT COMMON
         // Install ComputeServer DefaultConfigFile
         try {
-            File outputFile = new File(DEPF.userHome() + DefaultConfs.Init_ComputeServerConfigFilePath);
+            File outputFile = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.ComputeServerConfigFilePath"));
             outputFile.createNewFile();
             if (!outputFile.exists()) {
                 return StatusCodes.FAIL;
             }
 
-            InputStream inputStream = DEPF.getResourceStream(DefaultConfs.Init_ComputeServerConfigFileNAME);
-            OutputStream outputStream = new FileOutputStream(DEPF.userHome() + DefaultConfs.Init_ComputeServerConfigFilePath);
+            InputStream inputStream = DEPF.getResourceStream((String)
+                                                DefaultConfs.fixSettingsMap.get("Init.ComputeServerConfigFileNAME"));
+            OutputStream outputStream = new FileOutputStream(DEPF.userHome() +
+                                                DefaultConfs.fixSettingsMap.get("Init.ComputeServerConfigFilePath"));
 
             DEPF.copyFile(inputStream, outputStream);
 
@@ -266,7 +286,7 @@ public class SettingsCenter {
 
         // Install OMS Depends Jars
         try {
-            File omsRuntimePath = new File(DEPF.userHome() + DefaultConfs.Init_RuntimeOMSPathPath);
+            File omsRuntimePath = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.RuntimeOMSPathPath"));
             omsRuntimePath.createNewFile();
             if (!omsRuntimePath.exists()) {
                 return StatusCodes.FAIL;
@@ -284,7 +304,7 @@ public class SettingsCenter {
 
                 InputStream inputStream = DEPF.getResourceStream("oms" + "/" + jar);
                 OutputStream outputStream = new FileOutputStream(DEPF.userHome() +
-                                                                    DefaultConfs.Init_RuntimeOMSPathPath + "/" + jar);
+                                                DefaultConfs.fixSettingsMap.get("Init.RuntimeOMSPathPath") + "/" + jar);
 
                 DEPF.copyFile(inputStream, outputStream);
 
@@ -292,9 +312,8 @@ public class SettingsCenter {
                 outputStream.close();
             }
 
-
-
         } catch (Exception e) {
+            System.out.println("Install Failed!");
             e.printStackTrace();
             return StatusCodes.FAIL;
         }

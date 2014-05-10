@@ -18,25 +18,27 @@ import java.util.Map;
  */
 public class DefaultConfs {
     /* Init Settings, Cannot Be Override */
-    public static String Init_Kind = "ComputeServer";
+    protected static Map fixSettingsMap = new HashMap<String, String>() {{
 
-    public static String Init_BasePath = "/.MIMS";
-    public static String Init_DistributeServerConfigFileNAME = "DistributeServer.xml";
-    public static String Init_DistributeServerConfigFilePath = Init_BasePath + "/" + Init_DistributeServerConfigFileNAME;
-    public static String Init_ComputeServerConfigFileNAME = "ComputeServer.xml";
-    public static String Init_ComputeServerConfigFilePath = Init_BasePath + "/" + Init_ComputeServerConfigFileNAME;
+        put("Init.BasePath", "/.MIMS");
 
-    public static String Init_LogPathName = "Log";
-    public static String Init_LogPathPath = Init_BasePath + "/" + Init_LogPathName;
-    public static String Init_DistributeServerLogFileName = "DistributeServer.log";
-    public static String Init_DistributeServerLogFilePath = Init_LogPathPath + "/" + Init_DistributeServerLogFileName;
-    public static String Init_ComputeServerLogFileName = "ComputeServer.log";
-    public static String Init_ComputeServerLogFilePath = Init_LogPathPath + "/" + Init_ComputeServerLogFileName;
+        put("Init.DistributeServerConfigFileNAME", "DistributeServer.xml");
+        put("Init.DistributeServerConfigFilePath", "/.MIMS/DistributeServer.xml");
+        put("Init.ComputeServerConfigFileNAME", "ComputeServer.xml");
+        put("Init.ComputeServerConfigFilePath", "/.MIMS/ComputeServer.xml");
 
-    public static String Init_RuntimePathName = "Runtime";
-    public static String Init_RuntimePathPath = Init_BasePath + "/" + Init_RuntimePathName;
-    public static String Init_RuntimeOMSPathName = "OMS3";
-    public static String Init_RuntimeOMSPathPath = Init_RuntimePathPath + "/" + Init_RuntimeOMSPathName;
+        put("Init.LogPathName", "Log");
+        put("Init.LogPathPath", "/.MIMS/Log");
+        put("Init.DistributeServerLogFileName", "DistributeServer.log");
+        put("Init.DistributeServerLogFilePath",  "/.MIMS/Log/DistributeServer.log");
+        put("Init.ComputeServerLogFileName", "ComputeServer.log");
+        put("Init.ComputeServerLogFilePath", "/.MIMS/Log/ComputeServer.log");
+
+        put("Init.RuntimePathName", "Runtime");
+        put("Init.RuntimePathPath", "/.MIMS/Runtime");
+        put("Init.RuntimeOMSPathName", "OMS3");
+        put("Init.RuntimeOMSPathPath", "/.MIMS/Runtime/OMS3");
+    }};
 
 
     /* Different Categories of Configurations */
@@ -52,6 +54,7 @@ public class DefaultConfs {
     protected static Map defaultSettingsMapComputeServer = new HashMap<String, String>(){{
 
         // Running Settings
+        put("Init.Kind", "DistributeServer");
         put("Running.ServerName", "PrettyX_Compute");
         put("Running.LogLevel", "3");
 

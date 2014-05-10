@@ -9,6 +9,7 @@
 // +----------------------------------------------------------------------
 package org.prettyx.DistributeServer.Settings;
 
+import org.prettyx.Common.DEPF;
 import org.prettyx.Common.LogUtility;
 import org.prettyx.Common.StatusCodes;
 import org.prettyx.Common.XMLParser;
@@ -51,51 +52,23 @@ public class SettingsCenter {
      */
     @SuppressWarnings("unchecked")
     public int loadSettings(){
-        if (isConfigured() == StatusCodes.FAIL) {
-            if (installConfigurations() == StatusCodes.FAIL) {
+        if (isInstalled() == StatusCodes.FAIL) {
+            if (install() == StatusCodes.FAIL) {
                 return StatusCodes.FAIL;
             }
         }
 
         if (isEnvironmentOK() == StatusCodes.FAIL) {
             System.out.println("Error Happens, Check and Restart...");
-            System.exit(-1);
-        }
-
-        // Set the Fixed Init Settings
-        settingsMap.put("Init.Kind", DefaultConfs.Init_Kind);
-        settingsMap.put("Init.BasePath", System.getProperty("user.home") +
-                DefaultConfs.Init_BasePath);
-        settingsMap.put("Init.DistributeServerConfigFileNAME", System.getProperty("user.home") +
-                DefaultConfs.Init_DistributeServerConfigFileNAME);
-        settingsMap.put("Init.DistributeServerConfigFilePath", System.getProperty("user.home") +
-                DefaultConfs.Init_DistributeServerConfigFilePath);
-        settingsMap.put("Init.LogPathName", System.getProperty("user.home") +
-                DefaultConfs.Init_LogPathName);
-        settingsMap.put("Init.LogPathPath", System.getProperty("user.home") +
-                DefaultConfs.Init_LogPathPath);
-        settingsMap.put("Init.DistributeServerLogFileName", System.getProperty("user.home") +
-                DefaultConfs.Init_DistributeServerLogFileName);
-        settingsMap.put("Init.DistributeServerLogFilePath", System.getProperty("user.home") +
-                DefaultConfs.Init_DistributeServerLogFilePath);
-
-
-        // Load Configurations
-        Map configuresMap = null;
-        try {
-            configuresMap = XMLParser.parserXmlFromFile(System.getProperty("user.home") +
-                                                        DefaultConfs.Init_DistributeServerConfigFilePath);
-        } catch (Exception e) {
-            LogUtility.logUtility().log2err(e.getMessage());
             return StatusCodes.FAIL;
         }
 
-        // Set the Alterable Settings
-        Iterator iterator = null;
+        // Set the Fixed Init Settings
+        Iterator itf = null;
         try {
-            iterator = configuresMap.entrySet().iterator();
-            while (iterator.hasNext()){
-                Map.Entry entry = (Map.Entry)iterator.next();
+            itf = DefaultConfs.fixSettingsMap.entrySet().iterator();
+            while (itf.hasNext()){
+                Map.Entry entry = (Map.Entry)itf.next();
                 String key = (String) entry.getKey();
                 String value = (String) entry.getValue();
 
@@ -108,12 +81,45 @@ public class SettingsCenter {
                 settingsMap.put(key, value);
             }
         } catch (NullPointerException e) {
-            LogUtility.logUtility().log2err(e.getMessage());
+            System.out.println("Load Settings Failed, Check and Restart...");
+            return StatusCodes.FAIL;
+        }
+
+        //TODO NOT COMMON
+        // Load Configurations
+        Map configuresMap = null;
+        try {
+            configuresMap = XMLParser.parserXmlFromFile(DEPF.userHome() + 
+                                            DefaultConfs.fixSettingsMap.get("Init.DistributeServerConfigFilePath"));
+        } catch (Exception e) {
+            System.out.println("Load Conf File Failed, Check and Restart...");
+            return StatusCodes.FAIL;
+        }
+
+        // Set the Alterable Settings
+        Iterator ita = null;
+        try {
+            ita = configuresMap.entrySet().iterator();
+            while (ita.hasNext()){
+                Map.Entry entry = (Map.Entry)ita.next();
+                String key = (String) entry.getKey();
+                String value = (String) entry.getValue();
+
+                String[] keyBreak = key.split("/");
+
+                if (keyBreak.length >= 4) {
+                    key = keyBreak[2] + "." + keyBreak[3];
+                }
+
+                settingsMap.put(key, value);
+            }
+        } catch (NullPointerException e) {
+            System.out.println("Load Settings Failed, Check and Restart...");
             return StatusCodes.FAIL;
         }
 
         // Check Log File Exists
-        File logFile = new File(System.getProperty("user.home") + DefaultConfs.Init_LogPathPath);
+        File logFile = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.LogPathPath"));
         if (!logFile.exists()) {
             return StatusCodes.FILE_NOT_FOUND;
         }
@@ -121,9 +127,9 @@ public class SettingsCenter {
         // Init the LogUtility
         String logLevel = (String) settingsMap.get("Running.LogLevel");
         if (logLevel != null) {
-            LogUtility.logUtility().configure(System.getProperty("user.home") +
-                                                DefaultConfs.Init_DistributeServerLogFilePath,
-                                                                                        Integer.valueOf(logLevel));
+            LogUtility.logUtility().configure(DEPF.userHome() +
+                                                DefaultConfs.fixSettingsMap.get("Init.DistributeServerLogFilePath"),
+                                                Integer.valueOf(logLevel));
             LogUtility.logUtility().log2out("Application is Starting!");
             LogUtility.logUtility().log2out("Configurations load successfully.");
         }
@@ -131,6 +137,7 @@ public class SettingsCenter {
         return StatusCodes.SUCCESS;
     }
 
+    //TODO NOT COMMON
     /**
      * Get Settings from DefaultConfsMapDistributeServer
      * @return string_value/null
@@ -160,17 +167,27 @@ public class SettingsCenter {
      *
      * @return SUCCESS/FAIL
      */
-    private int isConfigured(){
+    private int isInstalled(){
 
+        //TODO NOT COMMON
         // Check Files
-        File configFile = new File(System.getProperty("user.home") + DefaultConfs.Init_DistributeServerConfigFilePath);
-        // Check Directories
-        File basePath = new File(System.getProperty("user.home") + DefaultConfs.Init_BasePath);
-        File logPath = new File(System.getProperty("user.home") + DefaultConfs.Init_LogPathPath);
-        File runtimePath = new File(System.getProperty("user.home") + DefaultConfs.Init_RuntimePathPath);
+        File configFile = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.DistributeServerConfigFilePath"));
 
-        if (basePath.isDirectory() && logPath.isDirectory() && runtimePath.isDirectory()
-                && configFile.isFile()) {
+        // Check Directories
+        File basePath = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.BasePath"));
+        File logPath = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.LogPathPath"));
+        File runtimePath = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.RuntimePathPath"));
+        File runtimeOMSPath = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.RuntimeOMSPathPath"));
+
+        if (
+            // Files
+                configFile.isFile() &&
+            // Directories
+                basePath.isDirectory() &&
+                logPath.isDirectory() &&
+                runtimePath.isDirectory() &&
+                runtimeOMSPath.isDirectory()
+                ) {
             return StatusCodes.SUCCESS;
         }
 
@@ -185,7 +202,7 @@ public class SettingsCenter {
      */
     private int isEnvironmentOK(){
 
-        if (System.getProperty("java.home")  == null) {
+        if (DEPF.javaHome()  == null) {
             System.out.println("You need to install the latest JDK and set 'JAVA_HOME' to your JDK install directory.\n"
                     + "Please start again ...");
             return StatusCodes.FAIL;
@@ -207,14 +224,14 @@ public class SettingsCenter {
      *
      * @return SUCCESS/FAIL
      */
-    private int installConfigurations(){
+    private int install(){
 
         System.out.println("Application starts first time.");
         System.out.println("Installing application support files will be in " +
-                                System.getProperty("user.home") + DefaultConfs.Init_BasePath);
+                                DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.BasePath"));
 
         // Install Init_BasePath
-        File basePath = new File(System.getProperty("user.home") + DefaultConfs.Init_BasePath);
+        File basePath = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.BasePath"));
         if (!basePath.isDirectory()) {
             if (!basePath.mkdirs()) {
                 return StatusCodes.FAIL;
@@ -222,7 +239,7 @@ public class SettingsCenter {
         }
 
         // Install LogPath
-        File logPath = new File(System.getProperty("user.home") + DefaultConfs.Init_LogPathPath);
+        File logPath = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.LogPathPath"));
         if (!logPath.isDirectory()) {
             if (!logPath.mkdirs()) {
                 return StatusCodes.FAIL;
@@ -230,31 +247,34 @@ public class SettingsCenter {
         }
 
         // Install RuntimePath
-        File runtimePath = new File(System.getProperty("user.home") + DefaultConfs.Init_RuntimePathPath);
+        File runtimePath = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.RuntimePathPath"));
         if (!runtimePath.isDirectory()) {
             if (!runtimePath.mkdirs()) {
                 return StatusCodes.FAIL;
             }
         }
+        File runtimeOMSPath = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.RuntimeOMSPathPath"));
+        if (!runtimeOMSPath.isDirectory()) {
+            if (!runtimeOMSPath.mkdirs()) {
+                return StatusCodes.FAIL;
+            }
+        }
 
+        //TODO NOT COMMON
         // Install DistributeServer DefaultConfigFile
         try {
-            InputStream inputStream = Thread.currentThread().getClass().
-                                            getResourceAsStream("/org/prettyx/Resource/" +
-                                                    DefaultConfs.Init_DistributeServerConfigFileNAME);
-
-            File outputFile = new File(System.getProperty("user.home") +
-                                                    DefaultConfs.Init_DistributeServerConfigFilePath);
+            File outputFile = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.DistributeServerConfigFilePath"));
             outputFile.createNewFile();
             if (!outputFile.exists()) {
                 return StatusCodes.FAIL;
             }
-            OutputStream outputStream = new FileOutputStream(System.getProperty("user.home") +
-                                                                DefaultConfs.Init_DistributeServerConfigFilePath);
-            byte[] bytes = new byte[1];
-            while (inputStream.read(bytes) != -1) {
-                outputStream.write(bytes);
-            }
+
+            InputStream inputStream = DEPF.getResourceStream((String)
+                                                DefaultConfs.fixSettingsMap.get("Init.DistributeServerConfigFileNAME"));
+            OutputStream outputStream = new FileOutputStream(DEPF.userHome() +
+                                                DefaultConfs.fixSettingsMap.get("Init.DistributeServerConfigFilePath"));
+
+            DEPF.copyFile(inputStream, outputStream);
 
             inputStream.close();
             outputStream.close();
@@ -263,6 +283,39 @@ public class SettingsCenter {
             return StatusCodes.FAIL;
         }
 
+        // Install OMS Depends Jars
+        try {
+            File omsRuntimePath = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.RuntimeOMSPathPath"));
+            omsRuntimePath.createNewFile();
+            if (!omsRuntimePath.exists()) {
+                return StatusCodes.FAIL;
+            }
+
+            String[] jars = {
+                    "oms-all.jar",
+                    "groovy-all-1.8.6.jar",
+                    "jfreechart-1.0.12.jar",
+                    "jcommon-1.0.15.jar",
+                    "cpptasks-1.0b6-od.jar"
+            };
+
+            for (String jar : jars) {
+
+                InputStream inputStream = DEPF.getResourceStream("oms" + "/" + jar);
+                OutputStream outputStream = new FileOutputStream(DEPF.userHome() +
+                        DefaultConfs.fixSettingsMap.get("Init.RuntimeOMSPathPath") + "/" + jar);
+
+                DEPF.copyFile(inputStream, outputStream);
+
+                inputStream.close();
+                outputStream.close();
+            }
+
+        } catch (Exception e) {
+            System.out.println("Install Failed!");
+            e.printStackTrace();
+            return StatusCodes.FAIL;
+        }
 
         System.out.println("Install successfully!");
         return StatusCodes.SUCCESS;

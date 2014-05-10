@@ -2,6 +2,7 @@
 <Configurations>
 
     <Running>
+        <Kind>DistributeServer</Kind>
         <ServerName>PrettyX_Distribute</ServerName>
         <LogLevel>3</LogLevel>
     </Running>
