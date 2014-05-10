@@ -35,6 +35,16 @@ public class OMSProcessExecution {
 
     private ProcessExecution processExecution;
 
+    /**
+     * Setup Simulation Running Environment
+     *
+     * @param omsHome
+     *              OMS3 Runtime Support
+     * @param workDir
+     *              Current Simulation Work Directory
+     * @return
+     *          JAVA_HOME_NOT_FOUND/FILE_NOT_FOUND/FILE_NOT_FOUND/FILE_NOT_FOUND/SUCCESS
+     */
     public int setUpEnvironment(String omsHome, String workDir){
 
         String[] jvmOptions = new String[0];
@@ -58,39 +68,27 @@ public class OMSProcessExecution {
 
         File omsall = new File(omsHome + "/" + OMSCore.depsJars()[0]);
         if (!omsall.exists()) {
-            System.out.println(new StringBuilder().append("Not found: ").append(omsall).append("\n").toString());
+            LogUtility.logUtility().log2err(omsall + " Not Found!");
             return StatusCodes.FILE_NOT_FOUND;
         }
 
         processExecution = new ProcessExecution(
                 new File(
-                        new StringBuilder().
-                                append(javaHome).append(File.separator).
-                                append("bin").append(File.separator).
-                                append("java").toString()
+                        javaHome + File.separator + "bin" + File.separator + "java"
                 )
         );
 
         String separator = File.pathSeparatorChar == ';' ? "\"" : "";
 
+        processExecution.setWorkingDirectory(new File(workDir));
+
         processExecution.setArguments(
                 jvmOptions,
-                new StringBuilder().
-                        append(separator).
-                        append("-Doms3.work=").append(workDir).
-                        append(separator).toString(),
-                "-cp",
-                new StringBuilder().
-                        append(separator).
-                        append(jars(new File(omsHome), workDir, javaClassPath)).
-                        append(separator).toString(),
-                "oms3.CLI",
+                separator + "-Doms3.work=" + workDir + separator,
+                "-cp", separator + jars(new File(omsHome), workDir, javaClassPath) + separator, "oms3.CLI",
                 "-l", "ALL",
                 "-r",
-                new StringBuilder().
-                        append(separator).
-                        append(new File(workDir + "/simulation.sim")).
-                        append(separator).toString()
+                separator + new File(workDir + "/simulation.sim") + separator
         );
 
 
@@ -113,11 +111,24 @@ public class OMSProcessExecution {
         return StatusCodes.SUCCESS;
     }
 
+
+    /**
+     * Return the ProcessExecution OutputString
+     * @return
+     *          String
+     */
     public String getProcessOutput(){
 
         return processOutputBuffer.toString();
     }
 
+
+    /**
+     * Run Simulation
+     *
+     * @return
+     *          NOT_READY/SUCCESS
+     */
     public int runProcessExecution() {
 
         if (!ready) {
@@ -140,6 +151,19 @@ public class OMSProcessExecution {
         return StatusCodes.SUCCESS;
     }
 
+
+    /**
+     * Return Depend Jars to String for CMD
+     *
+     * @param omsHome
+     *          OMS3 Runtime Support
+     * @param workDir
+     *          Current Simulation Work Directory
+     * @param java_classpath
+     *          Addition Classpath
+     * @return
+     *          String
+     */
     private String jars(File omsHome, String workDir, String java_classpath) {
         List list = new ArrayList();
 

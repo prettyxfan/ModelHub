@@ -30,8 +30,8 @@ public class OMSCore {
      * @return
      *      SUCCESS/FAIL
      */
-    public static int runSimulationWithSim(String simFile){
-
-        return 0;
-    }
+//    public static int runSimulationWithSim(String simFile){
+//
+//        return 0;
+//    }
 }

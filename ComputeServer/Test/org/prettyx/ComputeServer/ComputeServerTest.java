@@ -42,7 +42,7 @@ public class ComputeServerTest {
 
 
         OMSProcessExecution omsProcessExecution = new OMSProcessExecution();
-        omsProcessExecution.setUpEnvironment(DEPF.userHome() + "/.MIMS/Runtime/OMS3", "/Users/PJW/Desktop/oms3/oms3");
+        omsProcessExecution.setUpEnvironment(DEPF.userHome() + "/.MIMS/Runtime/OMS3", "/Users/PJW/Desktop/oms3/project");
         omsProcessExecution.runProcessExecution();
 
 //        while (true) {
@@ -54,8 +54,6 @@ public class ComputeServerTest {
 //                System.exit(0);
 //            }
 //        }
-
     }
-
 
 }

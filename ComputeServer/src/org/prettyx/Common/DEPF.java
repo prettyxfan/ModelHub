@@ -45,6 +45,7 @@ public class DEPF {
      * Return InputStream of A Resource
      *
      * @param fileName
+     *              fileName
      * @return
      *      InputStream
      */
@@ -56,6 +57,7 @@ public class DEPF {
      * Return InputStream of A Resource
      *
      * @param fileName
+     *              fileName
      * @return
      *      URL
      */
@@ -67,6 +69,7 @@ public class DEPF {
      * Read File From InputStream
      *
      * @param inputStream
+     *                  input
      * @return
      *      String
      * @throws IOException
@@ -86,6 +89,7 @@ public class DEPF {
      * Read File From File
      *
      * @param fileName
+     *              fileName
      * @return
      *      String
      * @throws FileNotFoundException
@@ -101,7 +105,9 @@ public class DEPF {
      * Write File From OutputStream
      *
      * @param outputStream
+     *                  output
      * @param content
+     *              content
      * @throws IOException
      */
     public static void writeFile(OutputStream outputStream, String content) throws IOException {
@@ -114,7 +120,9 @@ public class DEPF {
      * Write File From File
      *
      * @param file
+     *          file
      * @param content
+     *              content
      * @throws FileNotFoundException
      * @throws IOException
      */
@@ -126,7 +134,9 @@ public class DEPF {
      * Copy File
      *
      * @param inputFile
+     *              input
      * @param outputFile
+     *              output
      * @throws IOException
      */
     public static void copyFile(File inputFile, File outputFile) throws IOException {
@@ -138,7 +148,9 @@ public class DEPF {
      * Copy File
      *
      * @param inputStream
+     *                  input
      * @param outputStream
+     *                  output
      * @throws IOException
      */
     public static void copyFile(InputStream inputStream, OutputStream outputStream) throws IOException{
@@ -147,17 +159,18 @@ public class DEPF {
     }
 
     /**
-     * Download File
+     * Copy Bin File
      *
-     * @param url
-     * @param local
+     * @param inputStream
+     *                  input
+     * @param outputStream
+     *                  output
      * @throws IOException
      */
-    static void downloadFromUrl(File url, File local) throws IOException{
+    public static void copyBinFile(InputStream inputStream, OutputStream outputStream) throws IOException{
 
-        File tmp = local;
-        BufferedInputStream in = new BufferedInputStream(new FileInputStream(url));
-        BufferedOutputStream bout = new BufferedOutputStream(new FileOutputStream(tmp));
+        BufferedInputStream in = new BufferedInputStream(inputStream);
+        BufferedOutputStream bout = new BufferedOutputStream(outputStream);
         byte[] data = new byte[4096];
         int len = 0;
         while ((len = in.read(data)) >= 0) {
@@ -165,5 +178,19 @@ public class DEPF {
         }
         bout.close();
         in.close();
+    }
+
+    /**
+     * Copy Bin File
+     *
+     * @param inputFile
+     *              input
+     * @param outputFile
+     *              output
+     * @throws IOException
+     */
+    public static void copyBinFile(File inputFile, File outputFile) throws IOException{
+
+        copyBinFile(new FileInputStream(inputFile), new FileOutputStream(outputFile));
     }
 }

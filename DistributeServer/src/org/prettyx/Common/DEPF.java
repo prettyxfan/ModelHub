@@ -45,6 +45,7 @@ public class DEPF {
      * Return InputStream of A Resource
      *
      * @param fileName
+     *              fileName
      * @return
      *      InputStream
      */
@@ -56,6 +57,7 @@ public class DEPF {
      * Return InputStream of A Resource
      *
      * @param fileName
+     *              fileName
      * @return
      *      URL
      */
@@ -67,9 +69,10 @@ public class DEPF {
      * Read File From InputStream
      *
      * @param inputStream
+     *                  input
      * @return
      *      String
-     * @throws java.io.IOException
+     * @throws IOException
      */
     public static String readFile(InputStream inputStream) throws IOException {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
@@ -86,10 +89,11 @@ public class DEPF {
      * Read File From File
      *
      * @param fileName
+     *              fileName
      * @return
      *      String
-     * @throws java.io.FileNotFoundException
-     * @throws java.io.IOException
+     * @throws FileNotFoundException
+     * @throws IOException
      */
     public static String readFile(File fileName) throws IOException{
 
@@ -101,8 +105,10 @@ public class DEPF {
      * Write File From OutputStream
      *
      * @param outputStream
+     *                  output
      * @param content
-     * @throws java.io.IOException
+     *              content
+     * @throws IOException
      */
     public static void writeFile(OutputStream outputStream, String content) throws IOException {
         BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
@@ -114,9 +120,11 @@ public class DEPF {
      * Write File From File
      *
      * @param file
+     *          file
      * @param content
-     * @throws java.io.FileNotFoundException
-     * @throws java.io.IOException
+     *              content
+     * @throws FileNotFoundException
+     * @throws IOException
      */
     public static void writeFile(File file, String content) throws FileNotFoundException, IOException{
         writeFile(new FileOutputStream(file), content);
@@ -126,8 +134,10 @@ public class DEPF {
      * Copy File
      *
      * @param inputFile
+     *              input
      * @param outputFile
-     * @throws java.io.IOException
+     *              output
+     * @throws IOException
      */
     public static void copyFile(File inputFile, File outputFile) throws IOException {
         String content = readFile(inputFile);
@@ -138,8 +148,10 @@ public class DEPF {
      * Copy File
      *
      * @param inputStream
+     *                  input
      * @param outputStream
-     * @throws java.io.IOException
+     *                  output
+     * @throws IOException
      */
     public static void copyFile(InputStream inputStream, OutputStream outputStream) throws IOException{
         String content = readFile(inputStream);
@@ -147,17 +159,18 @@ public class DEPF {
     }
 
     /**
-     * Download File
+     * Copy Bin File
      *
-     * @param url
-     * @param local
-     * @throws java.io.IOException
+     * @param inputStream
+     *                  input
+     * @param outputStream
+     *                  output
+     * @throws IOException
      */
-    static void downloadFromUrl(File url, File local) throws IOException{
+    public static void copyBinFile(InputStream inputStream, OutputStream outputStream) throws IOException{
 
-        File tmp = local;
-        BufferedInputStream in = new BufferedInputStream(new FileInputStream(url));
-        BufferedOutputStream bout = new BufferedOutputStream(new FileOutputStream(tmp));
+        BufferedInputStream in = new BufferedInputStream(inputStream);
+        BufferedOutputStream bout = new BufferedOutputStream(outputStream);
         byte[] data = new byte[4096];
         int len = 0;
         while ((len = in.read(data)) >= 0) {
@@ -165,5 +178,19 @@ public class DEPF {
         }
         bout.close();
         in.close();
+    }
+
+    /**
+     * Copy Bin File
+     *
+     * @param inputFile
+     *              input
+     * @param outputFile
+     *              output
+     * @throws IOException
+     */
+    public static void copyBinFile(File inputFile, File outputFile) throws IOException{
+
+        copyBinFile(new FileInputStream(inputFile), new FileOutputStream(outputFile));
     }
 }

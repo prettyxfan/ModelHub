@@ -263,11 +263,6 @@ public class SettingsCenter {
         //TODO NOT COMMON
         // Install DistributeServer DefaultConfigFile
         try {
-            File outputFile = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.DistributeServerConfigFilePath"));
-            outputFile.createNewFile();
-            if (!outputFile.exists()) {
-                return StatusCodes.FAIL;
-            }
 
             InputStream inputStream = DEPF.getResourceStream((String)
                                                 DefaultConfs.fixSettingsMap.get("Init.DistributeServerConfigFileNAME"));
@@ -285,11 +280,6 @@ public class SettingsCenter {
 
         // Install OMS Depends Jars
         try {
-            File omsRuntimePath = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.RuntimeOMSPathPath"));
-            omsRuntimePath.createNewFile();
-            if (!omsRuntimePath.exists()) {
-                return StatusCodes.FAIL;
-            }
 
             String[] jars = {
                     "oms-all.jar",
@@ -305,7 +295,7 @@ public class SettingsCenter {
                 OutputStream outputStream = new FileOutputStream(DEPF.userHome() +
                         DefaultConfs.fixSettingsMap.get("Init.RuntimeOMSPathPath") + "/" + jar);
 
-                DEPF.copyFile(inputStream, outputStream);
+                DEPF.copyBinFile(inputStream, outputStream);
 
                 inputStream.close();
                 outputStream.close();
