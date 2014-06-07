@@ -25,7 +25,7 @@ import java.net.ServerSocket;
  * Send Response to WenFrontEnd
  *
  */
-public class DistributeServerHearken extends WebSocketServer{
+public class DistributeServerHearken extends WebSocketServer {
 
     public DistributeServerHearken( int port ) {
         super( new InetSocketAddress( port ) );

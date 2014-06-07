@@ -1,0 +1,275 @@
+<!doctype html>
+<html manifest="manifest.appcache" class="no-js" lang="en" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>校车查询</title>
+    <link rel="shortcut icon" type="image/ico" href="css/favicon.ico">
+    <link rel="stylesheet" href="css/foundation.css"/>
+    <script src="js/vendor/modernizr.js"></script>
+    <script type="text/javascript">
+
+        var tody = new Date();
+        var month = tody.getMonth();
+        var path = "";
+
+        if( month>4 && month<10 ){
+            path = "../logistics_data/bus_summer.xml";
+        } else{
+            path = "../logistics_data/bus_winter.xml";
+        }
+
+        var xmlDom = null;
+
+        try {
+            // IE & FireFox
+            xmlDom = document.implementation.createDocument("","",null);
+            xmlDom.async=false;
+            xmlDom.loadXML(path);
+        } catch (e) {
+            // Chrome & Safari
+            xmlhttp = new XMLHttpRequest();
+            xmlhttp.open("GET", path, false);
+            xmlhttp.send(null);
+            xmlDom = xmlhttp.responseXML;
+        }
+
+        x = xmlDom.getElementsByTagName("timetable");
+
+        var info = new Array();
+
+        function ergodicity( obj ){
+            if (obj.nodeType == 1) {
+                var child = obj.childNodes;
+                for (var i = 0; i < child.length; i++) {
+                    if(child[i].nodeName == "from"){
+                        info.push(new Array("from", child[i].childNodes[0].nodeValue));
+                        continue;
+                    }
+                    else if(child[i].nodeName == "to"){
+                        info.push(new Array("to", child[i].childNodes[0].nodeValue));
+                        continue;
+                    }
+                    else if(child[i].nodeName == "place"){
+                        info.push(new Array("place", child[i].childNodes[0].nodeValue));
+                        continue;
+                    }
+                    else if(child[i].nodeName == "meta"){
+                        var v = "";
+                        if( child[i].attributes.length != 0 ){
+                            v = child[i].childNodes[0].nodeValue + "(" + child[i].attributes[0].value + ")";
+                            info.push(new Array("meta", v));
+                        } else {
+                            info.push(new Array("meta", child[i].childNodes[0].nodeValue));
+                        }
+                        continue;
+                    }
+                    else {
+                        ergodicity(child[i]);
+                    }
+                }
+            }
+            return;
+        }
+
+        ergodicity(x[0]);
+
+        var Benbu_Yuzhong = new Array();
+        var Yuzhong_Benbu = new Array();
+        var transition = new Array();
+
+        var currentKey = "";
+        var currentArray = "";
+        for(var i=0; i<info.length; i++){
+
+            transition = info[i];
+
+            if( transition[0] == "from" && transition[1] == "本部" ) {
+
+                currentArray = "Benbu_Yuzhong";
+                currentKey = "";
+                continue;
+            }
+            else if( transition[0] == "from" && transition[1] == "榆中" ){
+
+                currentArray = "Yuzhong_Benbu";
+                currentKey = "";
+                continue;
+            }
+            else if( transition[0] == "place" ){
+
+                if( currentArray == "Benbu_Yuzhong" ){
+                    currentKey = transition[1];
+                    Benbu_Yuzhong[currentKey] = new Array();
+                } else {
+                    currentKey = transition[1];
+                    Yuzhong_Benbu[currentKey] = new Array();
+                }
+            }
+            else if( transition[0] == "meta" ) {
+
+                if( currentArray == "Benbu_Yuzhong"){
+                    Benbu_Yuzhong[currentKey].push(transition[1]);
+                } else {
+                    Yuzhong_Benbu[currentKey].push(transition[1]);
+                }
+            }
+        }
+
+        var nestY_B = new Array("","",0);
+        var nestB_Y = new Array("","",0);
+
+        function showTime(){
+
+            var now = new Date();
+            var hour = now.getHours();
+            var minute = now.getMinutes() + hour*60;
+            var mark = 0;
+            for(var key in Benbu_Yuzhong){
+                for(var j=0;j<Benbu_Yuzhong[key].length;j++){
+                    var st = String(Benbu_Yuzhong[key][j]);
+                    var startTime = st.split(":");
+                    var startMin = Number(startTime[0])*60 + Number(startTime[1]);
+                    var deviation = startMin - minute;
+                    //alert(deviation);
+                    if(deviation > 0 && (nestB_Y[2] == 0 || deviation < nestB_Y[2])){
+                        mark = 1;
+                        nestB_Y[0] = Benbu_Yuzhong[key][j];
+                        nestB_Y[1] = key;
+                        nestB_Y[2] = deviation;
+                        break;
+                    }
+
+                }
+            }
+            if(mark == 0) nestB_Y = ["","",0];
+            mark = 0;
+            for(var key in Yuzhong_Benbu){
+                for(var j=0;j<Yuzhong_Benbu[key].length;j++){
+                    var st = String(Yuzhong_Benbu[key][j]);
+                    var startTime = st.split(":");
+                    var startMin = Number(startTime[0])*60 + Number(startTime[1]);
+                    var deviation = startMin - minute;
+                    if(deviation > 0 && (nestY_B[2] == 0 || deviation < nestY_B[2])){
+                        mark = 1;
+                        nestY_B[0] = Yuzhong_Benbu[key][j];
+                        nestY_B[1] = key;
+                        nestY_B[2] = deviation;
+                        break;
+                    }
+                }
+            }
+            if(mark == 0 ) nestY_B= ["","",0];
+
+            var dd = document.getElementById("dd");
+            var show = document.getElementById("showTime");
+            if(dd.title == ""){
+                dd.title = "1";
+                if(nestB_Y[0] != "") {
+                    show.innerHTML = "<h3>本部 至 榆中</h3><h5>距下一趟校车还有" + nestB_Y[2] + "分钟</h5><h5>" + nestB_Y[0] + "&nbsp;&nbsp;(" + nestB_Y[1] + ")</h5>";
+                } else {
+                    show.innerHTML = "<h3>本部 至 榆中</h3><h5>太晚了,今天没有校车了！</h5><h5>次日" + Benbu_Yuzhong["体育馆"][0] + "&nbsp;&nbsp;(本部体育馆)</h5>";
+                }
+            }
+
+        }
+
+        window.setTimeout(showTime, 0);
+
+        function change(){
+            var dd = document.getElementById("dd");
+            var show = document.getElementById("showTime");
+            if(dd.title == "1") {
+                dd.title = "2";
+                if (nestB_Y[0] != "") {
+                    show.innerHTML = "<h3>榆中 至 本部</h3><h5>距下一趟校车还有" + nestY_B[2] + "分钟</h5><h5>" + nestY_B[0] + "&nbsp;&nbsp;(" + nestY_B[1] + ")</h5>";
+                } else {
+                    show.innerHTML = "<h3>榆中 至 本部</h3><h5>太晚了,今天没有校车了！</h5><h5>次日" + Yuzhong_Benbu["榆中校车队"] + "&nbsp;&nbsp;(榆中校车队)</h5>";
+                }
+            }
+            else{
+                dd.title = "1";
+                if(nestB_Y[0] != "")
+                    show.innerHTML = "<h3>本部 至 榆中</h3><h5>距下一趟校车还有"+nestB_Y[2]+"分钟</h5><h5>"+nestB_Y[0]+"&nbsp;&nbsp;("+nestB_Y[1]+")</h5>";
+                else
+                    show.innerHTML = "<h3>本部 至 榆中</h3><h5>太晚了,今天没有校车了！</h5><h5>次日"+Benbu_Yuzhong["体育馆"][0]+"&nbsp;&nbsp;(本部体育馆)</h5>";
+            }
+        }
+
+    </script>
+</head>
+<body>
+<nav class="top-bar" data-topbar>
+    <ul class="title-area">
+        <li class="name">
+            <h1><a href="#">校车查询</a></h1>
+        </li>
+    </ul>
+</nav>
+<div id="first">
+    <div>
+        <div onClick="change()" title="" id="dd">
+            <a class="button expand" >
+                </br>
+                <p id="showTime"></p>
+                </br>
+            </a>
+        </div>
+    </div>
+    <div>
+        <p></p>
+        <h3 align="center" style="color:#222222">冬季时刻表</h3>
+        <h4 align="center" style="color:#222222">10月1日---次年4月30日</h4>
+        <div align="center">
+            <ul class="side-nav">
+                <li><a href="winter_benbu_yuzhong.html">本部到榆中校区</a></li>
+                <li class="divider"></li>
+                <li><a href="winter_yuzhong_benbu.html">榆中校区到本部</a></li>
+            </ul>
+        </div>
+    </div>
+    <hr/>
+    <div>
+        <p></p>
+        <h3 align="center" style="color:#222222">夏季时刻表</h3>
+        <h4 align="center" style="color:#222222">5月1日---9月30日</h4>
+        <div align="center">
+            <ul class="side-nav">
+                <li><a href="summer_benbu_yuzhong.html">本部到榆中校区</a></li>
+                <li class="divider"></li>
+                <li><a href="summer_yuzhong_benbu.html">榆中校区到本部</a></li>
+            </ul>
+            <p></p>
+            <p></p>
+        </div>
+    </div>
+</div>
+<hr/>
+<div>
+    <p></p>
+    <h3 align="center" style="color:#222222">注意事项</h3>
+    <h4 align="center" style="color:#222222">节假日期间</h4>
+
+    <div align="center">
+        <ul class="side-nav">
+            <li>本部到榆中校区:</li>
+            <p>上午08:00 下午18:30</p>
+            <li>榆中校区到本部:</li>
+            <p>上午08:10 下午17:10</p>
+            <li>其余时间坐满即发</li>
+        </ul>
+    </div>
+</div>
+<div>
+    <div class="alert-box success" data-alert="">
+        <p>运输中心调度室联系电话：<br/>
+            <a href="tel:0931-8815109" mce_href="tel:0931-8815109">0931-8815109</a></p>
+    </div>
+</div>
+<script src="js/vendor/jquery.js"></script>
+<script src="js/foundation.min.js"></script>
+<script>
+    $(document).foundation();
+</script>
+</body>
+</html>

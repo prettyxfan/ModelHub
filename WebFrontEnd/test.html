@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf8"/>
+
+        <title>Basic shapes</title>
+
+        <link rel="stylesheet" type="text/css" href="./dist/joint.css" />
+
+        <style>
+            #paper {
+                display: inline-block;
+                border: 1px solid gray;
+            }
+            #model {
+                display: inline-block;
+                border: 1px solid gray;
+            }
+            #tool {
+                display: inline-block;
+                border: 1px solid gray;
+            }
+        </style>
+    </head>
+    <body>
+    <div>
+        <!-- <button onclick="addComponent()" value="AddComponent">AddComponent</button>
+        <button onclick="sendXmlToServer()" value="SendXML">SendXML</button>
+         -->
+         <button onclick="createModel()" value="CreateModel">CreateModel</button>
+        </div>
+        <div id="paper"></div>
+        <div id="model"></div>
+        <div id="tool"></div>
+        <div id="content"></div>
+
+
+        <script src="./lib/jquery.js"></script>
+        <script src="./lib/jquery.sortElements.js"></script>
+        <script src="./lib/lodash.js"></script>
+        <script src="./lib/backbone.js"></script>
+
+        <script src="./src/core.js"></script>
+        <script src="./src/vectorizer.js"></script>
+        <script src="./src/geometry.js"></script>
+
+
+        <script src="./src/joint.dia.graph.js"></script>
+
+        <script src="./src/joint.dia.cell.js"></script>
+        <script src="./src/joint.dia.element.js"></script>
+        <script src="./src/joint.dia.link.js"></script>
+        <script src="./src/joint.dia.paper.js"></script>
+
+        <script src="./plugins/joint.shapes.basic.js"></script>
+
+        <script src="./dist/joint.shapes.uml.min.js"></script>
+        <script src="./dist/joint.shapes.uml.js"></script>
+        <script src="./dist/joint.shapes.devs.min.js"></script>
+        <script src="./dist/joint.shapes.devs.js"></script>
+
+        <script src="./test.js"></script>
+        
+    
+
+    </body>
+</html>

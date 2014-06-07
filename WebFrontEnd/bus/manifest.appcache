@@ -1,0 +1,23 @@
+CACHE MANIFEST
+
+# 2014-04-06
+
+./css/foundation.css
+./css/normalize.css
+./css/favicon.ico
+
+./js/vendor/fastclick.js
+./js/vendor/jquery.cookie.js
+./js/vendor/jquery.js
+./js/vendor/modernizr.js
+./js/vendor/placeholder.js
+./js/foundation.min.js
+
+./index.html
+./summer_benbu_yuzhong.html
+./summer_yuzhong_benbu.html
+./winter_benbu_yuzhong.html
+./winter_yuzhong_benbu.html
+
+../logistics_data/bus_summer.xml
+../logistics_data/bus_winter.xml
