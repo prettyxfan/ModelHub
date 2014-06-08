@@ -18,6 +18,7 @@ import org.prettyx.Common.StatusCodes;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.util.Collection;
 
 /**
  * Hearken to InComing Request.
@@ -46,12 +47,45 @@ public class DistributeServerHearken extends WebSocketServer {
     public void onMessage(WebSocket webSocket, String s) {
 
         System.out.println(s);
+        if(s.equals("Get Model")) {
+            String ModelInfomation = "<components><component><componentName>gopher</componentName>"+
+                    "<componentDescription>It's a long long story</componentDescription>"+
+                    "<inputs><input><inputName>in1</inputName><inputType>string</inputType></input>"+
+                    "<input><inputName>in2</inputName><inputType>string</inputType></input></inputs>"+
+                    "<outputs><output><outputName>out</outputName><outputType>integer</outputType>"+
+                    "</output></outputs><parameters><parameter><parameterName></parameterName><parameterType>"+
+                    "</parameterType></parameter></parameters></component><component><componentName>Hello World"+
+                    "</componentName><componentDescription>The component just prints out the message."+
+                    "</componentDescription><inputs><input><inputName>message</inputName>"+
+                    "<inputType>string</inputType></input></inputs><outputs><output><outputName>out</outputName>"+
+                    "<outputType>string</outputType></output></outputs><parameters><parameter><parameterName>"+
+                    "</parameterName><parameterType></parameterType></parameter></parameters></component></components>";
+            sendToAll(ModelInfomation);
+        }
     }
 
     @Override
     public void onError(WebSocket webSocket, Exception e) {
 
     }
+
+    /**
+     * Sends <var>text</var> to all currently connected WebSocket clients.
+     *
+     * @param text
+     *            The String to send across the network.
+     * @throws InterruptedException
+     *             When socket related I/O errors occur.
+     */
+    public void sendToAll( String text ) {
+        Collection<WebSocket> con = connections();
+        synchronized ( con ) {
+            for( WebSocket c : con ) {
+                c.send( text );
+            }
+        }
+    }
+
 
 
     /**

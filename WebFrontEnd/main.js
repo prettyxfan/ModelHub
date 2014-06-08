@@ -1,4 +1,9 @@
 function init() {
+
+  /**
+  *decleration the globe variabel
+  */
+
   componentDOM= null;
   IdCount = 0;
   sendXML = '';
@@ -9,6 +14,27 @@ function init() {
   recievedModelNumber = 0;
   drawModelArray = new Array();
   drawModelNumber = 0;
+  ModelInfomation = '';
+
+  createInterface();
+
+  websocket = new WebSocket("ws://localhost:8528");
+  websocket.onopen = function(evt) { 
+    console.log("connected ! " + evt.data);
+    websocket.send("Get Model");
+  }; 
+  websocket.onclose = function(evt) { 
+    console.log("disconncted ! " + evt.data);
+    websocket.close();
+  }; 
+  websocket.onmessage = function(evt) { 
+    ModelInfomation = evt.data;
+    console.log("get message ! " + evt.data);
+    createModel();
+  }; 
+  websocket.onerror = function(evt) { 
+    console.log("error ! " + evt.data); 
+  }; 
 
   if(document.implementation && document.implementation.createDocument) {
     componentDOM = document.implementation.createDocument('', '', null);
@@ -19,9 +45,9 @@ function init() {
     component.appendChild(to);
     var parts = componentDOM.createElement('parts');
     component.appendChild(parts);
-  	componentXML = "";
-  	componentXML = new XMLSerializer().serializeToString(component);
-  	console.log(componentXML); 
+    componentXML = "";
+    componentXML = new XMLSerializer().serializeToString(component);
+    //console.log(componentXML); 
   }
 
   // if(document.implementation && document.implementation.createDocument) {
@@ -38,20 +64,24 @@ function init() {
   //   console.log(dataflowXML); 
   // }
 
-  websocket = new WebSocket("ws://localhost:8528");
-  websocket.onopen = function(evt) { 
-    console.log("connected ! " + evt.data);
-  }; 
-  websocket.onclose = function(evt) { 
-    console.log("disconncted ! " + evt.data);
-    websocket.close();
-  }; 
-  websocket.onmessage = function(evt) { 
-    console.log("get message ! " + evt.data);
-  }; 
-  websocket.onerror = function(evt) { 
-    console.log("error ! " + evt.data); 
-  }; 
+}
+
+window.addEventListener("load", init(), false);
+
+
+
+
+
+/**
+* Create the Whole Interface
+*/
+
+function createInterface(){
+
+  /**
+*Create the Graphics interface
+*/
+
   graph = new joint.dia.Graph;
   paper = new joint.dia.Paper({
       el: $('#paper'),
@@ -71,89 +101,92 @@ function init() {
       snapLinks: { radius: 35 }
   });
 
+/**
+* Get the Link of Component
+*Create the Component XML and Dataflow XML 
+*/
+
   graph.on('change:source change:target', function(link) {
 
-    sourcePort = link.get('source').port;
-    sourceId = link.get('source').id;
-    targetPort = link.get('target').port;
-    targetId = link.get('target').id;
+  sourcePort = link.get('source').port;
+  sourceId = link.get('source').id;
+  targetPort = link.get('target').port;
+  targetId = link.get('target').id;
 
-    var sourceNode = '';
-    var targetNode = '';
-    var xmobj = $.parseXML(componentXML);
+  var sourceNode = '';
+  var targetNode = '';
+  var xmobj = $.parseXML(componentXML);
 
-      var obj = $(xmobj).find("part").each(function(){
-        var xmlAttr=$(this).attr("id");
-          if (xmlAttr == sourceId) {
-            $(this).find("outputId").each(function() {
-              if ($(this).attr("portName") == sourcePort) {
-                $(this).text(targetId);
-                $(this).attr("targetPortName", targetPort);
-              }
-            });
-          }
-          else if (xmlAttr == targetId) {
-            $(this).find("inputId").each(function() {
-              if ($(this).attr("portName") == targetPort) {
-                $(this).text(sourceId);
-                $(this).attr("sourcePortName", sourcePort);
-              }
-            }); 
-
-          }
-
-      });
-      componentXML = new XMLSerializer().serializeToString(xmobj);
+    var obj = $(xmobj).find("part").each(function(){
+      var xmlAttr=$(this).attr("id");
+        if (xmlAttr == sourceId) {
+          $(this).find("outputId").each(function() {
+            if ($(this).attr("portName") == sourcePort) {
+              $(this).text(targetId);
+              $(this).attr("targetPortName", targetPort);
+            }
+          });
+        }
+        else if (xmlAttr == targetId) {
+          $(this).find("inputId").each(function() {
+            if ($(this).attr("portName") == targetPort) {
+              $(this).text(sourceId);
+              $(this).attr("sourcePortName", sourcePort);
+            }
+          }); 
+        }
+    });
+    componentXML = new XMLSerializer().serializeToString(xmobj);
         
   });
+
+/**
+* To Get the Pointer Focus Cell
+*/
+
   paper.on('cell:pointerdown' ,function(evt, x, y) {
+
     var evtId = "#" + evt.id;
     var cellId = $(evtId).attr("model-id");
     focusCellId = cellId;
     var m = graph.getCell(cellId);
     displayAttributes(m);
 
-    // var xmobj = '';
-    // if (focusCellId != '') {
-    //   xmobj = $.parseXML(dataflowXML);
-    //   var cell = graph.getCell(focusCellId);
-    //     if(cell instanceof joint.shapes.devs.Model) {
-    //       var obj = $(xmobj).find("part").each(function(){
-    //         var xmlAttr=$(this).attr("id");
-    //           if (xmlAttr == focusCellId) {
-    //             $(this).remove()
-    //             deleteCell.remove();
-    //             }
-    //           });
-    //       }
-                   
-    //     componentXML = new XMLSerializer().serializeToString(xmobj);
-    //     console.log(componentXML);
-    // }
   });
 
+/**
+* To Create the Component XML
+*/
+
   graph.on('add', function(cell) {
+
     if(cell instanceof joint.shapes.devs.Model) {
+
       var xmobj = $.parseXML(componentXML);
       IdCount = cell.id;
       var inputNumber = cell.get('inPorts').length;
       var outputNumber = cell.get('outPorts').length;
       var part ='';
+
         var obj = $(xmobj).find("parts").each(function(){
+
           var part = componentDOM.createElement('part'); 
           part.setAttribute('id', IdCount);
+
           for(var i=0; i<inputNumber; i++) {
             var inputId = componentDOM.createElement('inputId');
             inputId.setAttribute('portName', cell.get('inPorts')[i]);
             inputId.setAttribute('sourcePortName', '');
             part.appendChild(inputId);
           }
+
           for(var i=0; i<outputNumber; i++) {
             var outputId = componentDOM.createElement('outputId');
             outputId.setAttribute('portName', cell.get('outPorts')[i]);
             outputId.setAttribute('targetPortName', '');
             part.appendChild(outputId);
           }
+
           $(this).append(part);
 
         });
@@ -191,53 +224,30 @@ function init() {
      //  dataflowXML = new XMLSerializer().serializeToString(xmobj);
      // console.log(dataflowXML);
     }
+
   });
 
-
-  var thisModel;
-  var ConstraintElementView = joint.dia.ElementView.extend({
-
-      pointerdown: function(evt, x, y) {
-        thisModel = graph1.getCell(this.model.id);
-      },
-
-      pointermove: function(evt, x, y) {
-      },
-
-      pointerup: function(evt, x, y) {
-        var copyModel = thisModel.clone();
-        copyModel.translate(x.toString(), y.toString());
-        graph2.addCell(copyModel);
-          // joint.dia.ElementView.prototype.pointerdown.apply(this, [evt, intersection.x, intersection.y]);
-      }
-      // pointermove: function(evt, x, y) {
-      //     var intersection = constraint.intersectionWithLineFromCenterToPoint(g.point(x, y));
-      //     joint.dia.ElementView.prototype.pointermove.apply(this, [evt, intersection.x, intersection.y]);
-      // }
-  });
-
+/**
+* Create the Model Display area
+*/
   graph1 = new joint.dia.Graph;
   paper1 = new joint.dia.Paper({
     el:$('#model'),
     gridSize: 20,
-    elementView: ConstraintElementView,
     model: graph1
   });
 
-
-  graph2 = new joint.dia.Graph;
-  paper2 = new joint.dia.Paper({
-    el: $('#tool'),
-    gridSize: 20,
-    elementView: ConstraintElementView,
-    model: graph2
-  });
+  /**
+  * To Show the Simple Introduction of the Model
+  */
 
   paper1.on('cell:pointerdown', function(evt, x, y){
+
     var evtId = "#" + evt.id;
     var id = $(evtId).attr("model-id");
     var m = graph1.getCell(id);
-    if(m instanceof joint.shapes.devs.Model){
+
+    if( m instanceof joint.shapes.devs.Model ){
       for(var i in recievedModelArray) {
         //console.log(recievedModelArray[i].id + " " + cellId);
         if(recievedModelArray[i].id == id){
@@ -248,6 +258,7 @@ function init() {
     else {
       $('#content').html('');
     }
+
   });
 
   paper1.on('cell:pointerdblclick' ,function(evt, x, y) {
@@ -255,7 +266,10 @@ function init() {
     var cellId = $(evtId).attr("model-id");
     var m = graph1.getCell(cellId);
     var m1 = '';
+
+
     for(var i in recievedModelArray) {
+      // console.log(recievedModelArray[i]);
       if( recievedModelArray[i].id == m.id ) {
         m1 = recievedModelArray[i];
         break;
@@ -266,22 +280,29 @@ function init() {
       m2.translate(100, 0);
       m1.id = m2.id;
       drawModelArray[drawModelNumber] = m1;
-      console.log(drawModelArray[drawModelNumber]);
+      //console.log(drawModelArray[drawModelNumber]);
       drawModelNumber++;
       graph.addCell(m2);
+      // console.log(m2.id);
     }
   });
 
-  createModel();
-}
-window.addEventListener("load", init(), false);
-
-
 /**
-*create graph
+* Create the Tool Display area
 */
 
+  graph2 = new joint.dia.Graph;
+  paper2 = new joint.dia.Paper({
+    el: $('#tool'),
+    gridSize: 20,
+    model: graph2
+  });
 
+}
+
+/**
+* Decleration of the Model Class
+*/
 
 function Model(componentName, componentDescription, inputs, outputs, parameters){ 
   this.componentName = componentName; 
@@ -291,6 +312,56 @@ function Model(componentName, componentDescription, inputs, outputs, parameters)
   this.parameters = parameters;
   this.id = '';
 } 
+
+/**
+* Create the Recieved Model
+*/
+
+function createModel(){
+  //alert("done");
+  if ( ModelInfomation != '') {
+    dealRecieveModel(ModelInfomation);
+    for(var i=0; i<recievedModelNumber; i++ ) {
+      var inPortsArray = new Array();
+      for (var j=0; j<recievedModelArray[i].inputs.length; j++) {
+        inPortsArray[j] = recievedModelArray[i].inputs[j][0];
+      }
+      var outPortsArray = new Array();
+      for (var j=0; j<recievedModelArray[i].outputs.length; j++) {
+        outPortsArray[j] = recievedModelArray[i].outputs[j][0];
+      }
+      // var outPortsArray = new Array();
+      // for (var j=0; j<recievedModelArray[i].outputs.length; j++) {
+      //   outPortsArray[j] = recievedModelArray[i].outputs[j][0];
+      // }
+      // console.log(recievedModelArray[i].componentName);
+      // var test = ['df','sdf'];
+      var m1 = new joint.shapes.devs.Model({
+        position: { x: 70, y: 70*(i+1)},
+        size: { width: 50, height: 50 },
+        inPorts: inPortsArray,
+        outPorts: outPortsArray,
+        attrs: {
+            '.label': { text: recievedModelArray[i].componentName, 'ref-x': .3, 'ref-y': .45 },
+            rect: { fill: '#fffff' },
+            '.inPorts circle': { fill: '#16A085', magnet: 'passive', type: 'input' },
+            '.outPorts circle': { fill: '#E74C3C', type: 'output' },
+            text: { fill: '#676767','pointer-events': ''}
+        }
+      });
+      recievedModelArray[i].id = m1.id;
+      //alert(m1.id);
+      graph1.addCell(m1);
+    }
+  }
+}
+
+/**
+* Deal with the Recieved Model XML
+* Create the RecievedModel Array
+* with the propoties: 
+* omponentName, componentDescription, inputs, outputs, parameters
+*/
 
 function dealRecieveModel(modelXML){
   var obj =$(modelXML).find("component").each(function(){
@@ -342,42 +413,7 @@ function dealRecieveModel(modelXML){
 
 }
 
-function createModel(){
-  str = "<components><component><componentName>gopher</componentName><componentDescription>It's a long long story</componentDescription><inputs><input><inputName>in1</inputName><inputType>string</inputType></input><input><inputName>in2</inputName><inputType>string</inputType></input></inputs><outputs><output><outputName>out</outputName><outputType>integer</outputType></output></outputs><parameters><parameter><parameterName></parameterName><parameterType></parameterType></parameter></parameters></component><component><componentName>Hello World</componentName><componentDescription>The component just prints out the message.</componentDescription><inputs><input><inputName>message</inputName><inputType>string</inputType></input></inputs><outputs><output><outputName>out</outputName><outputType>string</outputType></output></outputs><parameters><parameter><parameterName></parameterName><parameterType></parameterType></parameter></parameters></component></components>";
-  dealRecieveModel(str);
-  for(var i=0; i<recievedModelNumber; i++ ) {
-    var inPortsArray = new Array();
-    for (var j=0; j<recievedModelArray[i].inputs.length; j++) {
-      inPortsArray[j] = recievedModelArray[i].inputs[j][0];
-    }
-    var outPortsArray = new Array();
-    for (var j=0; j<recievedModelArray[i].outputs.length; j++) {
-      outPortsArray[j] = recievedModelArray[i].outputs[j][0];
-    }
-    // var outPortsArray = new Array();
-    // for (var j=0; j<recievedModelArray[i].outputs.length; j++) {
-    //   outPortsArray[j] = recievedModelArray[i].outputs[j][0];
-    // }
-    // console.log(recievedModelArray[i].componentName);
-    // var test = ['df','sdf'];
-    var m1 = new joint.shapes.devs.Model({
-      position: { x: 70, y: 70*(i+1)},
-      size: { width: 50, height: 50 },
-      inPorts: inPortsArray,
-      outPorts: outPortsArray,
-      attrs: {
-          '.label': { text: recievedModelArray[i].componentName, 'ref-x': .3, 'ref-y': .45 },
-          rect: { fill: '#fffff' },
-          '.inPorts circle': { fill: '#16A085', magnet: 'passive', type: 'input' },
-          '.outPorts circle': { fill: '#E74C3C', type: 'output' },
-          text: { fill: '#676767','pointer-events': ''}
-      }
-    });
-    recievedModelArray[i].id = m1.id;
-    //alert(m1.id);
-    graph1.addCell(m1);
-  }
-}
+
 
 function sendXmlToServer() {
   websocket.send(componentXML);
@@ -403,6 +439,7 @@ function deleteComponent() {
             if (xmlAttr == focusCellId) {
               $(this).remove()
               deleteCell.remove();
+              focusCellId = '';
               }
             });
         }
@@ -472,32 +509,8 @@ function displayAttributes(m){
     html += '<button type="button" class="btn btn-default">确定</button><button type="button" class="btn btn-default">取消</button>';
     $('#attributesArea').html(html);
   }
-
-
-              // <li><a href="#">Input</a></li>
-              // <li>
-              //   <div class="input-group">
-              //     <span class="input-group-addon">name</span>
-              //     <input type="text" class="form-control" placeholder="input name"/>
-              //     <span class="input-group-addon">type</span>
-              //     <input type="text" class="form-control" placeholder="input type">
-              //   </div>
-              // </li>
-              // <li><a href="#">Output</a></li>
-              // <li>
-              //     <div class="input-group">
-              //       <span class="input-group-addon">@</span>
-              //       <input type="text" class="form-control" placeholder="Username">
-              //     </div>
-              // </li>
-              // <li><a href="#">Paramete</a></li>
-              // <li>
-              //   <div class="input-group">
-              //     <span class="input-group-addon">@</span>
-              //     <input type="text" class="form-control" placeholder="Username">
-              //   </div>
-              // </li>
-              // <li><div id="content"></div></li>
 }
+
+
 
 
