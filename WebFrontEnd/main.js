@@ -352,6 +352,7 @@ function createModel(){
       recievedModelArray[i].id = m1.id;
       //alert(m1.id);
       graph1.addCell(m1);
+      $('#content').html(m1);
     }
   }
 }
@@ -477,36 +478,38 @@ function displayAttributes(m){
         break;
       }
     }
-    var html = '<li class="nav-header">Attributes</li>'
-    html +='<li>' + node.componentDescription + '</li>'
+    var html ='<p>' + node.componentDescription + '<p>';
+    html += '<hr/>';
     if (node.inputs.length != 0){
-      html += '<li><a href="#">Input</a></li>';
-      html += '<li><div class="input-group"';
+      html += '<h5>Input</h5>'
       for (var i in node.inputs){
+        html += '<div class="input-group">';
         html += '<span class="input-group-addon">' + node.inputs[i][0] + '</span>';
         html += '<input type="text" class="form-control" placeholder="' + node.inputs[i][1] + '"/>';
+        html += '</div>'
       }
-      html += '</div></li>'
+      html += '<hr/>';
     }
     if (node.parameters.length != 0){
-      html += '<li><a href="#">Parameter</a></li>';
-      html += '<li><div class="input-group"';
+      html += '<h5>Parameter</h5>'
       for (var i in node.parameters){
+        html += '<div class="input-group">';
         html += '<span class="input-group-addon">' + node.parameters[i][0] + '</span>';
         html += '<input type="text" class="form-control" placeholder="' + node.parameters[i][1] + '"/>';
+        html += '</div>'
       }
-      html += '</div></li>'
+      html += '<hr/>';
     }
     if (node.outputs.length != 0){
-      html += '<li><a href="#">Output</a></li>';
-      html += '<li><div class="input-group"';
+      html += '<h5>Output</h5>'
       for (var i in node.outputs){
+        html += '<div class="input-group">';
         html += '<span class="input-group-addon">' + node.outputs[i][0] + '</span>';
         html += '<input type="text" class="form-control" placeholder="' + node.outputs[i][1] + '"/>';
+        html += '</div>'
       }
-      html += '</div></li>'
     }
-    html += '<button type="button" class="btn btn-default">确定</button><button type="button" class="btn btn-default">取消</button>';
+    html += '<div class="panel-footer"><button type="button" class="btn btn-default">确定</button><button type="button" class="btn btn-default">取消</button></div>';
     $('#attributesArea').html(html);
   }
 }
