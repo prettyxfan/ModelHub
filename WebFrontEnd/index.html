@@ -44,40 +44,65 @@
         
         <!-- Favicon -->
         <link rel="shortcut icon" type="image/x-icon" href="./assets/ico/favicon.ico"/>
-
   </head>
 
   <body>
-      
-    <div class="login" style="display:none">
-        <form role="form">
-          <div class="form-group">
-            <label for="exampleInputEmail1">Email address</label>
-            <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter email">
-          </div>
-          <div class="form-group">
-            <label for="exampleInputPassword1">Password</label>
-            <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
-          </div>
-          <div class="form-group">
-            <label for="exampleInputFile">File input</label>
-            <input type="file" id="exampleInputFile">
-            <p class="help-block">Example block-level help text here.</p>
-          </div>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox"> Check me out
-            </label>
-          </div>
-          <button type="submit" class="btn btn-default">Submit</button>
-        </form>  
+    <div class="login">
+      <div class="col-md-4"></div>
+      <div class="col-md-4">
+        <div class="logoArea">
+          <img src="./assets/ico/favicon.png"/>
+          <h2>ModelHub</h2>
+        </div>
+        <div class="inputArea">
+          <ul class="nav nav-tabs">
+            <li class="active"><a href="#sign-up" data-toggle="tab">Sign up</a></li>
+            <li><a href="#login" data-toggle="tab">Login</a></li>
+          </ul>
+          <div id="myTabContent" class="tab-content">
+            <div class="tab-pane fade in active" id="sign-up">
+              <div class="sign-up-content">
+                <form role="form">
+                  <div class="form-group">
+                    <input type="text" class="form-control input-lg" id="sign-up-username" placeholder="Username">
+                  </div>
+                  <div class="form-group">
+                    <input type="email" class="form-control input-lg" id="sign-up-email" placeholder="Email">
+                  </div>
+                  <div class="form-group">
+                    <input type="password" class="form-control input-lg" id="sign-up-password" placeholder="Password">
+                  </div>
+                  <button type="submit" class="btn btn-info btn-lg btn-block">GET STARTED!</button>
+                </form>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="login">
+              <div class="login-content">
+                <form role="form">
+                  <div class="form-group">
+                    <div class="form-group">
+                      <input type="text" class="form-control input-lg" id="login-username-email" placeholder="Username Or Email">
+                    </div>
+                    <div class="form-group">
+                      <input type="password" class="form-control input-lg" id="login-password" placeholder="Password">
+                    </div>
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox"> Remember me
+                      </label>
+                    </div>
+                    <button type="submit" class="btn btn-info btn-lg btn-block">LOGIN</button>
+                </form>
+              </div>
+            </div>
+          </div> 
+        </div>
+        </div>
+        <div class="col-md-4"></div>  
+    </div>
     </div>
       
-    <div class="register" style="display:none">
-        
-    </div>
-      
-    <div class="row" style="display:">
+    <div class="row" style="display:none">
       <div class="col-md-2">
         <div class="panel panel-primary">
           <div class="panel-heading">
@@ -200,31 +225,31 @@
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="./lib/jquery.js"></script>
+    <script src="./assets/js/frameworks/JointJS/jquery.js"></script>
     <script src="./assets/js/frameworks/bootstrap.js"></script>
 
-    <script src="./lib/jquery.sortElements.js"></script>
-    <script src="./lib/lodash.js"></script>
-    <script src="./lib/backbone.js"></script>
+    <script src="./assets/js/frameworks/JointJS/jquery.sortElements.js"></script>
+    <script src="./assets/js/frameworks/JointJS/lodash.js"></script>
+    <script src="./assets/js/frameworks/JointJS/backbone.js"></script>
 
-    <script src="./src/core.js"></script>
-    <script src="./src/vectorizer.js"></script>
-    <script src="./src/geometry.js"></script>
+    <script src="./assets/js/frameworks/JointJS/core.js"></script>
+    <script src="./assets/js/frameworks/JointJS/vectorizer.js"></script>
+    <script src="./assets/js/frameworks/JointJS/geometry.js"></script>
 
-    <script src="./src/joint.dia.graph.js"></script>
-    <script src="./src/joint.dia.cell.js"></script>
-    <script src="./src/joint.dia.element.js"></script>
-    <script src="./src/joint.dia.link.js"></script>
-    <script src="./src/joint.dia.paper.js"></script>
+    <script src="./assets/js/frameworks/JointJS/joint.dia.graph.js"></script>
+    <script src="./assets/js/frameworks/JointJS/joint.dia.cell.js"></script>
+    <script src="./assets/js/frameworks/JointJS/joint.dia.element.js"></script>
+    <script src="./assets/js/frameworks/JointJS/joint.dia.link.js"></script>
+    <script src="./assets/js/frameworks/JointJS/joint.dia.paper.js"></script>
 
-    <script src="./plugins/joint.shapes.basic.js"></script>
+    <script src="./assets/js/frameworks/JointJS/joint.shapes.basic.js"></script>
 
-    <script src="./dist/joint.shapes.uml.min.js"></script>
-    <script src="./dist/joint.shapes.uml.js"></script>
-    <script src="./dist/joint.shapes.devs.min.js"></script>
-    <script src="./dist/joint.shapes.devs.js"></script>
+    <script src="./assets/js/frameworks/JointJS/joint.shapes.uml.min.js"></script>
+    <script src="./assets/js/frameworks/JointJS/joint.shapes.uml.js"></script>
+    <script src="./assets/js/frameworks/JointJS/joint.shapes.devs.min.js"></script>
+    <script src="./assets/js/frameworks/JointJS/joint.shapes.devs.js"></script>
       
-    <script src="./main.js"></script>
+    <script src="./assets/js/application.js"></script>
 
   </body>
 </html>
