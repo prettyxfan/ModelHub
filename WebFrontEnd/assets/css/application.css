@@ -1,0 +1,78 @@
+html {
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0     
+}
+
+body {
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0
+}
+
+
+
+/**
+.panel {
+    height: 100%;
+    overflow-x: auto; 
+    overflow-y: auto;
+    border-radius: 0px;
+    margin-bottom: 0px;
+}
+
+.panel-body {
+    padding: 3px;
+}
+
+.panel-heading {
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+}
+
+.btn-group > .btn-group:first-child > .btn:last-child,
+.btn-group > .btn-group:first-child > .dropdown-toggle,
+.btn-group > .btn-group:last-child > .btn:last-child,
+.btn-group > .btn-group:last-child > .dropdown-toggle  {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.btn-default {
+    border-color: #fff;
+    background-image: none;
+}
+
+.glyphicon {
+    line-height: inherit;
+    color: #428bca;
+}
+
+#paper {
+    overflow: auto;
+    overflow: auto;
+    height: 60%;
+    border: 1px solid transparent;
+    border-color: #e0e0e0;
+}
+
+#text {
+    overflow: auto;
+    overflow: auto;
+    height: 60%;
+    border: 1px solid transparent;
+    border-color: #e0e0e0;      
+}
+
+#console, #message, #analysis {
+    overflow: auto;
+    overflow: auto;
+    height: 20%;
+    border: 1px solid transparent;
+    border-color: #e0e0e0;
+}
+*//

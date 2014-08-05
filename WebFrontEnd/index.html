@@ -1,87 +1,83 @@
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>MIMS-Editor</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>ModelHub</title>
 
-    <!-- Le styles -->
-    <link href="./assets/css/bootstrap.css" rel="stylesheet">
-    <link href="./assets/css/bootstrap-theme.css" rel="stylesheet">
+        <!-- Metas -->
+        <meta name="keywords" content="ModelHub"/>
+        <meta name="description" content="This is ModelHub."/>
+        <meta name="author" content="PrettyX"/>
+        <meta name="copyright" content="Copyright © 2012-2014 PrettyX"/>
+        <meta name="application-name" content="ModelHub"/>
+      
+        <!-- Application -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;"/>
+        <meta name="format-detection" content="telephone=no"/>
 
-    <style type="text/css">
-    html {
-      height: 100%;
-      width: 100%;
-      padding: 0;
-      margin: 0     
-    }
-    body {
-      height: 100%;
-      width: 100%;
-      padding: 0;
-      margin: 0
-    }
-    .panel {
-      height: 100%;
-      overflow-x: auto; 
-      overflow-y: auto;
-      border-radius: 0px;
-      margin-bottom: 0px;
-    }
-    .panel-body {
-      padding: 3px;
-    }
-    .panel-heading {
-      border-top-left-radius: 0px;
-      border-top-right-radius: 0px;
-    }
-
-    .btn-group > .btn-group:first-child > .btn:last-child,
-    .btn-group > .btn-group:first-child > .dropdown-toggle,
-    .btn-group > .btn-group:last-child > .btn:last-child,
-    .btn-group > .btn-group:last-child > .dropdown-toggle  {
-      border-bottom-right-radius: 0;
-      border-bottom-left-radius: 0;
-      border-top-left-radius: 0;
-      border-top-right-radius: 0;
-    }
-    .btn-default {
-      border-color: #fff;
-      background-image: none;
-    }
-    .glyphicon {
-      line-height: inherit;
-      color: #428bca;
-    }
-    #paper {
-      overflow: auto;
-      overflow: auto;
-      height: 60%;
-      border: 1px solid transparent;
-      border-color: #e0e0e0;
-    }
-    #text {
-      overflow: auto;
-      overflow: auto;
-      height: 60%;
-      border: 1px solid transparent;
-      border-color: #e0e0e0;      
-    }
-    #console, #message, #analysis {
-      overflow: auto;
-      overflow: auto;
-      height: 20%;
-      border: 1px solid transparent;
-      border-color: #e0e0e0;
-    }
-    </style>
+        <!-- Apple Web Application 
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+        <meta name="apple-touch-fullscreen" content="yes" /> 
+        <link rel="apple-touch-icon" href="PengJingwen.png"/>
+        <link rel="apple-touch-startup-image" href="PengJingwen.png" />
+        -->
+        
+        <!-- IE Dream Taskbar 
+        <meta name="msapplication-task" content="name=XXX; action-uri=http://xxx.xxx; icon-uri=favicon.ico"/>
+        -->
+        
+        <!-- Open Graph Protocol 
+        <meta property="og:title" content="ModelHub"/>
+        <meta property="og:url" content="http://xxx.xxx"/>
+        <meta property="og:site_name" content="ModelHub"/>
+        <meta property="og:description" content="ModelHub"/>
+        <meta property="og:image" content="ModelHub.png"/>
+        -->
+        
+        <!-- Robots -->
+        <meta name="robots" Content="nofollow"/>
+        
+        <!-- CSS -->
+        <link rel="stylesheet" type="text/css" href="./assets/css/frameworks/bootstrap.css"/>
+        <link rel="stylesheet" type="text/css" href="./assets/css/frameworks/bootstrap-theme.css"/>
+        <link rel="stylesheet" type="text/css" href="./assets/css/application.css"/>
+        
+        <!-- Favicon -->
+        <link rel="shortcut icon" type="image/x-icon" href="./assets/ico/favicon.ico"/>
 
   </head>
 
   <body>
-    <div class="row">
+      
+    <div class="login" style="display:none">
+        <form role="form">
+          <div class="form-group">
+            <label for="exampleInputEmail1">Email address</label>
+            <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter email">
+          </div>
+          <div class="form-group">
+            <label for="exampleInputPassword1">Password</label>
+            <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+          </div>
+          <div class="form-group">
+            <label for="exampleInputFile">File input</label>
+            <input type="file" id="exampleInputFile">
+            <p class="help-block">Example block-level help text here.</p>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox"> Check me out
+            </label>
+          </div>
+          <button type="submit" class="btn btn-default">Submit</button>
+        </form>  
+    </div>
+      
+    <div class="register" style="display:none">
+        
+    </div>
+      
+    <div class="row" style="display:">
       <div class="col-md-2">
         <div class="panel panel-primary">
           <div class="panel-heading">
@@ -205,7 +201,7 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="./lib/jquery.js"></script>
-    <script src="./assets/js/bootstrap.js"></script>
+    <script src="./assets/js/frameworks/bootstrap.js"></script>
 
     <script src="./lib/jquery.sortElements.js"></script>
     <script src="./lib/lodash.js"></script>

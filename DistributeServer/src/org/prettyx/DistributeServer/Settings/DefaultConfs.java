@@ -22,24 +22,24 @@ public class DefaultConfs {
     /* Init Settings, Cannot Be Override */
     protected static Map fixSettingsMap = new HashMap<String, String>() {{
 
-        put("Init.BasePath","/Documents/MIMS");
+        put("Init.BasePath","/Documents/ModelHub");
 
         put("Init.DistributeServerConfigFileNAME", "DistributeServer.xml");
-        put("Init.DistributeServerConfigFilePath", "/Documents/MIMS/DistributeServer.xml");
+        put("Init.DistributeServerConfigFilePath", "/Documents/ModelHub/DistributeServer.xml");
         put("Init.ComputeServerConfigFileNAME", "ComputeServer.xml");
-        put("Init.ComputeServerConfigFilePath", "/Documents/MIMS/ComputeServer.xml");
+        put("Init.ComputeServerConfigFilePath", "/Documents/ModelHub/ComputeServer.xml");
 
         put("Init.LogPathName", "Log");
-        put("Init.LogPathPath", "/Documents/MIMS/Log");
+        put("Init.LogPathPath", "/Documents/ModelHub/Log");
         put("Init.DistributeServerLogFileName", "DistributeServer.log");
-        put("Init.DistributeServerLogFilePath", "/Documents/MIMS/Log/DistributeServer.log");
+        put("Init.DistributeServerLogFilePath", "/Documents/ModelHub/Log/DistributeServer.log");
         put("Init.ComputeServerLogFileName", "ComputeServer.log");
-        put("Init.ComputeServerLogFilePath", "/Documents/MIMS/Log/ComputeServer.log");
+        put("Init.ComputeServerLogFilePath", "/Documents/ModelHub/Log/ComputeServer.log");
 
         put("Init.RuntimePathName", "Runtime");
-        put("Init.RuntimePathPath", "/Documents/MIMS/Runtime");
+        put("Init.RuntimePathPath", "/Documents/ModelHub/Runtime");
         put("Init.RuntimeOMSPathName", "OMS3");
-        put("Init.RuntimeOMSPathPath", "/Documents/MIMS/Runtime/OMS3");
+        put("Init.RuntimeOMSPathPath", "/Documents/ModelHub/Runtime/OMS3");
     }};
 
 

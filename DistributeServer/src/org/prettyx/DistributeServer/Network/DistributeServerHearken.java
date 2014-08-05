@@ -14,11 +14,13 @@ import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 import org.prettyx.Common.LogUtility;
 import org.prettyx.Common.StatusCodes;
+import org.prettyx.Common.XMLParser;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Hearken to InComing Request.
@@ -44,24 +46,35 @@ public class DistributeServerHearken extends WebSocketServer {
     }
 
     @Override
-    public void onMessage(WebSocket webSocket, String s) {
+    public void onMessage(WebSocket webSocket, String string) {
 
-        System.out.println(s);
-        if(s.equals("Get Model")) {
-            String ModelInfomation = "<components><component><componentName>gopher</componentName>"+
-                    "<componentDescription>It's a long long story</componentDescription>"+
-                    "<inputs><input><inputName>in1</inputName><inputType>string</inputType></input>"+
-                    "<input><inputName>in2</inputName><inputType>string</inputType></input></inputs>"+
-                    "<outputs><output><outputName>out</outputName><outputType>integer</outputType>"+
-                    "</output></outputs><parameters><parameter><parameterName></parameterName><parameterType>"+
-                    "</parameterType></parameter></parameters></component><component><componentName>Hello World"+
-                    "</componentName><componentDescription>The component just prints out the message."+
-                    "</componentDescription><inputs><input><inputName>message</inputName>"+
-                    "<inputType>string</inputType></input></inputs><outputs><output><outputName>out</outputName>"+
-                    "<outputType>string</outputType></output></outputs><parameters><parameter><parameterName>"+
-                    "</parameterName><parameterType></parameterType></parameter></parameters></component></components>";
-            sendToAll(ModelInfomation);
+//        System.out.println(s);
+//        if(s.equals("Get Model")) {
+//            String ModelInfomation = "<components><component><componentName>gopher</componentName>"+
+//                    "<componentDescription>It's a long long story</componentDescription>"+
+//                    "<inputs><input><inputName>in1</inputName><inputType>string</inputType></input>"+
+//                    "<input><inputName>in2</inputName><inputType>string</inputType></input></inputs>"+
+//                    "<outputs><output><outputName>out</outputName><outputType>integer</outputType>"+
+//                    "</output></outputs><parameters><parameter><parameterName></parameterName><parameterType>"+
+//                    "</parameterType></parameter></parameters></component><component><componentName>Hello World"+
+//                    "</componentName><componentDescription>The component just prints out the message."+
+//                    "</componentDescription><inputs><input><inputName>message</inputName>"+
+//                    "<inputType>string</inputType></input></inputs><outputs><output><outputName>out</outputName>"+
+//                    "<outputType>string</outputType></output></outputs><parameters><parameter><parameterName>"+
+//                    "</parameterName><parameterType></parameterType></parameter></parameters></component></components>";
+//            sendToAll(ModelInfomation);
+//        }
+
+        LogUtility.logUtility().log2out(webSocket.getRemoteSocketAddress().toString());
+
+        try {
+            Map amap = XMLParser.parserXmlFromString(string);
+            LogUtility.logUtility().log2out(amap.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
+
     }
 
     @Override
