@@ -12,23 +12,23 @@ body {
     margin: 0
 }
 
-.login {
+#login {
     height: 100%;
 }
-.logoArea {
+#logoArea {
     margin-top: 10%;
     text-align: center;
 }
-.inputArea {
+#inputArea {
     vertical-align: middle;
     padding: 30px;
     /*margin-top: 30%;*/
     /*margin:-100px 0 0 -150px */
 }
-.sign-up-content {
+#sign-up-content {
     margin-top: 10%;
 }
-.login-content {
+#login-content {
     margin-top: 10%;
 }
 
