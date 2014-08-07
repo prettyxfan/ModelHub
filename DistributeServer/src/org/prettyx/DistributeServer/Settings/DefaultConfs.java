@@ -40,6 +40,8 @@ public class DefaultConfs {
         put("Init.RuntimePathPath", "/Documents/ModelHub/Runtime");
         put("Init.RuntimeOMSPathName", "OMS3");
         put("Init.RuntimeOMSPathPath", "/Documents/ModelHub/Runtime/OMS3");
+        put("Init.RuntimeDatabaseName", "Database.sqlite");
+        put("Init.RuntimeDatabasePath", "/Documents/ModelHub/Runtime/Database.sqlite");
     }};
 
 

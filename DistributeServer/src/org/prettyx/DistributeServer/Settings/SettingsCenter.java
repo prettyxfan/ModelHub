@@ -261,6 +261,7 @@ public class SettingsCenter {
         }
 
         //TODO NOT COMMON
+
         // Install DistributeServer DefaultConfigFile
         try {
 
@@ -270,6 +271,22 @@ public class SettingsCenter {
                                                 DefaultConfs.fixSettingsMap.get("Init.DistributeServerConfigFilePath"));
 
             DEPF.copyFile(inputStream, outputStream);
+
+            inputStream.close();
+            outputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return StatusCodes.FAIL;
+        }
+
+        // Install Database
+        try {
+            InputStream inputStream = DEPF.getResourceStream((String)
+                                                DefaultConfs.fixSettingsMap.get("Init.RuntimeDatabaseName"));
+            OutputStream outputStream = new FileOutputStream(DEPF.userHome() +
+                                                DefaultConfs.fixSettingsMap.get("Init.RuntimeDatabasePath"));
+
+            DEPF.copyBinFile(inputStream, outputStream);
 
             inputStream.close();
             outputStream.close();
