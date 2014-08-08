@@ -30,17 +30,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/sqlite-jdbc4-3.8.2.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib/sqlite-jdbc4-3.8.2.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/oms/cpptasks-1.0b6-od.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -94,6 +83,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="sqlite-jdbc-3.7.2" level="project" />
   </component>
 </module>
 
