@@ -89,8 +89,7 @@ public class SettingsCenter {
         // Load Configurations
         Map configuresMap = null;
         try {
-            configuresMap = XMLParser.parserXmlFromFile(DEPF.userHome() + 
-                                            DefaultConfs.fixSettingsMap.get("Init.DistributeServerConfigFilePath"));
+            configuresMap = XMLParser.parserXmlFromFile((String)DefaultConfs.fixSettingsMap.get("Init.DistributeServerConfigFilePath"));
         } catch (Exception e) {
             System.out.println("Load Conf File Failed, Check and Restart...");
             return StatusCodes.FAIL;
@@ -119,7 +118,7 @@ public class SettingsCenter {
         }
 
         // Check Log File Exists
-        File logFile = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.LogPathPath"));
+        File logFile = new File((String)DefaultConfs.fixSettingsMap.get("Init.LogPathPath"));
         if (!logFile.exists()) {
             return StatusCodes.FILE_NOT_FOUND;
         }
@@ -127,8 +126,7 @@ public class SettingsCenter {
         // Init the LogUtility
         String logLevel = (String) settingsMap.get("Running.LogLevel");
         if (logLevel != null) {
-            LogUtility.logUtility().configure(DEPF.userHome() +
-                                                DefaultConfs.fixSettingsMap.get("Init.DistributeServerLogFilePath"),
+            LogUtility.logUtility().configure((String)DefaultConfs.fixSettingsMap.get("Init.DistributeServerLogFilePath"),
                                                 Integer.valueOf(logLevel));
             LogUtility.logUtility().log2out("Application is Starting!");
             LogUtility.logUtility().log2out("Configurations load successfully.");
@@ -171,13 +169,13 @@ public class SettingsCenter {
 
         //TODO NOT COMMON
         // Check Files
-        File configFile = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.DistributeServerConfigFilePath"));
+        File configFile = new File((String)DefaultConfs.fixSettingsMap.get("Init.DistributeServerConfigFilePath"));
 
         // Check Directories
-        File basePath = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.BasePath"));
-        File logPath = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.LogPathPath"));
-        File runtimePath = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.RuntimePathPath"));
-        File runtimeOMSPath = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.RuntimeOMSPathPath"));
+        File basePath = new File((String)DefaultConfs.fixSettingsMap.get("Init.BasePath"));
+        File logPath = new File((String)DefaultConfs.fixSettingsMap.get("Init.LogPathPath"));
+        File runtimePath = new File((String)DefaultConfs.fixSettingsMap.get("Init.RuntimePathPath"));
+        File runtimeOMSPath = new File((String)DefaultConfs.fixSettingsMap.get("Init.RuntimeOMSPathPath"));
 
         if (
             // Files
@@ -228,10 +226,10 @@ public class SettingsCenter {
 
         System.out.println("Application starts first time.");
         System.out.println("Installing application support files will be in " +
-                                DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.BasePath"));
+                                (String)DefaultConfs.fixSettingsMap.get("Init.BasePath"));
 
         // Install Init_BasePath
-        File basePath = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.BasePath"));
+        File basePath = new File((String)DefaultConfs.fixSettingsMap.get("Init.BasePath"));
         if (!basePath.isDirectory()) {
             if (!basePath.mkdirs()) {
                 return StatusCodes.FAIL;
@@ -239,7 +237,7 @@ public class SettingsCenter {
         }
 
         // Install LogPath
-        File logPath = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.LogPathPath"));
+        File logPath = new File((String)DefaultConfs.fixSettingsMap.get("Init.LogPathPath"));
         if (!logPath.isDirectory()) {
             if (!logPath.mkdirs()) {
                 return StatusCodes.FAIL;
@@ -247,13 +245,13 @@ public class SettingsCenter {
         }
 
         // Install RuntimePath
-        File runtimePath = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.RuntimePathPath"));
+        File runtimePath = new File((String)DefaultConfs.fixSettingsMap.get("Init.RuntimePathPath"));
         if (!runtimePath.isDirectory()) {
             if (!runtimePath.mkdirs()) {
                 return StatusCodes.FAIL;
             }
         }
-        File runtimeOMSPath = new File(DEPF.userHome() + DefaultConfs.fixSettingsMap.get("Init.RuntimeOMSPathPath"));
+        File runtimeOMSPath = new File((String)DefaultConfs.fixSettingsMap.get("Init.RuntimeOMSPathPath"));
         if (!runtimeOMSPath.isDirectory()) {
             if (!runtimeOMSPath.mkdirs()) {
                 return StatusCodes.FAIL;
@@ -267,7 +265,7 @@ public class SettingsCenter {
 
             InputStream inputStream = DEPF.getResourceStream((String)
                                                 DefaultConfs.fixSettingsMap.get("Init.DistributeServerConfigFileNAME"));
-            OutputStream outputStream = new FileOutputStream(DEPF.userHome() +
+            OutputStream outputStream = new FileOutputStream((String)
                                                 DefaultConfs.fixSettingsMap.get("Init.DistributeServerConfigFilePath"));
 
             DEPF.copyFile(inputStream, outputStream);
@@ -283,7 +281,7 @@ public class SettingsCenter {
         try {
             InputStream inputStream = DEPF.getResourceStream((String)
                                                 DefaultConfs.fixSettingsMap.get("Init.RuntimeDatabaseName"));
-            OutputStream outputStream = new FileOutputStream(DEPF.userHome() +
+            OutputStream outputStream = new FileOutputStream((String)
                                                 DefaultConfs.fixSettingsMap.get("Init.RuntimeDatabasePath"));
 
             DEPF.copyBinFile(inputStream, outputStream);
@@ -309,7 +307,7 @@ public class SettingsCenter {
             for (String jar : jars) {
 
                 InputStream inputStream = DEPF.getResourceStream("oms" + "/" + jar);
-                OutputStream outputStream = new FileOutputStream(DEPF.userHome() +
+                OutputStream outputStream = new FileOutputStream((String)
                         DefaultConfs.fixSettingsMap.get("Init.RuntimeOMSPathPath") + "/" + jar);
 
                 DEPF.copyBinFile(inputStream, outputStream);

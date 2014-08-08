@@ -9,7 +9,6 @@
 // +----------------------------------------------------------------------
 package org.prettyx.DistributeServer;
 
-import com.sun.java.util.jar.pack.*;
 import org.prettyx.Common.DEPF;
 import org.prettyx.Common.LogUtility;
 import org.prettyx.Common.StatusCodes;
@@ -18,8 +17,9 @@ import org.prettyx.DistributeServer.Settings.SettingsCenter;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class DistributeServer {
 
@@ -52,40 +52,26 @@ public class DistributeServer {
         DistributeServerHearken distributeServerHearken = new DistributeServerHearken(Integer.valueOf(distributeServer.settingsCenter.getSetting("Network", "Port")));
         distributeServerHearken.checkAndStart();
 
-        String absolutePathOfdb = "/Users/XieFan/Documents/ModelHub/Runtime";
-        Connection connection = null;
-        ResultSet resultSet = null;
-        PreparedStatement statement = null;
-
-        try {
-            Class.forName("org.sqlit.JDBC");
-            connection = DriverManager.getConnection("jdbc:sqlite:" + absolutePathOfdb + " Database.sqlite");
-            String sql = "select * from Users;";
-            statement = connection.prepareStatement(sql);
-            resultSet = statement.executeQuery(sql);
-            while (resultSet.next()) {
-                System.out.println("username = " + resultSet.getString("username"));
-                System.out.println("password = " + resultSet.getString("password"));
-            }
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        finally
-        {
-            try
-            {
-                resultSet.close();
-                statement.close();
-                connection.close();
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-
-
+        distributeServer.test();
     }
 
+
+    public void test(){
+        String absolutePathOfDB = this.settingsCenter.getSetting("Init", "RuntimeDatabasePath");
+
+        try {
+            DriverManager.registerDriver(new org.sqlite.JDBC());
+            Connection connection = DriverManager.getConnection("jdbc:sqlite:" + absolutePathOfDB);
+            Statement statement = connection.createStatement();
+            statement.setQueryTimeout(5);
+
+            ResultSet resultSet = statement.executeQuery("SELECT name FROM sqlite_master WHERE type='table'\n ORDER BY name;");
+
+            LogUtility.logUtility().log2out("First Table: " + resultSet.getString(1));
+
+        } catch (Exception e){
+
+            LogUtility.logUtility().log2err(e.getMessage());
+        }
+    }
 }
