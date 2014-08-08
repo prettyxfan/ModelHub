@@ -9,7 +9,6 @@
 // +----------------------------------------------------------------------
 package org.prettyx.DistributeServer;
 
-import com.sun.java.util.jar.pack.*;
 import org.prettyx.Common.DEPF;
 import org.prettyx.Common.LogUtility;
 import org.prettyx.Common.StatusCodes;
@@ -20,6 +19,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+
 
 public class DistributeServer {
 

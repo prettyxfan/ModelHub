@@ -9,6 +9,9 @@
 // +----------------------------------------------------------------------
 package org.prettyx.DistributeServer.Network;
 
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
@@ -21,6 +24,9 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.prettyx.DistributeServer.Users.Users;
 
 /**
  * Hearken to InComing Request.
@@ -30,23 +36,26 @@ import java.util.Map;
  */
 public class DistributeServerHearken extends WebSocketServer {
 
+
+    private Map currentUsers = new ConcurrentHashMap<Users, WebSocketServer>();
+
     public DistributeServerHearken( int port ) {
         super( new InetSocketAddress( port ) );
         LogUtility.logUtility().log2out("Initializing WebSocket Hearken.");
     }
 
     @Override
-    public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
-
+    public void onOpen(WebSocket connection, ClientHandshake handshake) {
+        System.out.println("new connection to " + connection.getRemoteSocketAddress());
     }
 
     @Override
-    public void onClose(WebSocket webSocket, int i, String s, boolean b) {
-
+    public void onClose(WebSocket connection, int code, String reason, boolean remote) {
+        System.out.println("closed " + connection.getRemoteSocketAddress() + " with exit code " + code + " additional info: " + reason);
     }
 
     @Override
-    public void onMessage(WebSocket webSocket, String string) {
+    public void onMessage(WebSocket conection, String string) {
 
 //        System.out.println(s);
 //        if(s.equals("Get Model")) {
@@ -65,7 +74,7 @@ public class DistributeServerHearken extends WebSocketServer {
 //            sendToAll(ModelInfomation);
 //        }
 
-        LogUtility.logUtility().log2out(webSocket.getRemoteSocketAddress().toString());
+        LogUtility.logUtility().log2out(conection.getRemoteSocketAddress().toString());
 
         try {
             Map amap = XMLParser.parserXmlFromString(string);
@@ -78,8 +87,8 @@ public class DistributeServerHearken extends WebSocketServer {
     }
 
     @Override
-    public void onError(WebSocket webSocket, Exception e) {
-
+    public void onError(WebSocket connection, Exception ex) {
+        System.err.println("an error occured on connection " + connection.getRemoteSocketAddress()  + ":" + ex);
     }
 
     /**
@@ -99,7 +108,18 @@ public class DistributeServerHearken extends WebSocketServer {
         }
     }
 
+    protected void handleMessage(WebSocket connection, String text) throws Exception {
 
+        Document document = DocumentHelper.parseText(text);
+        Element rootElement = document.getRootElement();
+        Element actionElement = rootElement.element("action");
+        Element ssidElement = rootElement.element("ssid");
+        Element dataElement = rootElement.element("data");
+
+
+
+
+    }
 
     /**
      * A Wrapper for start() method
