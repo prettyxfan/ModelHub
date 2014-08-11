@@ -9,12 +9,15 @@
 // +----------------------------------------------------------------------
 package org.prettyx.DistributeServer.Network;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
+import org.prettyx.Common.DBOP;
 import org.prettyx.Common.LogUtility;
 import org.prettyx.Common.StatusCodes;
 import org.prettyx.Common.XMLParser;
@@ -22,8 +25,12 @@ import org.prettyx.Common.XMLParser;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.Collection;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.prettyx.DistributeServer.Users.Users;
@@ -36,6 +43,11 @@ import org.prettyx.DistributeServer.Users.Users;
  */
 public class DistributeServerHearken extends WebSocketServer {
 
+    public static final int LOGIN = 0;
+    public static final int LOGOUT = 1;
+    public static final int SIGN_UP = 2;
+    public static final int GET_MODEL = 3;
+    public static final int RUN = 4;
 
     private Map currentUsers = new ConcurrentHashMap<Users, WebSocketServer>();
 
@@ -56,7 +68,6 @@ public class DistributeServerHearken extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket conection, String string) {
-
 //        System.out.println(s);
 //        if(s.equals("Get Model")) {
 //            String ModelInfomation = "<components><component><componentName>gopher</componentName>"+
@@ -73,16 +84,10 @@ public class DistributeServerHearken extends WebSocketServer {
 //                    "</parameterName><parameterType></parameterType></parameter></parameters></component></components>";
 //            sendToAll(ModelInfomation);
 //        }
+//        System.out.println(string);
 
-        LogUtility.logUtility().log2out(conection.getRemoteSocketAddress().toString());
-
-        try {
-            Map amap = XMLParser.parserXmlFromString(string);
-            LogUtility.logUtility().log2out(amap.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+//        LogUtility.logUtility().log2out(string);
+        handleMessage(conection, string);
 
     }
 
@@ -91,36 +96,96 @@ public class DistributeServerHearken extends WebSocketServer {
         System.err.println("an error occured on connection " + connection.getRemoteSocketAddress()  + ":" + ex);
     }
 
-    /**
-     * Sends <var>text</var> to all currently connected WebSocket clients.
-     *
-     * @param text
-     *            The String to send across the network.
-     * @throws InterruptedException
-     *             When socket related I/O errors occur.
-     */
-    public void sendToAll( String text ) {
-        Collection<WebSocket> con = connections();
-        synchronized ( con ) {
-            for( WebSocket c : con ) {
-                c.send( text );
+    protected void handleMessage(WebSocket connection, String text) {
+
+        JSONObject jsonObject = JSONObject.fromObject(text);
+        System.out.println(jsonObject.size());
+        if(jsonObject.size() == 3){
+            LogUtility.logUtility().log2out(jsonObject.toString());
+            int action = (Integer)jsonObject.get("action");
+            String sid = (String)jsonObject.get("sid");
+            String data = (String)jsonObject.get("data");
+
+            try {
+                switch(action) {
+                    case LOGIN: login(connection, data); break;
+                    case LOGOUT: logOut(); break;
+                    case SIGN_UP: signUp(); break;
+                    case GET_MODEL: getModel(); break;
+                    case RUN: runModel(); break;
+                    default: LogUtility.logUtility().log2err("action type error");
+                }
+            } catch (Exception e) {
+
             }
+
         }
-    }
-
-    protected void handleMessage(WebSocket connection, String text) throws Exception {
-
-        Document document = DocumentHelper.parseText(text);
-        Element rootElement = document.getRootElement();
-        Element actionElement = rootElement.element("action");
-        Element ssidElement = rootElement.element("ssid");
-        Element dataElement = rootElement.element("data");
-
-
 
 
     }
+    /**
+     * @TODO
+     */
 
+    protected void login(WebSocket connection, String data) throws Exception {
+
+        String sid = UUID.randomUUID().toString();
+        Users user = new Users(connection, sid);
+        Map userInfo = XMLParser.parserXmlFromString(data);
+        String userNameOrEmail = (String)userInfo.get("/message/username_email");
+        String password = (String)userInfo.get("/message/password");
+        LogUtility.logUtility().log2out("user: "+userNameOrEmail+"password: "+password);
+
+        DBOP dbop = new DBOP();
+
+        Connection connectionToSql = dbop.getConnection();
+        PreparedStatement prep = connectionToSql.prepareStatement(
+                "select count(*) as rowCount from Users where( username = ? or nickname = ?) and password = ?;");
+        prep.setString(1, userNameOrEmail);
+        prep.setString(2, userNameOrEmail);
+        prep.setString(3, password);
+
+        ResultSet resultSet = prep.executeQuery();
+
+        if (resultSet.getInt("rowCount") == 0) {
+            //用户不存在
+            JSONObject jsonObject = JSONObject.fromObject("{action:'login',StatusCode:0,message:'fail'}");
+             connection.send(jsonObject.toString());
+        } else {
+            JSONObject jsonObject = JSONObject.fromObject("{action:'login',StatusCode:1,message:'ok'}");
+            connection.send(jsonObject.toString());
+        }
+
+
+    }
+    /**
+     * @TODO
+     */
+
+    protected void logOut() {
+
+    }
+    /**
+     * @TODO
+     */
+
+    protected void signUp() {
+
+    }
+    /**
+     * @TODO
+     */
+
+    protected void getModel() {
+
+    }
+    /**
+     * @TODO
+     */
+
+    protected void runModel() {
+
+    }
     /**
      * A Wrapper for start() method
      * Check & Start Listening at Given Port

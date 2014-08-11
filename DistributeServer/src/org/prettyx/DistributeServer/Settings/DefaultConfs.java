@@ -22,26 +22,26 @@ public class DefaultConfs {
     /* Init Settings, Cannot Be Override */
     protected static Map fixSettingsMap = new HashMap<String, String>() {{
 
-        put("Init.BasePath","/Documents/ModelHub");
+        put("Init.BasePath",DEPF.userHome() + "/Documents/ModelHub");
 
         put("Init.DistributeServerConfigFileNAME", "DistributeServer.xml");
-        put("Init.DistributeServerConfigFilePath", "/Documents/ModelHub/DistributeServer.xml");
+        put("Init.DistributeServerConfigFilePath", DEPF.userHome() + "/Documents/ModelHub/DistributeServer.xml");
         put("Init.ComputeServerConfigFileNAME", "ComputeServer.xml");
-        put("Init.ComputeServerConfigFilePath", "/Documents/ModelHub/ComputeServer.xml");
+        put("Init.ComputeServerConfigFilePath", DEPF.userHome() + "/Documents/ModelHub/ComputeServer.xml");
 
         put("Init.LogPathName", "Log");
-        put("Init.LogPathPath", "/Documents/ModelHub/Log");
+        put("Init.LogPathPath", DEPF.userHome() + "/Documents/ModelHub/Log");
         put("Init.DistributeServerLogFileName", "DistributeServer.log");
-        put("Init.DistributeServerLogFilePath", "/Documents/ModelHub/Log/DistributeServer.log");
+        put("Init.DistributeServerLogFilePath", DEPF.userHome() + "/Documents/ModelHub/Log/DistributeServer.log");
         put("Init.ComputeServerLogFileName", "ComputeServer.log");
-        put("Init.ComputeServerLogFilePath", "/Documents/ModelHub/Log/ComputeServer.log");
+        put("Init.ComputeServerLogFilePath", DEPF.userHome() + "/Documents/ModelHub/Log/ComputeServer.log");
 
         put("Init.RuntimePathName", "Runtime");
-        put("Init.RuntimePathPath", "/Documents/ModelHub/Runtime");
+        put("Init.RuntimePathPath", DEPF.userHome() + "/Documents/ModelHub/Runtime");
         put("Init.RuntimeOMSPathName", "OMS3");
-        put("Init.RuntimeOMSPathPath", "/Documents/ModelHub/Runtime/OMS3");
+        put("Init.RuntimeOMSPathPath", DEPF.userHome() + "/Documents/ModelHub/Runtime/OMS3");
         put("Init.RuntimeDatabaseName", "Database.sqlite");
-        put("Init.RuntimeDatabasePath", "/Documents/ModelHub/Runtime/Database.sqlite");
+        put("Init.RuntimeDatabasePath", DEPF.userHome() + "/Documents/ModelHub/Runtime/Database.sqlite");
     }};
 
 

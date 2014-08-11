@@ -9,6 +9,9 @@
 // +----------------------------------------------------------------------
 package org.prettyx.DistributeServer;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import org.prettyx.Common.DBOP;
 import org.prettyx.Common.DEPF;
 import org.prettyx.Common.LogUtility;
 import org.prettyx.Common.StatusCodes;
@@ -17,13 +20,16 @@ import org.prettyx.DistributeServer.Settings.SettingsCenter;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.UUID;
 
 
 public class DistributeServer {
 
     private SettingsCenter settingsCenter;
+    public static String absolutePathOfDB = null;
 
     /**
      * Initialize the Application Running Environment
@@ -36,6 +42,7 @@ public class DistributeServer {
         if (settingsCenter.loadSettings() != StatusCodes.SUCCESS) {
             return StatusCodes.FAIL;
         }
+        absolutePathOfDB = this.settingsCenter.getSetting("Init", "RuntimeDatabasePath");
 
         return StatusCodes.SUCCESS;
     }
@@ -52,40 +59,43 @@ public class DistributeServer {
         DistributeServerHearken distributeServerHearken = new DistributeServerHearken(Integer.valueOf(distributeServer.settingsCenter.getSetting("Network", "Port")));
         distributeServerHearken.checkAndStart();
 
-        String absolutePathOfdb = "/Users/XieFan/Documents/ModelHub/Runtime";
-        Connection connection = null;
-        ResultSet resultSet = null;
-        PreparedStatement statement = null;
+//        distributeServer.test4();
+    }
+    public void test(){
+
+        String absolutePathOfDB = this.settingsCenter.getSetting("Init", "RuntimeDatabasePath");
 
         try {
-            Class.forName("org.sqlit.JDBC");
-            connection = DriverManager.getConnection("jdbc:sqlite:" + absolutePathOfdb + " Database.sqlite");
-            String sql = "select * from Users;";
-            statement = connection.prepareStatement(sql);
-            resultSet = statement.executeQuery(sql);
-            while (resultSet.next()) {
-                System.out.println("username = " + resultSet.getString("username"));
-                System.out.println("password = " + resultSet.getString("password"));
-            }
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            DriverManager.registerDriver(new org.sqlite.JDBC());
+            Connection connection = DriverManager.getConnection("jdbc:sqlite:" + absolutePathOfDB);
+            Statement statement = connection.createStatement();
+            statement.setQueryTimeout(5);
+
+            ResultSet resultSet = statement.executeQuery("SELECT name FROM sqlite_master WHERE type='table'\n ORDER BY name;");
+
+            LogUtility.logUtility().log2out("First Table: " + resultSet.getString(1));
+
+        } catch (Exception e){
+
+            LogUtility.logUtility().log2err(e.getMessage());
         }
-        finally
-        {
-            try
-            {
-                resultSet.close();
-                statement.close();
-                connection.close();
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
+    }
+
+    public void test2(){
+        DBOP dbop = new DBOP();
+        dbop.Operation("SELECT name FROM sqlite_master WHERE type='table'\n ORDER BY name;");
+    }
+
+    public void test3(){
+        LogUtility.logUtility().log2out(UUID.randomUUID().toString());
+    }
+    public void test4() {
+        String json="{name:'Java',price:52.3}";
+        JSONObject object=JSONObject.fromObject(json);
+        System.out.println(object.get("name")+" "+object.get("price"));
 
 
     }
+
 
 }
