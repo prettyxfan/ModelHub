@@ -1,5 +1,6 @@
 function init() {
     websocket = new WebSocket("ws://localhost:8528");
+    requireTime = 0;
     websocket.onopen = function(event) { 
         console.log("connected ! " + event.data);
         onOpen(event);
@@ -16,16 +17,79 @@ function init() {
         console.log("error ! " + event.data); 
         onError(event);
     }; 
+
 }
 
 window.addEventListener("load", init(), false);
 
 function onOpen(event) {
     console.log("Connection established");
+    console.log(websocket.readyState);
+    // if(websocket.readyState == 1 && requireTime == 0) {
+    //     var storage = window.localStorage;
+    //     console.log("done");
+    //     console.log(storage.getItem('SID'));
+    //     var getData = storage.getItem('SID');
+    //     if(getData != "") {
+    //         var sidJSON = eval('(' + getData + ')');
+    //         var actionStatus = 0;
+    //         var ssid = sidJSON.sid;
+    //         var login_message = "null";
+    //         var sendMessage = {
+    //             action:actionStatus , 
+    //             sid : ssid,
+    //             data:login_message
+    //         };
+    //         websocket.send(json2str(sendMessage));
+    //     }
+    //     requireTime = 1;
+    // }
 }
 
 function onMessage(event) {
     console.log(event.data);
+    var message = eval('(' + event.data + ')');
+    var action = message.action;
+    console.log(message.action);
+    if(action == 'login') {
+        if(message.StatusCode == 1) {
+            if(document.getElementById("check_id").checked){
+                var login_username_email = $("#login-username-email").val();
+                var user = {
+                    sid : message.message,
+                    name : login_username_email
+                };
+                var storage = window.localStorage;
+                storage.setItem('SID', json2str(user));
+                console.log(storage.getItem('SID'));
+            }  else {
+                var storage = window.localStorage;
+                storage.removeItem('SID');
+            }
+            $("#login").css("display","none"); 
+            $("#modelInterface").css("display","block"); 
+        }
+        else if(message.StatusCode == 3) {
+            $("#login").css("display","none"); 
+            $("#modelInterface").css("display","block"); 
+        }
+    }
+    else if(action == 'sign_up') {
+        if(message.StatusCode == 4) {
+            alert(message.message);
+            $('#sign-up-email').val() = '';
+        }
+        else if(message.StatusCode == 5){
+            alert(message.message);
+            $('#sign-up-username').val() = '';
+        }
+        else if(message.StatusCode == 6){
+            alert(message.message);
+            $('#form-sign-up')[0].reset();
+            $('#login_a').click();
+        }
+
+    }
 }
 
 function onError(event) {
@@ -40,7 +104,7 @@ function start() {
     var login_username_email = $("#login-username-email").val();
     var login_password = $("#login-password").val();
     var remember = false;
-    if(!!!$("#check_id").attr("checked")) {
+    if(document.getElementById("check_id").checked) {
         remember = true;
     }
     var actionStatus = 0;
@@ -52,9 +116,22 @@ function start() {
         data:login_message
     };
     websocket.send(json2str(sendMessage));
-
 }
 
+function signUp(){
+    var userName = $('#sign-up-username').val();
+    var userEmail = $('#sign-up-email').val();
+    var password = $('#sign-up-password').val();
+    var actionStatus = 2;
+    var ssid = "null";
+    var sign_up_message = "<message><userName>"+userName+"</userName><userEmail>"+userEmail+"</userEmail><password>"+password+"</password></message>";
+    var sendMessage = {
+        action: actionStatus,
+        sid: ssid,
+        data: sign_up_message
+    };
+    websocket.send(json2str(sendMessage));
+}
 
 function json2str(obj) {
   var S = [];

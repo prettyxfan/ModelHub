@@ -49,7 +49,7 @@ public class DistributeServerHearken extends WebSocketServer {
     public static final int GET_MODEL = 3;
     public static final int RUN = 4;
 
-    private Map currentUsers = new ConcurrentHashMap<Users, WebSocketServer>();
+    private Map currentUsers = new ConcurrentHashMap<WebSocketServer, String>();
 
     public DistributeServerHearken( int port ) {
         super( new InetSocketAddress( port ) );
@@ -108,9 +108,16 @@ public class DistributeServerHearken extends WebSocketServer {
 
             try {
                 switch(action) {
-                    case LOGIN: login(connection, data); break;
+                    case LOGIN: {
+                        if(sid.equals("\"null\"")) {
+                            userNameOrEmailTologin(connection, data);
+                        }else{
+                            userSidTologin(connection, sid);
+                        }
+                        break;
+                    }
                     case LOGOUT: logOut(); break;
-                    case SIGN_UP: signUp(); break;
+                    case SIGN_UP: signUp(connection, data); break;
                     case GET_MODEL: getModel(); break;
                     case RUN: runModel(); break;
                     default: LogUtility.logUtility().log2err("action type error");
@@ -127,18 +134,19 @@ public class DistributeServerHearken extends WebSocketServer {
      * @TODO
      */
 
-    protected void login(WebSocket connection, String data) throws Exception {
+
+    protected void userNameOrEmailTologin(WebSocket connection, String data) throws Exception {
+        System.out.println("here1");
 
         String sid = UUID.randomUUID().toString();
-        Users user = new Users(connection, sid);
         Map userInfo = XMLParser.parserXmlFromString(data);
         String userNameOrEmail = (String)userInfo.get("/message/username_email");
         String password = (String)userInfo.get("/message/password");
-        LogUtility.logUtility().log2out("user: "+userNameOrEmail+"password: "+password);
+        LogUtility.logUtility().log2out("user: "+userNameOrEmail+" password: "+password);
 
         DBOP dbop = new DBOP();
-
         Connection connectionToSql = dbop.getConnection();
+
         PreparedStatement prep = connectionToSql.prepareStatement(
                 "select count(*) as rowCount from Users where( username = ? or nickname = ?) and password = ?;");
         prep.setString(1, userNameOrEmail);
@@ -149,13 +157,54 @@ public class DistributeServerHearken extends WebSocketServer {
 
         if (resultSet.getInt("rowCount") == 0) {
             //用户不存在
+            System.out.println("fail1");
             JSONObject jsonObject = JSONObject.fromObject("{action:'login',StatusCode:0,message:'fail'}");
-             connection.send(jsonObject.toString());
-        } else {
-            JSONObject jsonObject = JSONObject.fromObject("{action:'login',StatusCode:1,message:'ok'}");
             connection.send(jsonObject.toString());
+        } else {
+            System.out.println("ok1");
+            JSONObject jsonObject = JSONObject.fromObject("{action:'login',StatusCode:1,message:'" + sid + "'}");
+            connection.send(jsonObject.toString());
+            prep = connectionToSql.prepareStatement(
+                    "UPDATE Users SET session=? where ( username = ? or nickname = ?) and password = ?;");
+            prep.setString(1, sid);
+            prep.setString(2, userNameOrEmail);
+            prep.setString(3, userNameOrEmail);
+            prep.setString(4, password);
+            prep.executeUpdate();
+            currentUsers.put(connection, sid);
         }
+        prep.close();
+        connectionToSql.close();
+        resultSet.close();
 
+    }
+
+    protected void userSidTologin(WebSocket connection, String sid) throws Exception {
+        System.out.println("here2");
+        System.out.println("sid = "+sid);
+        DBOP dbop = new DBOP();
+        Connection connectionToSql = dbop.getConnection();
+
+        PreparedStatement prep = connectionToSql.prepareStatement(
+                "select count(*) as rowCount from Users where session ='"+ sid +"';");
+        ResultSet resultSet = prep.executeQuery();
+
+        System.out.println("rowCount = "+resultSet.getInt("rowCount"));
+
+        if (resultSet.getInt("rowCount") == 0) {
+            //用户不存在
+            System.out.println("fail2");
+            JSONObject jsonObject = JSONObject.fromObject("{action:'login',StatusCode:2,message:'fail'}");
+            connection.send(jsonObject.toString());
+        } else {
+            System.out.println("ok2");
+            JSONObject jsonObject = JSONObject.fromObject("{action:'login',StatusCode:3,message:'ok'}");
+            connection.send(jsonObject.toString());
+            currentUsers.put(connection, sid);
+        }
+        prep.close();
+        connectionToSql.close();
+        resultSet.close();
 
     }
     /**
@@ -169,8 +218,55 @@ public class DistributeServerHearken extends WebSocketServer {
      * @TODO
      */
 
-    protected void signUp() {
+    protected void signUp(WebSocket connection, String data) throws Exception{
+        System.out.println("here3");
 
+        String sid = UUID.randomUUID().toString();
+        Map userInfo = XMLParser.parserXmlFromString(data);
+        String userName = (String)userInfo.get("/message/userName");
+        String email = (String)userInfo.get("/message/userEmail");
+        String password = (String)userInfo.get("/message/password");
+        LogUtility.logUtility().log2out("username: "+userName+" email: "+email+" password: "+password);
+
+        DBOP dbop = new DBOP();
+        Connection connectionToSql = dbop.getConnection();
+
+        PreparedStatement prep = connectionToSql.prepareStatement(  //email has been sign up
+                "select count(*) as rowCount from Users where username = ?;");
+        prep.setString(1, email);
+        ResultSet resultSet = prep.executeQuery();
+        if(resultSet.getInt("rowCount") != 0){
+            System.out.println("fail3");
+            JSONObject jsonObject = JSONObject.fromObject("{action:'sign_up',StatusCode:4,message:'This Email has been sign up'}");
+            connection.send(jsonObject.toString());
+
+        } else {
+
+            prep = connectionToSql.prepareStatement(
+                    "select count(*) as rowCount from Users where nickname = ?;");
+            prep.setString(1, userName);
+
+            resultSet = prep.executeQuery();
+
+            if (resultSet.getInt("rowCount") != 0) { //username has been sign up
+                System.out.println("fail4");
+                JSONObject jsonObject = JSONObject.fromObject("{action:'sign_up',StatusCode:5,message:'This UserName has been sign up'}");
+                connection.send(jsonObject.toString());
+            } else {
+                System.out.println("ok4");
+                prep = connectionToSql.prepareStatement("insert into Users values(?,?,?,null) ;");
+                prep.setString(1, email);
+                prep.setString(2, userName);
+                prep.setString(3,password);
+                prep.executeUpdate();
+                currentUsers.put(connection, sid);
+                JSONObject jsonObject = JSONObject.fromObject("{action:'sign_up',StatusCode:6,message:'success'}");
+                connection.send(jsonObject.toString());
+            }
+        }
+        prep.close();
+        connectionToSql.close();
+        resultSet.close();
     }
     /**
      * @TODO
