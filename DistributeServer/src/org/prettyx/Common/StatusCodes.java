@@ -78,4 +78,7 @@ public class StatusCodes {
     public static int Error = 1002;
     public static int FILE_NOT_FOUND = 1003;
 
+
+    // Action Code
+
 }

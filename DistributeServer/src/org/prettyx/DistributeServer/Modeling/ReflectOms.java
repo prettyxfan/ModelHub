@@ -1,4 +1,3 @@
-package org.prettyx.DistributeServer.Modeling;
 // +----------------------------------------------------------------------
 // | Multipurpose Integrated Modeling System
 // +----------------------------------------------------------------------
@@ -8,6 +7,7 @@ package org.prettyx.DistributeServer.Modeling;
 // +----------------------------------------------------------------------
 // | Author: XieFan <xiefan1228@gmail.com>
 // +----------------------------------------------------------------------
+package org.prettyx.DistributeServer.Modeling;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;

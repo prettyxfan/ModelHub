@@ -25,12 +25,19 @@ window.addEventListener("load", init(), false);
 function onOpen(event) {
     console.log("Connection established");
     console.log(websocket.readyState);
-    // if(websocket.readyState == 1 && requireTime == 0) {
-    //     var storage = window.localStorage;
-    //     console.log("done");
-    //     console.log(storage.getItem('SID'));
-    //     var getData = storage.getItem('SID');
-    //     if(getData != "") {
+    var storage = window.localStorage;
+    console.log("done");
+    console.log(storage.getItem('SID'));
+    var getData = storage.getItem('SID');
+    // if(getData == null) {
+    //     $("#login").css("display","block"); 
+    //     $("#modelInterface").css("display","none"); 
+    // } else{
+    //     if(websocket.readyState == 1 && requireTime == 0) {
+    //         var storage = window.localStorage;
+    //         console.log("done");
+    //         console.log(storage.getItem('SID'));
+    //         var getData = storage.getItem('SID');
     //         var sidJSON = eval('(' + getData + ')');
     //         var actionStatus = 0;
     //         var ssid = sidJSON.sid;
@@ -42,8 +49,12 @@ function onOpen(event) {
     //         };
     //         websocket.send(json2str(sendMessage));
     //     }
-    //     requireTime = 1;
+    //     else {
+    //             $("#login").css("display","block"); 
+    //         $("#modelInterface").css("display","none"); 
+    //     }
     // }
+    requireTime = 1;
 }
 
 function onMessage(event) {
@@ -52,7 +63,13 @@ function onMessage(event) {
     var action = message.action;
     console.log(message.action);
     if(action == 'login') {
-        if(message.StatusCode == 1) {
+        if(message.StatusCode == 0) {
+            $('#login-username-email').popover('show');
+        }
+        else if(message.StatusCode == 1) {
+            $('#login-password').popover('show');
+        }
+        else if(message.StatusCode == 2) {
             if(document.getElementById("check_id").checked){
                 var login_username_email = $("#login-username-email").val();
                 var user = {
@@ -70,26 +87,32 @@ function onMessage(event) {
             $("#modelInterface").css("display","block"); 
         }
         else if(message.StatusCode == 3) {
+            $("#login").css("display","block"); 
+            $("#modelInterface").css("display","none");     
+        }
+        else if(message.StatusCode == 4) {
             $("#login").css("display","none"); 
             $("#modelInterface").css("display","block"); 
         }
     }
     else if(action == 'sign_up') {
-        if(message.StatusCode == 4) {
-            alert(message.message);
-            $('#sign-up-email').val() = '';
-        }
-        else if(message.StatusCode == 5){
-            alert(message.message);
-            $('#sign-up-username').val() = '';
+        if(message.StatusCode == 5) {
+            $('#sign-up-email').popover('show');
         }
         else if(message.StatusCode == 6){
-            alert(message.message);
-            $('#form-sign-up')[0].reset();
-            $('#login_a').click();
+            $('#sign-up-username').popover('show');
+        }
+        else if(message.StatusCode == 7){
+            $('#myModal').modal('show');
         }
 
     }
+}
+
+function backToLogin(){
+    $('#myModal').modal('hide');
+    $('#form-sign-up')[0].reset();
+    $('#login_a').click();
 }
 
 function onError(event) {

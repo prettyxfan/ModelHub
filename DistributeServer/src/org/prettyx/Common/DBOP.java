@@ -1,4 +1,3 @@
-package org.prettyx.Common;
 // +----------------------------------------------------------------------
 // | Multipurpose Integrated Modeling System
 // +----------------------------------------------------------------------
@@ -8,6 +7,7 @@ package org.prettyx.Common;
 // +----------------------------------------------------------------------
 // | Author: XieFan <xiefan1228@gmail.com>
 // +----------------------------------------------------------------------
+package org.prettyx.Common;
 
 import org.prettyx.DistributeServer.DistributeServer;
 
