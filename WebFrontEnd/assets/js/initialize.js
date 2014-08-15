@@ -29,36 +29,35 @@ function onOpen(event) {
     console.log("done");
     console.log(storage.getItem('SID'));
     var getData = storage.getItem('SID');
-    // if(getData == null) {
-    //     $("#login").css("display","block"); 
-    //     $("#modelInterface").css("display","none"); 
-    // } else{
-    //     if(websocket.readyState == 1 && requireTime == 0) {
-    //         var storage = window.localStorage;
-    //         console.log("done");
-    //         console.log(storage.getItem('SID'));
-    //         var getData = storage.getItem('SID');
-    //         var sidJSON = eval('(' + getData + ')');
-    //         var actionStatus = 0;
-    //         var ssid = sidJSON.sid;
-    //         var login_message = "null";
-    //         var sendMessage = {
-    //             action:actionStatus , 
-    //             sid : ssid,
-    //             data:login_message
-    //         };
-    //         websocket.send(json2str(sendMessage));
-    //     }
-    //     else {
-    //             $("#login").css("display","block"); 
-    //         $("#modelInterface").css("display","none"); 
-    //     }
-    // }
+    if(getData == null) {
+        $("#login").css("display","block"); 
+        $("#modelInterface").css("display","none"); 
+    } else{
+        if(websocket.readyState == 1 && requireTime == 0) {
+            var storage = window.localStorage;
+            console.log(storage.getItem('SID'));
+            var getData = storage.getItem('SID');
+            var sidJSON = eval('(' + getData + ')');
+            var actionStatus = 0;
+            var ssid = sidJSON.sid;
+            var login_message = "null";
+            var sendMessage = {
+                action:actionStatus , 
+                sid : ssid,
+                data:login_message
+            };
+            websocket.send(json2str(sendMessage));
+        }
+        else {
+                $("#login").css("display","block"); 
+                $("#modelInterface").css("display","none"); 
+        }
+    }
     requireTime = 1;
 }
 
 function onMessage(event) {
-    console.log(event.data);
+    // console.log(event.data);
     var message = eval('(' + event.data + ')');
     var action = message.action;
     console.log(message.action);
@@ -85,6 +84,7 @@ function onMessage(event) {
             }
             $("#login").css("display","none"); 
             $("#modelInterface").css("display","block"); 
+            interfaceInit();
         }
         else if(message.StatusCode == 3) {
             $("#login").css("display","block"); 
@@ -106,6 +106,11 @@ function onMessage(event) {
             $('#myModal').modal('show');
         }
 
+    }
+    else if(action == 'get model') {
+        ModelInfomation = message.message;
+        console.log("get model ! " + message.message);
+        createModel();
     }
 }
 

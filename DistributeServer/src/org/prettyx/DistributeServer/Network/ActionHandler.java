@@ -14,10 +14,12 @@ import org.java_websocket.WebSocket;
 import org.prettyx.Common.DBOP;
 import org.prettyx.Common.LogUtility;
 import org.prettyx.Common.XMLParser;
+import org.prettyx.DistributeServer.Modeling.XMLCreater;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
 
@@ -43,7 +45,7 @@ public class ActionHandler {
         Map userInfo = XMLParser.parserXmlFromString(data);
         String userNameOrEmail = (String)userInfo.get("/message/username_email");
         String password = (String)userInfo.get("/message/password");
-        LogUtility.logUtility().log2out("user: "+userNameOrEmail+" password: "+password);
+        String remember = (String)userInfo.get("/message/remember");
 
         DBOP dbop = new DBOP();
         Connection connectionToSql = dbop.getConnection();
@@ -76,14 +78,29 @@ public class ActionHandler {
             System.out.println("ok1");
             JSONObject jsonObject = JSONObject.fromObject("{action:'login',StatusCode:2,message:'" + sid + "'}");
             connection.send(jsonObject.toString());
+            String token = null;
+            if (remember.equals("true")){
+                token = sid;
+            } else {
+                token = null;
+            }
             prep = connectionToSql.prepareStatement(
-                    "UPDATE Users SET session=? where ( username = ? or nickname = ?) and password = ?;");
-            prep.setString(1, sid);
+                    "UPDATE Users SET token=? where ( username = ? or nickname = ?) and password = ?;");
+            prep.setString(1, token);
             prep.setString(2, userNameOrEmail);
             prep.setString(3, userNameOrEmail);
             prep.setString(4, password);
             prep.executeUpdate();
-            DistributeServerHearken.currentUsers.put(connection, sid);
+
+            prep = connectionToSql.prepareStatement(
+                    "select sid  from Users where username = ? or nickname = ?;");
+            prep.setString(1, userNameOrEmail);
+            prep.setString(2, userNameOrEmail);
+
+            resultSet = prep.executeQuery();
+            String user = resultSet.getString("sid");
+            System.out.println("user = " + user);
+            DistributeServerHearken.currentUsers.put(connection, user);
         }
         prep.close();
         connectionToSql.close();
@@ -104,7 +121,7 @@ public class ActionHandler {
         Connection connectionToSql = dbop.getConnection();
 
         PreparedStatement prep = connectionToSql.prepareStatement(
-                "select count(*) as rowCount from Users where session ='"+ sid +"';");
+                "select count(*) as rowCount from Users where token ='"+ sid +"';");
         ResultSet resultSet = prep.executeQuery();
 
         System.out.println("rowCount = "+resultSet.getInt("rowCount"));
@@ -118,7 +135,14 @@ public class ActionHandler {
             System.out.println("ok2");
             JSONObject jsonObject = JSONObject.fromObject("{action:'login',StatusCode:4,message:'ok'}");
             connection.send(jsonObject.toString());
-            DistributeServerHearken.currentUsers.put(connection, sid);
+
+            prep = connectionToSql.prepareStatement(
+                    "select sid  from Users where token = ?;");
+            prep.setString(1, sid);
+            resultSet = prep.executeQuery();
+            String user = resultSet.getString("sid");
+            System.out.println("user = " + user);
+            DistributeServerHearken.currentUsers.put(connection, user);
         }
         prep.close();
         connectionToSql.close();
@@ -177,12 +201,13 @@ public class ActionHandler {
                 connection.send(jsonObject.toString());
             } else {
                 System.out.println("ok4");
-                prep = connectionToSql.prepareStatement("insert into Users values(?,?,?,null) ;");
+                prep = connectionToSql.prepareStatement("insert into Users values(?,?,?,null,?) ;");
                 prep.setString(1, email);
                 prep.setString(2, userName);
                 prep.setString(3,password);
+                String user = UUID.randomUUID().toString();
+                prep.setString(4, user);
                 prep.executeUpdate();
-                DistributeServerHearken.currentUsers.put(connection, sid);
                 JSONObject jsonObject = JSONObject.fromObject("{action:'sign_up',StatusCode:7,message:'success'}");
                 connection.send(jsonObject.toString());
             }
@@ -195,26 +220,25 @@ public class ActionHandler {
      * @TODO
      */
 
-    public static void getModel() {
-        //        System.out.println(s);
-//        if(s.equals("Get Model")) {
-//            String ModelInfomation = "<components><component><componentName>gopher</componentName>"+
-//                    "<componentDescription>It's a long long story</componentDescription>"+
-//                    "<inputs><input><inputName>in1</inputName><inputType>string</inputType></input>"+
-//                    "<input><inputName>in2</inputName><inputType>string</inputType></input></inputs>"+
-//                    "<outputs><output><outputName>out</outputName><outputType>integer</outputType>"+
-//                    "</output></outputs><parameters><parameter><parameterName></parameterName><parameterType>"+
-//                    "</parameterType></parameter></parameters></component><component><componentName>Hello World"+
-//                    "</componentName><componentDescription>The component just prints out the message."+
-//                    "</componentDescription><inputs><input><inputName>message</inputName>"+
-//                    "<inputType>string</inputType></input></inputs><outputs><output><outputName>out</outputName>"+
-//                    "<outputType>string</outputType></output></outputs><parameters><parameter><parameterName>"+
-//                    "</parameterName><parameterType></parameterType></parameter></parameters></component></components>";
-//            sendToAll(ModelInfomation);
-//        }
-//        System.out.println(string);
+    public static void getModel(WebSocket connection) throws SQLException {
+        String userID = (String)DistributeServerHearken.currentUsers.get(connection);
 
-//        LogUtility.logUtility().log2out(string);
+        DBOP dbop = new DBOP();
+        Connection connectionToSql = dbop.getConnection();
+
+        PreparedStatement prep = connectionToSql.prepareStatement(  //email has been sign up
+                "select description from Models where owner = ?;");
+        prep.setString(1, userID);
+        ResultSet resultSet = prep.executeQuery();
+        String modelDescription = "";
+        while (resultSet.next()) {
+            modelDescription += resultSet.getString("description");
+        }
+        modelDescription = XMLCreater.ComponentXML(modelDescription);
+        JSONObject jsonObject = JSONObject.fromObject("{action:'get model',StatusCode:0,message:\""+modelDescription+"\"}");
+        connection.send(jsonObject.toString());
+
+        System.out.println(jsonObject.toString());
 
     }
     /**

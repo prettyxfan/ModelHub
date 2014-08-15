@@ -85,7 +85,10 @@ public class DistributeServerHearken extends WebSocketServer {
                     }
                     case LOGOUT: ActionHandler.logOut(); break;
                     case SIGN_UP: ActionHandler.signUp(connection, data); break;
-                    case GET_MODEL: ActionHandler.getModel(); break;
+                    case GET_MODEL: {
+
+                        ActionHandler.getModel(connection);
+                    } break;
                     case RUN: ActionHandler.runModel(); break;
                     default: LogUtility.logUtility().log2err("action type error");
                 }

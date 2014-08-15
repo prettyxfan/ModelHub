@@ -1,4 +1,5 @@
-function init() {
+function interfaceInit(){
+  alert("done");
 
   /**
   *decleration the globe variabel
@@ -17,24 +18,16 @@ function init() {
   ModelInfomation = '';
 
   createInterface();
-
-  websocket = new WebSocket("ws://localhost:8528");
-  websocket.onopen = function(evt) { 
-    console.log("connected ! " + evt.data);
-    websocket.send("Get Model");
-  }; 
-  websocket.onclose = function(evt) { 
-    console.log("disconncted ! " + evt.data);
-    websocket.close();
-  }; 
-  websocket.onmessage = function(evt) { 
-    ModelInfomation = evt.data;
-    console.log("get message ! " + evt.data);
-    createModel();
-  }; 
-  websocket.onerror = function(evt) { 
-    console.log("error ! " + evt.data); 
-  }; 
+  
+  var actionStatus = 3;
+  var ssid = "null";
+  var sign_up_message = "null";
+  var sendMessage = {
+      action: actionStatus,
+      sid: ssid,
+      data: sign_up_message
+  };
+  websocket.send(json2str(sendMessage));
 
   if(document.implementation && document.implementation.createDocument) {
     componentDOM = document.implementation.createDocument('', '', null);
@@ -65,12 +58,6 @@ function init() {
   // }
 
 }
-
-window.addEventListener("load", init(), false);
-
-
-
-
 
 /**
 * Create the Whole Interface
