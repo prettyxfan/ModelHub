@@ -1,3 +1,0 @@
-
-<components><component><componentName>gopher</componentName><componentDescription>It's a long long story</componentDescription><inputs><input><inputName>in1</inputName><inputType>string</inputType></input><input><inputName>in2</inputName><inputType>string</inputType></input></inputs><outputs><output><outputName>out</outputName><outputType>integer</outputType></output></outputs><parameters><parameter><parameterName></parameterName><parameterType></parameterType></parameter></parameters></component></components>
-
