@@ -143,6 +143,7 @@ function start() {
         sid : ssid,
         data:login_message
     };
+    console.log(json2str(sendMessage));
     websocket.send(json2str(sendMessage));
 }
 

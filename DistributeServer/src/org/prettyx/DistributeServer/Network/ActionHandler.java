@@ -10,16 +10,24 @@
 package org.prettyx.DistributeServer.Network;
 
 import net.sf.json.JSONObject;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 import org.java_websocket.WebSocket;
 import org.prettyx.Common.DBOP;
 import org.prettyx.Common.LogUtility;
 import org.prettyx.Common.XMLParser;
 import org.prettyx.DistributeServer.Modeling.XMLCreater;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -240,6 +248,23 @@ public class ActionHandler {
 
         System.out.println(jsonObject.toString());
 
+    }
+
+    public static void compileModel(WebSocket connection, String data) throws DocumentException {
+        SAXReader reader =new SAXReader();
+        Document document = DocumentHelper.parseText(data);
+        Element root = document.getRootElement();
+        List components = root.elements("part");
+        for (Iterator it = components.iterator(); it.hasNext();) {
+            Element component = (Element) it.next();
+            String partId = component.attributeValue("id");
+            System.out.println(partId);
+            //do something
+        }
+        String docXmlText=document.asXML();
+        String rootXmlText=root.asXML();
+        Element memberElm=root.element("member");
+        String memberXmlText=memberElm.asXML();
     }
     /**
      * @TODO
