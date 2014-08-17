@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Action Handler
@@ -233,12 +234,13 @@ public class ActionHandler {
         Connection connectionToSql = dbop.getConnection();
 
         PreparedStatement prep = connectionToSql.prepareStatement(  //email has been sign up
-                "select description from Models where owner = ?;");
+                "select description,id from Models where owner = ?;");
         prep.setString(1, userID);
         ResultSet resultSet = prep.executeQuery();
         String modelDescription = "";
+        String modelId = "";
         while (resultSet.next()) {
-            modelDescription += resultSet.getString("description");
+            modelDescription += XMLGenerator.ComponentXML(resultSet.getString("description"), resultSet.getString("id"));
         }
         modelDescription = XMLGenerator.ComponentXML(modelDescription);
         JSONObject jsonObject = JSONObject.fromObject("{action:'get model',StatusCode:0,message:\""+modelDescription+"\"}");
@@ -246,6 +248,30 @@ public class ActionHandler {
 
         System.out.println(jsonObject.toString());
 
+    }
+    public static void linkModel(WebSocket connection, String data) throws DocumentException, SQLException {
+        Map idToName = new ConcurrentHashMap<String, String>();
+
+        Document document = DocumentHelper.parseText(data);
+        Element root = document.getRootElement();
+        List parts = root.element("parts").elements("part");
+
+        DBOP dbop = new DBOP();
+        Connection connectionToSql = dbop.getConnection();
+        PreparedStatement prep = connectionToSql.prepareStatement(  //email has been sign up
+                "select modelname from Models where id= ?;");
+
+        for (Iterator it = parts.iterator(); it.hasNext();) {
+            Element component = (Element) it.next();
+            String partId = component.attributeValue("componentId");
+            prep.setString(1, partId);
+            ResultSet resultSet = prep.executeQuery();
+            if(resultSet.next()){
+                String partName = resultSet.getString("modelname");
+                idToName.put(partId, partName);
+                System.out.println("partname : id = " + partName + ":" + partId);
+            }
+        }
     }
 
     public static void compileModel(WebSocket connection, String data) throws DocumentException {

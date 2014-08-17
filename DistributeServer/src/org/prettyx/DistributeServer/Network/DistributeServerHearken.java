@@ -34,8 +34,9 @@ public class DistributeServerHearken extends WebSocketServer {
     public static final int LOGOUT = 1;
     public static final int SIGN_UP = 2;
     public static final int GET_MODEL = 3;
-    public static final int COMPILE = 4;
-    public static final int RUN = 5;
+    public static final int LINK = 4;
+    public static final int COMPILE = 5;
+    public static final int RUN = 6;
 
     public static Map currentUsers = new ConcurrentHashMap<WebSocketServer, String>();
 
@@ -90,6 +91,7 @@ public class DistributeServerHearken extends WebSocketServer {
                         // 这里之后可以添加 是得到用户自己的模型还是搜素其他人的模型
                         ActionHandler.getModel(connection);
                     } break;
+                    case LINK: ActionHandler.linkModel(connection, data);
                     case COMPILE: ActionHandler.compileModel(connection, data);break;
                     case RUN: ActionHandler.runModel(); break;
                     default: LogUtility.logUtility().log2err("action type error");

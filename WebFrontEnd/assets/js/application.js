@@ -162,6 +162,15 @@ function createInterface(){
 
                 var part = componentDOM.createElement('part'); 
                 part.setAttribute('id', IdCount);
+                var componentId = '';
+                for(var i in drawModelArray) {
+                    //console.log(recievedModelArray[i].id + " " + cellId);
+                    if(drawModelArray[i].id == IdCount){
+                        componentId = drawModelArray[i].modelId;
+                        console.log("componentId = "+componentId);
+                    }
+                }
+                part.setAttribute('componentId', componentId);
 
                 for(var i=0; i<inputNumber; i++) {
                     var inputId = componentDOM.createElement('inputId');
@@ -262,6 +271,7 @@ function createInterface(){
           // console.log(recievedModelArray[i]);
             if( recievedModelArray[i].id == m.id ) {
                 m1 = recievedModelArray[i];
+                        console.log("m1 = "+m1.modelId);
                 break;
             }
         }
@@ -294,12 +304,13 @@ function createInterface(){
 * Decleration of the Model Class
 */
 
-function Model(componentName, componentDescription, inputs, outputs, parameters){ 
+function Model(componentName, componentDescription, inputs, outputs, parameters, modelId){ 
     this.componentName = componentName; 
     this.componentDescription = componentDescription; 
     this.inputs = inputs; 
     this.outputs = outputs;
     this.parameters = parameters;
+    this.modelId = modelId;
     this.id = '';
 } 
 
@@ -357,6 +368,8 @@ function createModel(){
 function dealRecieveModel(modelXML){
     var obj =$(modelXML).find("component").each(function(){
 
+        var componentId = $(this).find("componentId").text();;
+        console.log("componentId = " + componentId);
         var inputArray = new Array();
         var inputNumber = 0;
         var outputArray = new Array();
@@ -397,8 +410,9 @@ function dealRecieveModel(modelXML){
             }
         });
 
-        var m1 = new Model(componentName, componentDescription, inputArray, outputArray, parameterArray);
+        var m1 = new Model(componentName, componentDescription, inputArray, outputArray, parameterArray, componentId);
         recievedModelArray[recievedModelNumber] = m1;
+        console.log("m1 = " + m1.componentName);
         recievedModelNumber += 1;
     });
 
@@ -407,7 +421,16 @@ function dealRecieveModel(modelXML){
 
 
 function sendXmlToServer() {
-    websocket.send(componentXML);
+    var actionStatus = 4;
+    var ssid = "null";
+    var modelMessage = componentXML.replace(/"([^"]*)"/g, "'$1'");
+    var sendMessage = {
+        action: actionStatus,
+        sid: ssid,
+        data: modelMessage
+    };
+    websocket.send(json2str(sendMessage));
+    console.log(json2str(sendMessage));
 }
 
 function clearComponent() {

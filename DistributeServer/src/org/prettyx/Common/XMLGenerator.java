@@ -13,6 +13,14 @@ import java.io.File;
 
 public class XMLGenerator {
 
+    public static String ComponentXML(String string, String id){
+        String xml = "";
+        if(string.contains("<component>")){
+            string = string.substring(0,string.indexOf("<componentName>")) + "<componentId>" + id + "</componentId>"
+                    + string.substring(string.indexOf("<componentName>"));
+        }
+        return string;
+    }
     public static String ComponentXML(String string){
         return "<components>" + string + "</components>";
     }
