@@ -19,9 +19,8 @@ import org.java_websocket.WebSocket;
 import org.prettyx.Common.DBOP;
 import org.prettyx.Common.LogUtility;
 import org.prettyx.Common.XMLParser;
-import org.prettyx.DistributeServer.Modeling.XMLCreater;
+import org.prettyx.Common.XMLGenerator;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -242,7 +241,7 @@ public class ActionHandler {
         while (resultSet.next()) {
             modelDescription += resultSet.getString("description");
         }
-        modelDescription = XMLCreater.ComponentXML(modelDescription);
+        modelDescription = XMLGenerator.ComponentXML(modelDescription);
         JSONObject jsonObject = JSONObject.fromObject("{action:'get model',StatusCode:0,message:\""+modelDescription+"\"}");
         connection.send(jsonObject.toString());
 

@@ -7,13 +7,11 @@
 // +----------------------------------------------------------------------
 // | Author: XieFan <xiefan1228@gmail.com>
 // +----------------------------------------------------------------------
-package org.prettyx.DistributeServer.Modeling;
+package org.prettyx.Common;
 
 import java.io.File;
 
-import org.prettyx.Common.DEPFS;
-
-public class XMLCreater {
+public class XMLGenerator {
 
     public static String ComponentXML(String string){
         return "<components>" + string + "</components>";
@@ -23,7 +21,7 @@ public class XMLCreater {
 
     private String content;
 
-    public XMLCreater(String url) {
+    public XMLGenerator(String url) {
 
         location = url;
         File file = new File(url);

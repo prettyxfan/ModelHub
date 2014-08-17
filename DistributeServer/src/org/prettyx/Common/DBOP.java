@@ -11,7 +11,6 @@ package org.prettyx.Common;
 
 import org.prettyx.DistributeServer.DistributeServer;
 
-import java.beans.*;
 import java.sql.*;
 import java.sql.Statement;
 
