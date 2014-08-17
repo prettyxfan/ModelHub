@@ -9,7 +9,7 @@
 // +----------------------------------------------------------------------
 package org.prettyx.DistributeServer.Settings;
 
-import org.prettyx.Common.DEPF;
+import org.prettyx.Common.DEPFS;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,26 +22,26 @@ public class DefaultConfs {
     /* Init Settings, Cannot Be Override */
     protected static Map fixSettingsMap = new HashMap<String, String>() {{
 
-        put("Init.BasePath",DEPF.userHome() + "/Documents/ModelHub");
+        put("Init.BasePath", DEPFS.userHome() + "/Documents/ModelHub");
 
         put("Init.DistributeServerConfigFileNAME", "DistributeServer.xml");
-        put("Init.DistributeServerConfigFilePath", DEPF.userHome() + "/Documents/ModelHub/DistributeServer.xml");
+        put("Init.DistributeServerConfigFilePath", DEPFS.userHome() + "/Documents/ModelHub/DistributeServer.xml");
         put("Init.ComputeServerConfigFileNAME", "ComputeServer.xml");
-        put("Init.ComputeServerConfigFilePath", DEPF.userHome() + "/Documents/ModelHub/ComputeServer.xml");
+        put("Init.ComputeServerConfigFilePath", DEPFS.userHome() + "/Documents/ModelHub/ComputeServer.xml");
 
         put("Init.LogPathName", "Log");
-        put("Init.LogPathPath", DEPF.userHome() + "/Documents/ModelHub/Log");
+        put("Init.LogPathPath", DEPFS.userHome() + "/Documents/ModelHub/Log");
         put("Init.DistributeServerLogFileName", "DistributeServer.log");
-        put("Init.DistributeServerLogFilePath", DEPF.userHome() + "/Documents/ModelHub/Log/DistributeServer.log");
+        put("Init.DistributeServerLogFilePath", DEPFS.userHome() + "/Documents/ModelHub/Log/DistributeServer.log");
         put("Init.ComputeServerLogFileName", "ComputeServer.log");
-        put("Init.ComputeServerLogFilePath", DEPF.userHome() + "/Documents/ModelHub/Log/ComputeServer.log");
+        put("Init.ComputeServerLogFilePath", DEPFS.userHome() + "/Documents/ModelHub/Log/ComputeServer.log");
 
         put("Init.RuntimePathName", "Runtime");
-        put("Init.RuntimePathPath", DEPF.userHome() + "/Documents/ModelHub/Runtime");
+        put("Init.RuntimePathPath", DEPFS.userHome() + "/Documents/ModelHub/Runtime");
         put("Init.RuntimeOMSPathName", "OMS3");
-        put("Init.RuntimeOMSPathPath", DEPF.userHome() + "/Documents/ModelHub/Runtime/OMS3");
+        put("Init.RuntimeOMSPathPath", DEPFS.userHome() + "/Documents/ModelHub/Runtime/OMS3");
         put("Init.RuntimeDatabaseName", "Database.sqlite");
-        put("Init.RuntimeDatabasePath", DEPF.userHome() + "/Documents/ModelHub/Runtime/Database.sqlite");
+        put("Init.RuntimeDatabasePath", DEPFS.userHome() + "/Documents/ModelHub/Runtime/Database.sqlite");
     }};
 
 

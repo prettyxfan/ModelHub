@@ -11,7 +11,7 @@ package org.prettyx.DistributeServer.Modeling;
 
 import java.io.File;
 
-import org.prettyx.Common.DEPF;
+import org.prettyx.Common.DEPFS;
 
 public class XMLCreater {
 
@@ -28,7 +28,7 @@ public class XMLCreater {
         location = url;
         File file = new File(url);
         try {
-            content = DEPF.readFile(file);
+            content = DEPFS.readFile(file);
         }catch (Exception e) {
 
         }

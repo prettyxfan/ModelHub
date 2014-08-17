@@ -1,40 +1,48 @@
+// +----------------------------------------------------------------------
+// | Multipurpose Integrated Modeling System
+// +----------------------------------------------------------------------
+// | Copyright (c) 2014 http://prettyx.org All rights reserved.
+// +----------------------------------------------------------------------
+// | Licensed ( http://www.gnu.org/licenses/gpl.html )
+// +----------------------------------------------------------------------
+// | Author: XieFan <xiefan1228@gmail.com>
+// +----------------------------------------------------------------------
 package org.prettyx.DistributeServer.Modeling;
 
-import org.prettyx.Common.DEPF;
+import org.prettyx.Common.DEPFS;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
-/**
- * Created by XieFan on 8/16/14.
- */
 public class SimFile {
-    private Set oms_import;
+    private Set oms_import = new HashSet();
     private Sim sim;
+
     public SimFile(){
-        oms_import = new HashSet();
+        sim = new Sim();
     }
     public SimFile(String string){
         String [] content = string.split("\n");
-        SimFile simFile = new SimFile();
         for(int i= 0; i<content.length; i++){
             String line = content[i];
-            if(line.contains("import")){
-                simFile.setImport(line);
-                System.out.println(simFile.getImport());
+            if(line.contains("import")){    //simfile 中设置 import
+                setImport(DEPFS.removeSpace(line));
                 continue;
             }
+
             if(line.contains("sim")){
+
                 String simContent = "";
                 while (i<content.length){
                     simContent += content[i] + "\n";
                     i++;
                 }
-                simFile.setSim(simContent);
-                System.out.println(simContent);
+
+                setSim(simContent);
                 break;
             }
-
+            //build outputstrategy output summary efficiency analysis 还没有写
         }
     }
     public void setImport(String string){
@@ -50,4 +58,15 @@ public class SimFile {
         return sim;
     }
 
+    public String toString() {
+        String string = "";
+        Iterator ita = null;
+        ita = oms_import.iterator();
+        while (ita.hasNext()) {
+            String value = (String)ita.next();
+            string +=  value + "\n";
+        }
+        string += sim.toString();
+        return string;
+    }
 }

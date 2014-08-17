@@ -9,7 +9,7 @@
 // +----------------------------------------------------------------------
 package org.prettyx.DistributeServer.Settings;
 
-import org.prettyx.Common.DEPF;
+import org.prettyx.Common.DEPFS;
 import org.prettyx.Common.LogUtility;
 import org.prettyx.Common.StatusCodes;
 import org.prettyx.Common.XMLParser;
@@ -200,7 +200,7 @@ public class SettingsCenter {
      */
     private int isEnvironmentOK(){
 
-        if (DEPF.javaHome()  == null) {
+        if (DEPFS.javaHome()  == null) {
             System.out.println("You need to install the latest JDK and set 'JAVA_HOME' to your JDK install directory.\n"
                     + "Please start again ...");
             return StatusCodes.FAIL;
@@ -263,12 +263,12 @@ public class SettingsCenter {
         // Install DistributeServer DefaultConfigFile
         try {
 
-            InputStream inputStream = DEPF.getResourceStream((String)
-                                                DefaultConfs.fixSettingsMap.get("Init.DistributeServerConfigFileNAME"));
+            InputStream inputStream = DEPFS.getResourceStream((String)
+                    DefaultConfs.fixSettingsMap.get("Init.DistributeServerConfigFileNAME"));
             OutputStream outputStream = new FileOutputStream((String)
                                                 DefaultConfs.fixSettingsMap.get("Init.DistributeServerConfigFilePath"));
 
-            DEPF.copyFile(inputStream, outputStream);
+            DEPFS.copyFile(inputStream, outputStream);
 
             inputStream.close();
             outputStream.close();
@@ -279,12 +279,12 @@ public class SettingsCenter {
 
         // Install Database
         try {
-            InputStream inputStream = DEPF.getResourceStream((String)
-                                                DefaultConfs.fixSettingsMap.get("Init.RuntimeDatabaseName"));
+            InputStream inputStream = DEPFS.getResourceStream((String)
+                    DefaultConfs.fixSettingsMap.get("Init.RuntimeDatabaseName"));
             OutputStream outputStream = new FileOutputStream((String)
                                                 DefaultConfs.fixSettingsMap.get("Init.RuntimeDatabasePath"));
 
-            DEPF.copyBinFile(inputStream, outputStream);
+            DEPFS.copyBinFile(inputStream, outputStream);
 
             inputStream.close();
             outputStream.close();
@@ -306,11 +306,11 @@ public class SettingsCenter {
 
             for (String jar : jars) {
 
-                InputStream inputStream = DEPF.getResourceStream("oms" + "/" + jar);
+                InputStream inputStream = DEPFS.getResourceStream("oms" + "/" + jar);
                 OutputStream outputStream = new FileOutputStream((String)
                         DefaultConfs.fixSettingsMap.get("Init.RuntimeOMSPathPath") + "/" + jar);
 
-                DEPF.copyBinFile(inputStream, outputStream);
+                DEPFS.copyBinFile(inputStream, outputStream);
 
                 inputStream.close();
                 outputStream.close();
