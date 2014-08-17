@@ -10,6 +10,8 @@
 package org.prettyx.Common;
 
 
+import org.prettyx.DistributeServer.Settings.DefaultConfs;
+
 import java.io.*;
 import java.net.URL;
 
@@ -227,5 +229,33 @@ public class DEPFS {
             }
         }
         return string.substring(start, end+1);
+    }
+
+    /**
+     * Create Directory
+     *
+     * @param path
+     */
+
+    public static void createDirectory(String path){
+
+        File file = new File(path);
+        if (!file.isDirectory()) {
+            file.mkdirs();
+        }
+    }
+
+    /**
+     * Remove Directory
+     *
+     * @param path
+     */
+
+    public static void removeDirectory(String path){
+
+        File file = new File(path);
+        if (file.isDirectory()) {
+            file.delete();
+        }
     }
 }

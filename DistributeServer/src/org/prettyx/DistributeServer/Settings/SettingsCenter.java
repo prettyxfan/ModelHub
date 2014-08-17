@@ -257,6 +257,12 @@ public class SettingsCenter {
                 return StatusCodes.FAIL;
             }
         }
+        File runtimeUsersPath = new File((String)DefaultConfs.fixSettingsMap.get("Init.RuntimeUsersPathPath"));
+        if (!runtimeUsersPath.isDirectory()) {
+            if (!runtimeUsersPath.mkdirs()) {
+                return StatusCodes.FAIL;
+            }
+        }
 
         //TODO NOT COMMON
 

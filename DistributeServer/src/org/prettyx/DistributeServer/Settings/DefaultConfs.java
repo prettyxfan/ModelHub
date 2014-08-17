@@ -42,6 +42,8 @@ public class DefaultConfs {
         put("Init.RuntimeOMSPathPath", DEPFS.userHome() + "/Documents/ModelHub/Runtime/OMS3");
         put("Init.RuntimeDatabaseName", "Database.sqlite");
         put("Init.RuntimeDatabasePath", DEPFS.userHome() + "/Documents/ModelHub/Runtime/Database.sqlite");
+        put("Init.RuntimeUsersPathName", "Users");
+        put("Init.RuntimeUsersPathPath", DEPFS.userHome() + "/Documents/ModelHub/Runtime/Users");
     }};
 
 

@@ -16,10 +16,8 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.java_websocket.WebSocket;
-import org.prettyx.Common.DBOP;
-import org.prettyx.Common.LogUtility;
-import org.prettyx.Common.XMLParser;
-import org.prettyx.Common.XMLGenerator;
+import org.prettyx.Common.*;
+import org.prettyx.DistributeServer.DistributeServer;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -208,6 +206,7 @@ public class ActionHandler {
                 connection.send(jsonObject.toString());
             } else {
                 System.out.println("ok4");
+                DEPFS.createDirectory(DistributeServer.absolutePathOfRuntimeUsers + "/" + userName);
                 prep = connectionToSql.prepareStatement("insert into Users values(?,?,?,null,?) ;");
                 prep.setString(1, email);
                 prep.setString(2, userName);

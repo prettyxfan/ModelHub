@@ -22,6 +22,7 @@ public class DistributeServer {
 
     private SettingsCenter settingsCenter;
     public static String absolutePathOfDB = null;
+    public static String absolutePathOfRuntimeUsers = null;
 
     /**
      * Initialize the Application Running Environment
@@ -35,6 +36,7 @@ public class DistributeServer {
             return StatusCodes.FAIL;
         }
         absolutePathOfDB = this.settingsCenter.getSetting("Init", "RuntimeDatabasePath");
+        absolutePathOfRuntimeUsers = this.settingsCenter.getSetting("Init", "RuntimeUsersPathPath");
 
         return StatusCodes.SUCCESS;
     }
