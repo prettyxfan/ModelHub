@@ -249,9 +249,9 @@ public class ActionHandler {
         System.out.println(jsonObject.toString());
 
     }
+
     public static void linkModel(WebSocket connection, String data) throws DocumentException, SQLException {
         Map idToName = new ConcurrentHashMap<String, String>();
-
         Document document = DocumentHelper.parseText(data);
         Element root = document.getRootElement();
         List parts = root.element("parts").elements("part");
@@ -259,7 +259,7 @@ public class ActionHandler {
         DBOP dbop = new DBOP();
         Connection connectionToSql = dbop.getConnection();
         PreparedStatement prep = connectionToSql.prepareStatement(  //email has been sign up
-                "select modelname from Models where id= ?;");
+                "select owner from Models where id= ?;");
 
         for (Iterator it = parts.iterator(); it.hasNext();) {
             Element component = (Element) it.next();
@@ -267,11 +267,22 @@ public class ActionHandler {
             prep.setString(1, partId);
             ResultSet resultSet = prep.executeQuery();
             if(resultSet.next()){
-                String partName = resultSet.getString("modelname");
-                idToName.put(partId, partName);
-                System.out.println("partname : id = " + partName + ":" + partId);
+                String owner = resultSet.getString("owner");
+                PreparedStatement prep1 = connectionToSql.prepareStatement(
+                        "select nickname from Users where sid = ?;");
+                prep1.setString(1, owner);
+                ResultSet resultSet1 = prep1.executeQuery();
+                if(resultSet1.next()) {
+                    String ownerName = resultSet1.getString("nickname");
+                    idToName.put(partId, ownerName);
+                    System.out.println("partId : ownerName = " + partId + ":" + ownerName);
+                }
+                resultSet1.close();
+                prep1.close();
             }
         }
+        prep.close();
+        connectionToSql.close();
     }
 
     public static void compileModel(WebSocket connection, String data) throws DocumentException {
