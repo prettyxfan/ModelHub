@@ -18,6 +18,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Model is represent the element "model" of the sim file
+ * including other subelement
+ */
+
 public class Model {
     private String name = "";
     private String iter = "";
@@ -30,9 +35,17 @@ public class Model {
     private Map logging = new HashMap();
     private Parameter parameter = new Parameter();
 
+    /**
+     * default constructor with none input parameter
+     */
     public Model(){
         parameter = new Parameter();
     }
+
+    /**
+     * Using the content of the model element to create a model object
+     * @param string
+     */
     public Model(String string){
 
         String [] content = string.split("\n");
@@ -184,6 +197,11 @@ public class Model {
         }
 
     }
+
+    /**
+     * those set functions art to set all of the private fields
+     * @param string
+     */
     public void setClassname(String string){
         name = string;
     }
@@ -215,6 +233,10 @@ public class Model {
         parameter.setParameterConent(name, value);
     }
 
+    /**
+     * those get functions are to get all of the private fields
+     * @return
+     */
     public String getClassName(){
         return name;
     }

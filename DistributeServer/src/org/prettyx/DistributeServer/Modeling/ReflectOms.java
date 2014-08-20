@@ -89,9 +89,6 @@ public class ReflectOms extends ClassLoader{
         //如果这里 调用的是 实例方法 和以上的一样，只是后面调用Method的invoke不一样
 
 
-        System.out.println(method.getName());
-
-
         method.invoke(cl, new Object[]{new String []{}});
         //这里的cl 是 生产的类，为什么这里没有  cl.newInstance() ,因为调用的test2 是静态方法，如果不是静态方法，需要用一下的
         //method.invoke(cl.newInstance(), new Object[]{new String []{}});

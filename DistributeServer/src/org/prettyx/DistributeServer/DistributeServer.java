@@ -9,22 +9,40 @@
 // +----------------------------------------------------------------------
 package org.prettyx.DistributeServer;
 
+import com.sun.tools.javac.file.JavacFileManager;
+import oms3.annotations.In;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.ibex.nestedvm.util.Seekable;
 import org.prettyx.Common.*;
 import org.prettyx.DistributeServer.Modeling.SimFile;
 import org.prettyx.DistributeServer.Network.DistributeServerHearken;
 import org.prettyx.DistributeServer.Settings.SettingsCenter;
+import sun.misc.ClassLoaderUtil;
+import sun.rmi.rmic.iiop.ClassPathLoader;
 
 import java.io.*;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedType;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.rmi.server.RMIClassLoader;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+
+import oms3.util.Annotations;
+import oms3.util.Components;
+import javax.tools.*;
+
+import java.util.Enumeration;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 public class DistributeServer {
 
@@ -61,14 +79,43 @@ public class DistributeServer {
         DistributeServerHearken distributeServerHearken = new DistributeServerHearken(Integer.valueOf(distributeServer.settingsCenter.getSetting("Network", "Port")));
         distributeServerHearken.checkAndStart();
 
-        distributeServer.test5();
-//        distributeServer.test();
+        distributeServer.test2();
+
+
     }
 
+    public void test2() throws Exception {
 
-    public void test(){
-        String string = "   dsjf   ";
-        System.out.println(DEPFS.removeSpace(string));
+        String filePath = "/Users/XieFan/Desktop/oms3.prj.examples-basic/build/classes/";
+        ClassLoaderUtils classLoaderUtils = new ClassLoaderUtils(filePath);
+        List<Class<?>> s = classLoaderUtils.getServiceClassList();
+        List<Class<?>> undo = new LinkedList<Class<?>>();
+        for(int i=0; i<s.size(); i++){
+
+            Class<?> cla = s.get(i);
+            try {
+                Field[] fields = cla.getDeclaredFields();
+                for (int j = 0; j < fields.length; j++) {
+                    Field field = fields[j];
+                    Class fieldType = field.getType();
+
+                    System.out.println(cla.getName() + " " +field.getName() + " " + fieldType);
+                    System.out.println(Annotations.isIn(field));
+
+                }
+            }catch (NoClassDefFoundError e){
+                undo.add(cla);
+                continue;
+            }
+
+        }
+             for(int i=0; i<undo.size(); i++){
+
+                 Class<?> cla = undo.get(i);
+                 System.out.println(cla.getName());
+
+             }
+
     }
     public void test5() throws DocumentException, SQLException {
         Map idToName = new ConcurrentHashMap<String, String>();
@@ -89,7 +136,7 @@ public class DistributeServer {
         DBOP dbop = new DBOP();
         Connection connectionToSql = dbop.getConnection();
         PreparedStatement prep = connectionToSql.prepareStatement(  //email has been sign up
-                "select modelname from Models where id= ?;");
+                "select owner from Models where id= ?;");
 
         for (Iterator it = parts.iterator(); it.hasNext();) {
             Element component = (Element) it.next();
@@ -97,13 +144,25 @@ public class DistributeServer {
             prep.setString(1, partId);
             ResultSet resultSet = prep.executeQuery();
             if(resultSet.next()){
-                String partName = resultSet.getString("modelname");
-                idToName.put(partId, partName);
-                System.out.println("partname : id = " + partName + ":" + partId);
+                String owner = resultSet.getString("owner");
+                PreparedStatement preparedStatement =connectionToSql.prepareStatement(
+                     "select nickname from Users where sid= ?;"
+                );
+                preparedStatement.setString(1, owner);
+                ResultSet resultSet1 = preparedStatement.executeQuery();
+                if(resultSet1.next()) {
+                    String userName = resultSet1.getString("nickname");
+                    idToName.put(partId, userName);
+                    System.out.println("partId : userName = " + partId + ":" + userName);
+                }
+                resultSet1.close();
+                preparedStatement.close();
             }
         }
         prep.close();
         connectionToSql.close();
+        System.out.println(UUID.randomUUID().toString());
+        System.out.println(UUID.randomUUID().toString());
 //        for (Iterator it = parts.iterator(); it.hasNext();) {
 //            Element component = (Element) it.next();
 //            String partId = component.attributeValue("id");

@@ -47,12 +47,12 @@ public class DistributeServerHearken extends WebSocketServer {
 
     @Override
     public void onOpen(WebSocket connection, ClientHandshake handshake) {
-        System.out.println("new connection to " + connection.getRemoteSocketAddress());
+        LogUtility.logUtility().log2out("new connection to " + connection.getRemoteSocketAddress());
     }
 
     @Override
     public void onClose(WebSocket connection, int code, String reason, boolean remote) {
-        System.out.println("closed " + connection.getRemoteSocketAddress() + " with exit code " + code + " additional info: " + reason);
+        LogUtility.logUtility().log2out("closed " + connection.getRemoteSocketAddress() + " with exit code " + code + " additional info: " + reason);
     }
 
     @Override
@@ -62,13 +62,12 @@ public class DistributeServerHearken extends WebSocketServer {
 
     @Override
     public void onError(WebSocket connection, Exception ex) {
-        System.err.println("an error occured on connection " + connection.getRemoteSocketAddress()  + ":" + ex);
+        LogUtility.logUtility().log2out("an error occured on connection " + connection.getRemoteSocketAddress()  + ":" + ex);
     }
 
     protected void handleMessage(WebSocket connection, String text) {
 
         JSONObject jsonObject = JSONObject.fromObject(text);
-        System.out.println(jsonObject.size());
         if(jsonObject.size() == 3){
             LogUtility.logUtility().log2out(jsonObject.toString());
             int action = (Integer)jsonObject.get("action");

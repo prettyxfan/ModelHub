@@ -45,7 +45,6 @@ public class ActionHandler {
      *
      */
     public static void userNameOrEmailTologin(WebSocket connection, String data) throws Exception {
-        System.out.println("here1");
 
         String sid = UUID.randomUUID().toString();
         Map userInfo = XMLParser.parserXmlFromString(data);
@@ -66,7 +65,6 @@ public class ActionHandler {
 
         if (resultSet.getInt("rowCount") == 0) {
             //用户不存在
-            System.out.println("fail1");
             prep = connectionToSql.prepareStatement(
                     "select count(*) as rowCount from Users where username = ? or nickname = ?;");
             prep.setString(1, userNameOrEmail);
@@ -74,14 +72,18 @@ public class ActionHandler {
 
             resultSet = prep.executeQuery();
             if (resultSet.getInt("rowCount") == 0) {
+                LogUtility.logUtility().log2out("fail1, user is not exist");
+
                 JSONObject jsonObject = JSONObject.fromObject("{action:'login',StatusCode:0,message:''}");
                 connection.send(jsonObject.toString());
             } else {
+                LogUtility.logUtility().log2out("fail1, password is not right");
+
                 JSONObject jsonObject = JSONObject.fromObject("{action:'login',StatusCode:1,message:''}");
                 connection.send(jsonObject.toString());
             }
         } else {
-            System.out.println("ok1");
+            LogUtility.logUtility().log2out("log in is ok");
             JSONObject jsonObject = JSONObject.fromObject("{action:'login',StatusCode:2,message:'" + sid + "'}");
             connection.send(jsonObject.toString());
             String token = null;
@@ -105,7 +107,6 @@ public class ActionHandler {
 
             resultSet = prep.executeQuery();
             String user = resultSet.getString("sid");
-            System.out.println("user = " + user);
             DistributeServerHearken.currentUsers.put(connection, user);
         }
         prep.close();
@@ -121,8 +122,6 @@ public class ActionHandler {
      *
      */
     public static void userSidTologin(WebSocket connection, String sid) throws Exception {
-        System.out.println("here2");
-        System.out.println("sid = "+sid);
         DBOP dbop = new DBOP();
         Connection connectionToSql = dbop.getConnection();
 
@@ -130,15 +129,13 @@ public class ActionHandler {
                 "select count(*) as rowCount from Users where token ='"+ sid +"';");
         ResultSet resultSet = prep.executeQuery();
 
-        System.out.println("rowCount = "+resultSet.getInt("rowCount"));
-
         if (resultSet.getInt("rowCount") == 0) {
             //用户不存在
-            System.out.println("fail2");
+            LogUtility.logUtility().log2out("fail, user is not exist");
             JSONObject jsonObject = JSONObject.fromObject("{action:'login',StatusCode:3,message:'fail'}");
             connection.send(jsonObject.toString());
         } else {
-            System.out.println("ok2");
+            LogUtility.logUtility().log2out("log in is ok");
             JSONObject jsonObject = JSONObject.fromObject("{action:'login',StatusCode:4,message:'ok'}");
             connection.send(jsonObject.toString());
 
@@ -147,7 +144,6 @@ public class ActionHandler {
             prep.setString(1, sid);
             resultSet = prep.executeQuery();
             String user = resultSet.getString("sid");
-            System.out.println("user = " + user);
             DistributeServerHearken.currentUsers.put(connection, user);
         }
         prep.close();
@@ -163,16 +159,12 @@ public class ActionHandler {
 
     }
     /**
-     * @TODO
-     */
-    /**
      * Action when user sign up
      *
      * @param connection, data
      *
      */
     public static void signUp(WebSocket connection, String data) throws Exception{
-        System.out.println("here3");
 
         String sid = UUID.randomUUID().toString();
         Map userInfo = XMLParser.parserXmlFromString(data);
@@ -189,7 +181,7 @@ public class ActionHandler {
         prep.setString(1, email);
         ResultSet resultSet = prep.executeQuery();
         if(resultSet.getInt("rowCount") != 0){
-            System.out.println("fail3");
+            LogUtility.logUtility().log2out("fail, Email has been sign up ");
             JSONObject jsonObject = JSONObject.fromObject("{action:'sign_up',StatusCode:5,message:'This Email has been sign up'}");
             connection.send(jsonObject.toString());
 
@@ -202,11 +194,11 @@ public class ActionHandler {
             resultSet = prep.executeQuery();
 
             if (resultSet.getInt("rowCount") != 0) { //username has been sign up
-                System.out.println("fail4");
+                LogUtility.logUtility().log2out("fail, user name has been sign up");
                 JSONObject jsonObject = JSONObject.fromObject("{action:'sign_up',StatusCode:6,message:'This UserName has been sign up'}");
                 connection.send(jsonObject.toString());
             } else {
-                System.out.println("ok4");
+                LogUtility.logUtility().log2out("sign up is ok");
                 DEPFS.createDirectory(DistributeServer.absolutePathOfRuntimeUsers + "/" + userName);
                 prep = connectionToSql.prepareStatement("insert into Users values(?,?,?,null,?) ;");
                 prep.setString(1, email);
@@ -223,10 +215,13 @@ public class ActionHandler {
         connectionToSql.close();
         resultSet.close();
     }
-    /**
-     * @TODO
-     */
 
+    /**
+     * Action when user send message to get model description
+     *
+     * @param connection
+     *
+     */
     public static void getModel(WebSocket connection) throws SQLException {
         String userID = (String)DistributeServerHearken.currentUsers.get(connection);
 
@@ -246,9 +241,17 @@ public class ActionHandler {
         JSONObject jsonObject = JSONObject.fromObject("{action:'get model',StatusCode:0,message:\""+modelDescription+"\"}");
         connection.send(jsonObject.toString());
 
-        System.out.println(jsonObject.toString());
+        LogUtility.logUtility().log2out(jsonObject.toString());
 
     }
+
+    /**
+     * Action when user send message to link the models
+     *
+     * @param connection, data
+     *                    data is composed of model description xml
+     *
+     */
     public static void linkModel(WebSocket connection, String data) throws DocumentException, SQLException {
         Map idToName = new ConcurrentHashMap<String, String>();
 
@@ -258,8 +261,8 @@ public class ActionHandler {
 
         DBOP dbop = new DBOP();
         Connection connectionToSql = dbop.getConnection();
-        PreparedStatement prep = connectionToSql.prepareStatement(  //email has been sign up
-                "select modelname from Models where id= ?;");
+        PreparedStatement prep = connectionToSql.prepareStatement(
+                "select owner from Models where id= ?;");
 
         for (Iterator it = parts.iterator(); it.hasNext();) {
             Element component = (Element) it.next();
@@ -267,13 +270,32 @@ public class ActionHandler {
             prep.setString(1, partId);
             ResultSet resultSet = prep.executeQuery();
             if(resultSet.next()){
-                String partName = resultSet.getString("modelname");
-                idToName.put(partId, partName);
-                System.out.println("partname : id = " + partName + ":" + partId);
+                String owner = resultSet.getString("owner");
+                PreparedStatement preparedStatement =connectionToSql.prepareStatement(
+                        "select nickname from Users where sid= ?;"
+                );
+                preparedStatement.setString(1, owner);
+                ResultSet resultSet1 = preparedStatement.executeQuery();
+                if(resultSet1.next()) {
+                    String userName = resultSet1.getString("nickname");
+                    idToName.put(partId, userName);
+                    LogUtility.logUtility().log2out("partId : userName = " + partId + ":" + userName);
+                }
+                resultSet1.close();
+                preparedStatement.close();
             }
         }
+        prep.close();
+        connectionToSql.close();
     }
 
+    /**
+     * Action when user send message to compile the models
+     *
+     * @param connection, data
+     *                    data is composed of data file and model data flow XML
+     *
+     */
     public static void compileModel(WebSocket connection, String data) throws DocumentException {
         SAXReader reader =new SAXReader();
         Document document = DocumentHelper.parseText(data);
@@ -282,7 +304,6 @@ public class ActionHandler {
         for (Iterator it = components.iterator(); it.hasNext();) {
             Element component = (Element) it.next();
             String partId = component.attributeValue("id");
-            System.out.println(partId);
             //do something
         }
         String docXmlText=document.asXML();

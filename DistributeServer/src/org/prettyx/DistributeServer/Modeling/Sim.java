@@ -17,6 +17,10 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Sim is represent the element "sim" of the sim file
+ * including other subelement
+ */
 public class Sim {
     private String name = "";
     private String build = "";
@@ -28,10 +32,18 @@ public class Sim {
     private String output = "";
     private Analysis analysis = null;
 
+    /**
+     * default constructor with none input parameter
+     */
     public Sim(){
         model = new Model();
         analysis = new Analysis();
     }
+
+    /**
+     * Using the content of the sim element to create a sim object
+     * @param simContent
+     */
     public Sim(String simContent){
         String [] content = simContent.split("\n");
         for(int i = 0; i<content.length; i++){
@@ -96,6 +108,11 @@ public class Sim {
             }
         }
     }
+
+    /**
+     * those set functions art to set all of the private fields
+     * @param string
+     */
     public void setName(String string){
         name = string;
     }
@@ -125,6 +142,11 @@ public class Sim {
          * @TODO
          */
     }
+
+    /**
+     * those get functions are to get all of the private fields
+     * @return
+     */
     public String getName(){
         return name;
     }

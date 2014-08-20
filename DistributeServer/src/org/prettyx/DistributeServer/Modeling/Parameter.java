@@ -13,22 +13,38 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * Parameter is represent the element "parameter" of the sim file
+ * including other subelement
+ */
 public class Parameter {
     private String parameterFile = "";
     private Map parameterConent = new HashMap();
 
+    /**
+     * those set functions art to set all of the private fields
+     * @param string
+     */
     public void setParameterFile(String string){
         parameterFile = string;
     }
+
     public void setParameterConent(String name, String value){
         parameterConent.put(name, value);
     }
+
+    /**
+     * those get functions are to get all of the private fields
+     * @return
+     */
     public String getParameterFile(){
         return parameterFile;
     }
+
     public Map getParameterConent(){
         return parameterConent;
     }
+
     public Boolean isEmpty(){
         return parameterConent.isEmpty();
     }
