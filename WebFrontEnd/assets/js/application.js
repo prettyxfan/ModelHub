@@ -167,7 +167,6 @@ function createInterface(){
                     //console.log(recievedModelArray[i].id + " " + cellId);
                     if(drawModelArray[i].id == IdCount){
                         componentId = drawModelArray[i].modelId;
-                        console.log("componentId = "+componentId);
                     }
                 }
                 part.setAttribute('componentId', componentId);
@@ -266,24 +265,21 @@ function createInterface(){
         var m = graph1.getCell(cellId);
         var m1 = '';
 
-
         for(var i in recievedModelArray) {
-          // console.log(recievedModelArray[i]);
             if( recievedModelArray[i].id == m.id ) {
                 m1 = recievedModelArray[i];
-                        console.log("m1 = "+m1.modelId);
+                recievedModelArray[i] = m1;
                 break;
             }
         }
+
         if( m1!='') {
             var m2 = m.clone();
             m2.translate(100, 0);
-            m1.id = m2.id;
-            drawModelArray[drawModelNumber] = m1;
-            //console.log(drawModelArray[drawModelNumber]);
+            var m3 = new Model(m1.componentName, m1.componentDescription, m1.inputs, m1.outputs, m1.parameters, m1.modelId, m2.id);
+            drawModelArray[drawModelNumber] = m3;
             drawModelNumber++;
             graph.addCell(m2);
-            // console.log(m2.id);
         }
     });
 
@@ -304,14 +300,14 @@ function createInterface(){
 * Decleration of the Model Class
 */
 
-function Model(componentName, componentDescription, inputs, outputs, parameters, modelId){ 
+function Model(componentName, componentDescription, inputs, outputs, parameters, modelId, id){ 
     this.componentName = componentName; 
     this.componentDescription = componentDescription; 
     this.inputs = inputs; 
     this.outputs = outputs;
     this.parameters = parameters;
-    this.modelId = modelId;
-    this.id = '';
+    this.modelId = modelId;  //服务端保留的模型id
+    this.id = id;   //界面modelid
 } 
 
 /**
@@ -319,17 +315,18 @@ function Model(componentName, componentDescription, inputs, outputs, parameters,
 */
 
 function createModel(){
-    //alert("done");
     if ( ModelInfomation != '') {
         dealRecieveModel(ModelInfomation);
+        var position_y = 10;
+        var modelHeight = 0;
         for(var i=0; i<recievedModelNumber; i++ ) {
             var inPortsArray = new Array();
             for (var j=0; j<recievedModelArray[i].inputs.length; j++) {
-                inPortsArray[j] = recievedModelArray[i].inputs[j][0];
+                inPortsArray[j] = recievedModelArray[i].inputs[j][0].split(".")[1];
             }
             var outPortsArray = new Array();
             for (var j=0; j<recievedModelArray[i].outputs.length; j++) {
-                outPortsArray[j] = recievedModelArray[i].outputs[j][0];
+                outPortsArray[j] = recievedModelArray[i].outputs[j][0].split(".")[1];
             }
             // var outPortsArray = new Array();
             // for (var j=0; j<recievedModelArray[i].outputs.length; j++) {
@@ -337,23 +334,28 @@ function createModel(){
             // }
             // console.log(recievedModelArray[i].componentName);
             // var test = ['df','sdf'];
+            if(inPortsArray.length > outPortsArray.length){
+                modelHeight = 30*inPortsArray.length;
+            }
+            else {
+                modelHeight = 30*outPortsArray.length;
+            }
             var m1 = new joint.shapes.devs.Model({
-                position: { x: 70, y: 70*(i+1)},
-                size: { width: 50, height: 50 },
+                position: { x: 80, y: position_y},
+                size: { width: 80, height: modelHeight },
                 inPorts: inPortsArray,
                 outPorts: outPortsArray,
                 attrs: {
-                    '.label': { text: recievedModelArray[i].componentName, 'ref-x': .3, 'ref-y': .45 },
+                    '.label': { text: recievedModelArray[i].componentName, 'ref-x': .55, 'ref-y': .25 },
                     rect: { fill: '#fffff' },
-                    '.inPorts circle': { fill: '#16A085', magnet: 'passive', type: 'input' },
-                    '.outPorts circle': { fill: '#E74C3C', type: 'output' },
+                    '.inPorts circle': { fill: '#98BDD4', magnet: 'passive', type: 'input' },
+                    '.outPorts circle': { fill: '#CCCCCC', type: 'output' },
                     text: { fill: '#676767','pointer-events': ''}
                 }
             });
             recievedModelArray[i].id = m1.id;
-            //alert(m1.id);
             graph1.addCell(m1);
-            $('#content').html(m1);
+            position_y += modelHeight + 10;
         }
     }
 }
@@ -369,7 +371,6 @@ function dealRecieveModel(modelXML){
     var obj =$(modelXML).find("component").each(function(){
 
         var componentId = $(this).find("componentId").text();;
-        console.log("componentId = " + componentId);
         var inputArray = new Array();
         var inputNumber = 0;
         var outputArray = new Array();
@@ -410,15 +411,16 @@ function dealRecieveModel(modelXML){
             }
         });
 
-        var m1 = new Model(componentName, componentDescription, inputArray, outputArray, parameterArray, componentId);
+        var m1 = new Model(componentName, componentDescription, inputArray, outputArray, parameterArray, componentId, "");
         recievedModelArray[recievedModelNumber] = m1;
-        console.log("m1 = " + m1.componentName);
         recievedModelNumber += 1;
     });
 
 }
 
-
+function newModel(){
+    
+}
 
 function sendXmlToServer() {
     var actionStatus = 4;
@@ -499,32 +501,30 @@ function displayAttributes(m){
             html += '<h5>Input</h5>'
             for (var i in node.inputs){
                 html += '<div class="input-group">';
-                html += '<span class="input-group-addon">' + node.inputs[i][0] + '</span>';
+                html += '<span class="input-group-addon">' + node.inputs[i][0].split(".")[1] + '</span>';
                 html += '<input type="text" class="form-control" placeholder="' + node.inputs[i][1] + '"/>';
                 html += '</div>';
             }
-            html += '<hr/>';
         }
         if (node.parameters.length != 0){
             html += '<h5>Parameter</h5>'
             for (var i in node.parameters){
                 html += '<div class="input-group">';
-                html += '<span class="input-group-addon">' + node.parameters[i][0] + '</span>';
+                html += '<span class="input-group-addon">' + node.parameters[i][0].split(".")[1] + '</span>';
                 html += '<input type="text" class="form-control" placeholder="' + node.parameters[i][1] + '"/>';
                 html += '</div>';
             }
-            html += '<hr/>';
         }
         if (node.outputs.length != 0){
             html += '<h5>Output</h5>'
             for (var i in node.outputs){
                 html += '<div class="input-group">';
-                html += '<span class="input-group-addon">' + node.outputs[i][0] + '</span>';
+                html += '<span class="input-group-addon">' + node.outputs[i][0].split(".")[1] + '</span>';
                 html += '<input type="text" class="form-control" placeholder="' + node.outputs[i][1] + '"/>';
                 html += '</div>'
             }
         }
-        html += '<div class="panel-footer"><button type="button" class="btn btn-default">确定</button><button type="button" class="btn btn-default">取消</button></div>';
+        html += '<button type="button" class="btn btn-default btn-lg btn-block">确定</button><button type="button" class="btn btn-default btn-lg btn-block">取消</button>';
         $('#attributesArea').html(html);
     }
 }

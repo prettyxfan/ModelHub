@@ -9,237 +9,250 @@
         <meta name="author" content="PrettyX"/>
         <meta name="copyright" content="Copyright © 2012-2014 PrettyX"/>
         <meta name="application-name" content="ModelHub"/>
-      
+
         <!-- Application -->
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;"/>
         <meta name="format-detection" content="telephone=no"/>
 
-        <!-- Apple Web Application 
+        <!-- Apple Web Application
         <meta name="apple-mobile-web-app-capable" content="yes"/>
-        <meta name="apple-touch-fullscreen" content="yes" /> 
+        <meta name="apple-touch-fullscreen" content="yes" />
         <link rel="apple-touch-icon" href="PengJingwen.png"/>
         <link rel="apple-touch-startup-image" href="PengJingwen.png" />
         -->
-        
-        <!-- IE Dream Taskbar 
+
+        <!-- IE Dream Taskbar
         <meta name="msapplication-task" content="name=XXX; action-uri=http://xxx.xxx; icon-uri=favicon.ico"/>
         -->
-        
-        <!-- Open Graph Protocol 
+
+        <!-- Open Graph Protocol
         <meta property="og:title" content="ModelHub"/>
         <meta property="og:url" content="http://xxx.xxx"/>
         <meta property="og:site_name" content="ModelHub"/>
         <meta property="og:description" content="ModelHub"/>
         <meta property="og:image" content="ModelHub.png"/>
         -->
-        
+
         <!-- Robots -->
         <meta name="robots" Content="nofollow"/>
-        
+
         <!-- CSS -->
         <link rel="stylesheet" type="text/css" href="./assets/css/frameworks/bootstrap.css"/>
         <link rel="stylesheet" type="text/css" href="./assets/css/frameworks/bootstrap-theme.css"/>
         <link rel="stylesheet" type="text/css" href="./assets/css/application.css"/>
-        
+
         <!-- Favicon -->
         <link rel="shortcut icon" type="image/x-icon" href="./assets/ico/favicon.ico"/>
 
-  </head>
+    </head>
 
-  <body>
-  <div id="login" style="display:none">
-    <div class="col-md-4"></div>
-    <div class="col-md-4">
-      <div id="logoArea">
-        <img src="./assets/ico/favicon.png"/>
-        <h2>ModelHub</h2>
-      </div>
-
-      <div id="inputArea">
-        <ul class="nav nav-tabs">
-          <li class="active"><a href="#log-in" data-toggle="tab" id="login_a">Login</a></li>
-          <li><a href="#sign-up" data-toggle="tab" id="sign-up_a">Sign up</a></li>
-        </ul>
-
-        <!-- Tab panes -->
-        <div class="tab-content">
-          <div class="tab-pane active" id="log-in">
-            <div id="login-content">
-              <form role="form" id="form-login">
-                <div class="form-group">
-                  <input type="text" class="form-control input-lg" id="login-username-email" placeholder="Username Or Email" data-container="body" data-toggle="popover" data-placement="right" data-content="用户不存在.">
-                </div>
-                <div class="form-group">
-                  <input type="password" class="form-control input-lg" id="login-password" placeholder="Password" data-container="body" data-toggle="popover" data-placement="right" data-content="密码错误.">
-                </div>
-                <div class="checkbox">
-                  <label>
-                    <input type="checkbox" id="check_id"> Remember me
-                  </label>
-                </div>
-                <button type="button" class="btn btn-info btn-lg btn-block" onclick="start()">LOGIN</button>
-              </form>
+    <body>
+    <div id="login" style="display:none">
+        <div class="col-md-4"></div>
+        <div class="col-md-4">
+            <div id="logoArea">
+                <img src="./assets/ico/favicon.png"/>
+                <h2>ModelHub</h2>
             </div>
-          </div>
-          <div class="tab-pane" id="sign-up">
-            <div id="sign-up-content">
-              <form role="form" id="form-sign-up">
-                <div class="form-group">
-                  <input type="email" class="form-control input-lg" id="sign-up-email" placeholder="Email" data-container="body" data-toggle="popover" data-placement="right" data-content="该邮箱已经注册.">
-                </div>
-                <div class="form-group">
-                  <input type="text" class="form-control input-lg" id="sign-up-username" placeholder="Username" data-container="body" data-toggle="popover" data-placement="right" data-content="用户名存在.">
-                </div>
-                <div class="form-group">
-                  <input type="password" class="form-control input-lg" id="sign-up-password" placeholder="Password">
-                </div>
-                <button type="button" class="btn btn-info btn-lg btn-block" onclick="signUp()">GET STARTED!</button>
-              </form>
 
-              <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-sm">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal" onclick="backToLogin()"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <div id="inputArea">
+                <ul class="nav nav-tabs ">
+                    <li class="active"><a href="#log-in" data-toggle="tab" id="login_a">Login</a></li>
+                    <li><a href="#sign-up" data-toggle="tab" id="sign-up_a">Sign up</a></li>
+                </ul>
+
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div class="tab-pane active" id="log-in">
+                        <div id="login-content">
+                            <form role="form" id="form-login">
+                                <div class="form-group">
+                                    <input type="text" class="form-control input-lg" id="login-username-email" placeholder="Username Or Email" data-container="body" data-toggle="popover" data-placement="right" data-content="用户不存在.">
+                                </div>
+                                <div class="form-group">
+                                    <input type="password" class="form-control input-lg" id="login-password" placeholder="Password" data-container="body" data-toggle="popover" data-placement="right" data-content="密码错误.">
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" id="check_id"> Remember me
+                                    </label>
+                                </div>
+                                <button type="button" class="btn btn-info btn-lg btn-block" onclick="start()">LOGIN</button>
+                            </form>
+                        </div>
                     </div>
-                    <div class="modal-body">
-                      <h4 class="text-center">注册成功!</h4>
+                    <div class="tab-pane" id="sign-up">
+                        <div id="sign-up-content">
+                            <form role="form" id="form-sign-up">
+                                <div class="form-group">
+                                    <input type="email" class="form-control input-lg" id="sign-up-email" placeholder="Email" data-container="body" data-toggle="popover" data-placement="right" data-content="该邮箱已经注册.">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control input-lg" id="sign-up-username" placeholder="Username" data-container="body" data-toggle="popover" data-placement="right" data-content="用户名存在.">
+                                </div>
+                                <div class="form-group">
+                                    <input type="password" class="form-control input-lg" id="sign-up-password" placeholder="Password">
+                                </div>
+                                <button type="button" class="btn btn-info btn-lg btn-block" onclick="signUp()">GET STARTED!</button>
+                            </form>
+
+                            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-sm">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" onclick="backToLogin()"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <h4 class="text-center">注册成功!</h4>
+                                        </div>
+                                        <p class="text-center">
+                                            <button type="button" class="btn btn-info" onclick="backToLogin()">OK</button>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
-                    <p class="text-center">
-                      <button type="button" class="btn btn-info" onclick="backToLogin()">OK</button>
-                    </p>
-                  </div>
                 </div>
-              </div>
 
             </div>
-          </div>
         </div>
-
-      </div>
+        <div class="col-md-4"></div>
     </div>
-    <div class="col-md-4"></div>  
-  </div>
-      
-    <div id="modelInterface" style="display:none">
-      <div class="row">
-        <div class="col-md-2">
-          <div class="panel panel-primary">
-            <div class="panel-heading">
-              <h3 class="text-center">ModelHub</h3>
-            </div>
-            <div class="panel-body">
-              <div class="list-group" id="model">
-              </div>
-            </div>
-            <div class="panel-footer">
-              statements
-            </div>
-          </div>
-        </div>
-        <div class="col-md-8">
-          <div class="row">
-            <ul class="nav nav-tabs">
-              <li class="active"><a href="#designer" data-toggle="tab">Designer</a></li>
-              <li><a href="#text-editor" data-toggle="tab">Text Editor</a></li>
-            </ul>
-            <div id="myTabContent" class="tab-content">
-              <div class="tab-pane fade in active" id="designer">
-                <div class="btn-group btn-group-justified">
-                  <div class="btn-group">
-                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-file"> New</span></button>
-                  </div>
-                  <div class="btn-group">
-                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-folder-open"> Open</span></button>
-                  </div>
-                  <div class="btn-group">
-                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-floppy-disk"> Save</span></button>
-                  </div>
-                  <div class="btn-group">
-                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-import"> Import</span></button>
-                  </div>
-                  <div class="btn-group">
-                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-export"> Export</span></button>
-                  </div>
-                  <div class="btn-group">
-                    <button type="button" class="btn btn-default" onclick="sendXmlToServer()"><span class="glyphicon glyphicon-play"> Run</span></button>
-                  </div>
-                  <div class="btn-group">
-                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-trash"> Delete</span></button>
-                  </div>
-                  <div class="btn-group">
-                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-folder-open"> Help</span></button>
-                  </div>
-                  <div class="btn-group">
-                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-zoom-in"></span></button>
-                  </div>
-                  <div class="btn-group">
-                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-zoom-out"></span></button>
-                  </div>
-                </div>
-                <div id="paper"></div>
-              </div>
-              <div class="tab-pane fade" id="text-editor">
-                <div class="btn-group btn-group-justified">
-                  <div class="btn-group">
-                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-file"> New</span></button>
-                  </div>
-                  <div class="btn-group">
-                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-folder-open"> Open</span></button>
-                  </div>
-                  <div class="btn-group">
-                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-floppy-disk"> Save</span></button>
-                  </div>
-                  <div class="btn-group">
-                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-import"> Import</span></button>
-                  </div>
-                  <div class="btn-group">
-                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-export"> Export</span></button>
-                  </div>
-                  <div class="btn-group">
-                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-play"> Run</span></button>
-                  </div>
-                  <div class="btn-group">
-                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-trash"> Delete</span></button>
-                  </div>
-                  <div class="btn-group">
-                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-folder-open"> Help</span></button>
-                  </div>
-                  <div class="btn-group">
-                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-zoom-in"></span></button>
-                  </div>
-                  <div class="btn-group">
-                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-zoom-out"></span></button>
-                  </div>
-                </div>
-                <div id="text"></div>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <ul class="nav nav-tabs">
-              <li class="active"><a href="#console" data-toggle="tab">Console</a></li>
-              <li><a href="#message" data-toggle="tab">Message</a></li>
-              <li><a href="#analysis" data-toggle="tab">Analysis</a></li>
-            </ul>
 
-            <!-- Tab panes -->
-            <div class="tab-content">
-              <div class="tab-pane active" id="console">1</div>
-              <div class="tab-pane" id="message">2</div>
-              <div class="tab-pane" id="analysis">3</div>
+    <div id="modelInterface" style="display:none">
+        <div class="navbar navbar-default">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">ModelHub</a>
             </div>
-          </div>
-        </div>
-        <div class="col-md-2">
-          <div class="panel panel-info">
-            <div class="panel-heading">
-              <h5 class="text-center"> Inspector</h5>
+            <div class="navbar-collapse collapse navbar-responsive-collapse">
+                <form class="navbar-form navbar-left">
+                    <input type="text" class="form-control col-lg-8" placeholder="Search">
+                </form>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="active"><a href="#">designer</a></li>
+                    <li><a href="#">Text Editor</a></li>
+                </ul>
             </div>
-            <div class="panel-body" id="attributesArea"></div>
-          </div>
         </div>
-      </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="panel panel-primary">
+                    <div class="panel-body">
+                        <div class="list-group" id="model">
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        statements
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-7">
+                <div class="row">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#designer" data-toggle="tab">Designer</a></li>
+                        <li><a href="#text-editor" data-toggle="tab">Text Editor</a></li>
+                    </ul>
+                    <div id="myTabContent" class="tab-content">
+                        <div class="tab-pane fade in active" id="designer">
+                            <div class="btn-group btn-group-justified">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-file"> New</span></button>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-folder-open"> Open</span></button>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-floppy-disk"> Save</span></button>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-import"> Import</span></button>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-export"> Export</span></button>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default" onclick="sendXmlToServer()"><span class="glyphicon glyphicon-play"> Run</span></button>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-trash"> Delete</span></button>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-folder-open"> Help</span></button>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-zoom-in"></span></button>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-zoom-out"></span></button>
+                                </div>
+                            </div>
+                            <div id="paper"></div>
+                        </div>
+                        <div class="tab-pane fade" id="text-editor">
+                            <div class="btn-group btn-group-justified">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-file"> New</span></button>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-folder-open"> Open</span></button>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-floppy-disk"> Save</span></button>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-import"> Import</span></button>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-export"> Export</span></button>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-play"> Run</span></button>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-trash"> Delete</span></button>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-folder-open"> Help</span></button>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-zoom-in"></span></button>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-zoom-out"></span></button>
+                                </div>
+                            </div>
+                            <div id="text"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#console" data-toggle="tab">Console</a></li>
+                        <li><a href="#message" data-toggle="tab">Message</a></li>
+                        <li><a href="#analysis" data-toggle="tab">Analysis</a></li>
+                    </ul>
+
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="console">1</div>
+                        <div class="tab-pane" id="message">2</div>
+                        <div class="tab-pane" id="analysis">3</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="panel panel-info">
+                    <div class="panel-body" id="attributesArea"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Le javascript
@@ -270,5 +283,5 @@
     <script src="./assets/js/initialize.js"></script>
     <script src="./assets/js/application.js"></script>
 
-  </body>
+    </body>
 </html>

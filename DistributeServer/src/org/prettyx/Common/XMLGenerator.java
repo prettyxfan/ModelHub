@@ -69,10 +69,11 @@ public class XMLGenerator {
                             String fieldType = field.getType().toString();
                             String []typeSplite = fieldType.split("\\.");
                             fieldType = typeSplite[typeSplite.length-1];
+                            String fieldName = cla.getSimpleName() + "." + field.getName();
                             if(Annotations.isIn(field))
-                                input.put(field.getName(),fieldType);
+                                input.put(fieldName,fieldType);
                             else if(Annotations.isOut(field))
-                                output.put(field.getName(),fieldType);
+                                output.put(fieldName,fieldType);
                         }
                     }catch (NoClassDefFoundError e){
                         continue;

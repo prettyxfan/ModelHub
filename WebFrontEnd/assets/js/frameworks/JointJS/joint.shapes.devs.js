@@ -42,17 +42,17 @@ joint.shapes.devs.Model = joint.shapes.basic.Generic.extend(_.extend({}, joint.s
                 stroke: 'black'
             },
             circle: {
-                r: 8,
+                r: 4,
                 magnet: true,
-                stroke: 'black'
+                stroke: ''
             },
             text: {
                 fill: 'black',
                 'pointer-events': 'none'
             },
-            '.label': { text: 'Model', 'ref-x': .3, 'ref-y': .2 },
-            '.inPorts text': { x:-15, dy: 4, 'text-anchor': 'end' },
-            '.outPorts text':{ x: 15, dy: 4 }
+            '.label': { text: 'Model', 'ref-x': .10, 'ref-y': .10 },
+            '.inPorts text': { x: -15, dy: -8, 'text-anchor': 'end' },
+            '.outPorts text':{ x: 15, dy: -8 }
         }
 
     }, joint.shapes.basic.Generic.prototype.defaults),

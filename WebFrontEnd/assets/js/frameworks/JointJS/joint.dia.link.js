@@ -116,7 +116,7 @@ joint.dia.LinkView = joint.dia.CellView.extend({
 
     options: {
 
-        shortLinkLength: 100
+        shortLinkLength: 1000
     },
     
     initialize: function() {

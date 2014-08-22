@@ -93,6 +93,7 @@ function onMessage(event) {
         else if(message.StatusCode == 4) {
             $("#login").css("display","none"); 
             $("#modelInterface").css("display","block"); 
+            interfaceInit();
         }
     }
     else if(action == 'sign_up') {
