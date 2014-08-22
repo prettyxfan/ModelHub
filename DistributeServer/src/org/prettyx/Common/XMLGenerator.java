@@ -9,20 +9,120 @@
 // +----------------------------------------------------------------------
 package org.prettyx.Common;
 
+import oms3.util.Annotations;
+import org.prettyx.DistributeServer.DistributeServer;
+
 import java.io.File;
+import java.lang.reflect.Field;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
 
 public class XMLGenerator {
 
-    public static String ComponentXML(String string, String id){
+    public static String ComponentsXML(String userId) throws SQLException, ClassNotFoundException {
         String xml = "";
-        if(string.contains("<component>")){
-            string = string.substring(0,string.indexOf("<componentName>")) + "<componentId>" + id + "</componentId>"
-                    + string.substring(string.indexOf("<componentName>"));
+        String component = "";
+        Map<String, String> input = new HashMap<String, String>();
+        Map<String, String> output = new HashMap<String, String>();
+
+        DBOP dbop = new DBOP();
+        Connection connectionToSql = dbop.getConnection();
+
+        PreparedStatement prep = connectionToSql.prepareStatement(
+                "select modelname,description,id from Models where owner = ?;");
+        prep.setString(1, userId);
+        ResultSet resultSet = prep.executeQuery();
+
+        while (resultSet.next()) {
+            String modelName = "";
+            String modelDescription = "";
+            String modelId = "";
+            String userName = "";
+            String rootPath = "";
+            input.clear();
+            output.clear();
+
+            modelName = resultSet.getString("modelname");
+            modelDescription = resultSet.getString("description");
+            modelId = resultSet.getString("id");
+            PreparedStatement preparedStatement = connectionToSql.prepareStatement(
+                    "select nickname from Users where sid = ?;");
+            preparedStatement.setString(1,userId);
+            ResultSet resultSet1 = preparedStatement.executeQuery();
+            if(resultSet1.next()) {
+                userName = resultSet1.getString("nickname");
+            }
+            if(userName != ""){
+                rootPath = DistributeServer.absolutePathOfRuntimeUsers
+                        + "/" + userName + "/" + modelName + "/build/";
+                ClassLoaderUtils classLoaderUtils = new ClassLoaderUtils(rootPath);
+                List<Class<?>> s = classLoaderUtils.getServiceClassList();
+                for(int i=0; i<s.size(); i++){
+                    Class<?> cla = s.get(i);
+                    try {
+                        Field[] fields = cla.getDeclaredFields();
+                        for (int j = 0; j < fields.length; j++) {
+                            Field field = fields[j];
+                            String fieldType = field.getType().toString();
+                            String []typeSplite = fieldType.split("\\.");
+                            fieldType = typeSplite[typeSplite.length-1];
+                            if(Annotations.isIn(field))
+                                input.put(field.getName(),fieldType);
+                            else if(Annotations.isOut(field))
+                                output.put(field.getName(),fieldType);
+                        }
+                    }catch (NoClassDefFoundError e){
+                        continue;
+                    }
+
+                }
+                component += ComponentXML(modelId,modelName,modelDescription,input,output);
+            }
+            resultSet1.close();
+            preparedStatement.close();
+
         }
-        return string;
+        resultSet.close();
+        prep.close();
+
+        xml = "<components>" + component + "</components>";
+
+        return xml;
     }
-    public static String ComponentXML(String string){
-        return "<components>" + string + "</components>";
+    public static String ComponentXML(String modelId, String modelName, String modelDescription, Map input, Map output){
+
+        String component = "";
+        component = "<component>" +
+                "<componentId>" + modelId + "</componentId>" +
+                "<componentName>" + modelName + "</componentName>" +
+                "<componentDescription>" + modelDescription + "</componentDescription>" +
+                "<inputs>" ;
+        Iterator ita = null;
+        ita = input.entrySet().iterator();
+        while (ita.hasNext()) {
+            Map.Entry entry = (Map.Entry) ita.next();
+            String key = (String) entry.getKey();
+            String value = (String) entry.getValue();
+            component += "<input><inputName>"+key+"</inputName><inputType>"+value+"</inputType></input>";
+        }
+        component += "</inputs><outputs>";
+
+        ita = output.entrySet().iterator();
+        while (ita.hasNext()) {
+            Map.Entry entry = (Map.Entry) ita.next();
+            String key = (String) entry.getKey();
+            String value = (String) entry.getValue();
+            component += "<output><outputName>"+key+"</outputName><outputType>"+value+"</outputType></output>";
+        }
+        component += "</outputs>";
+        component += "<parameters><parameter><parameterName></parameterName>" +
+                "<parameterType></parameterType></parameter></parameters>";
+        component += "</component>";
+
+        return component;
     }
 
     private String location;

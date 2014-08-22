@@ -222,22 +222,10 @@ public class ActionHandler {
      * @param connection
      *
      */
-    public static void getModel(WebSocket connection) throws SQLException {
+    public static void getModel(WebSocket connection) throws SQLException, ClassNotFoundException {
         String userID = (String)DistributeServerHearken.currentUsers.get(connection);
+        String modelDescription = XMLGenerator.ComponentsXML(userID);
 
-        DBOP dbop = new DBOP();
-        Connection connectionToSql = dbop.getConnection();
-
-        PreparedStatement prep = connectionToSql.prepareStatement(  //email has been sign up
-                "select description,id from Models where owner = ?;");
-        prep.setString(1, userID);
-        ResultSet resultSet = prep.executeQuery();
-        String modelDescription = "";
-        String modelId = "";
-        while (resultSet.next()) {
-            modelDescription += XMLGenerator.ComponentXML(resultSet.getString("description"), resultSet.getString("id"));
-        }
-        modelDescription = XMLGenerator.ComponentXML(modelDescription);
         JSONObject jsonObject = JSONObject.fromObject("{action:'get model',StatusCode:0,message:\""+modelDescription+"\"}");
         connection.send(jsonObject.toString());
 

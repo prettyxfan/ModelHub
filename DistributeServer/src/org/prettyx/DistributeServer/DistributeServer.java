@@ -10,6 +10,7 @@
 package org.prettyx.DistributeServer;
 
 import com.sun.tools.javac.file.JavacFileManager;
+import net.sf.json.JSONObject;
 import oms3.annotations.In;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -79,14 +80,20 @@ public class DistributeServer {
         DistributeServerHearken distributeServerHearken = new DistributeServerHearken(Integer.valueOf(distributeServer.settingsCenter.getSetting("Network", "Port")));
         distributeServerHearken.checkAndStart();
 
-        distributeServer.test2();
+    }
 
+    public void test1() throws Exception {
+        String userID = "51c73107-1e8c-4e90-a730-4b2a688273df";
+        String modelDescription = XMLGenerator.ComponentsXML(userID);
 
+        JSONObject jsonObject = JSONObject.fromObject("{action:'get model',StatusCode:0,message:\""+modelDescription+"\"}");
+
+        LogUtility.logUtility().log2out(jsonObject.toString());
     }
 
     public void test2() throws Exception {
 
-        String filePath = "/Users/XieFan/Desktop/oms3.prj.examples-basic/build/classes/";
+        String filePath = "/Users/XieFan/Documents/ModelHub/Runtime/Users/PengJingwen";
         ClassLoaderUtils classLoaderUtils = new ClassLoaderUtils(filePath);
         List<Class<?>> s = classLoaderUtils.getServiceClassList();
         List<Class<?>> undo = new LinkedList<Class<?>>();
