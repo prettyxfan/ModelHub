@@ -494,36 +494,36 @@ function displayAttributes(m){
             }
         }
 
-        var html ='<p>' + node.componentDescription + '<p>';
-        html += '<hr/>';
+        var html = '<table class="table table-striped table-hover "><tbody>' +
+            '<tr><td class="text-center" colspan="2">'+node.componentDescription+'</td></tr>';
+
+
 
         if (node.inputs.length != 0){
-            html += '<h5>Input</h5>'
+            html += '<tr><td class="text-center" colspan="2">Inputs</td></tr>';
             for (var i in node.inputs){
-                html += '<div class="input-group">';
-                html += '<span class="input-group-addon">' + node.inputs[i][0].split(".")[1] + '</span>';
-                html += '<input type="text" class="form-control" placeholder="' + node.inputs[i][1] + '"/>';
-                html += '</div>';
+                html += '<tr><td>' + node.inputs[i][0].split(".")[1] + '</td>' +
+                    '<td>'+'<input type="text" class="form-control" placeholder="' + node.inputs[i][1] + '"/>'+'</td>' +
+                    '</tr>';
             }
         }
         if (node.parameters.length != 0){
-            html += '<h5>Parameter</h5>'
+            html += '<tr><td class="text-center" colspan="2">Parameter</td></tr>';
             for (var i in node.parameters){
-                html += '<div class="input-group">';
-                html += '<span class="input-group-addon">' + node.parameters[i][0].split(".")[1] + '</span>';
-                html += '<input type="text" class="form-control" placeholder="' + node.parameters[i][1] + '"/>';
-                html += '</div>';
+                html += '<tr><td>' + node.parameters[i][0].split(".")[1] + '</td>' +
+                    '<td>'+'<input type="text" class="form-control" placeholder="' + node.parameters[i][1] + '"/>'+'</td>' +
+                    '</tr>';
             }
         }
         if (node.outputs.length != 0){
-            html += '<h5>Output</h5>'
+            html += '<tr><td class="text-center" colspan="2">Output</td></tr>';
             for (var i in node.outputs){
-                html += '<div class="input-group">';
-                html += '<span class="input-group-addon">' + node.outputs[i][0].split(".")[1] + '</span>';
-                html += '<input type="text" class="form-control" placeholder="' + node.outputs[i][1] + '"/>';
-                html += '</div>'
+                html += '<tr><td>' + node.outputs[i][0].split(".")[1] + '</td>' +
+                    '<td>'+'<input type="text" class="form-control" placeholder="' + node.outputs[i][1] + '"/>'+'</td>' +
+                    '</tr>';
             }
         }
+        html += '</tbody></table>'
         html += '<button type="button" class="btn btn-default btn-lg btn-block">确定</button><button type="button" class="btn btn-default btn-lg btn-block">取消</button>';
         $('#attributesArea').html(html);
     }
