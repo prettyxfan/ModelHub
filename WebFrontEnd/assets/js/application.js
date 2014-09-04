@@ -15,8 +15,11 @@ function interfaceInit(){
     drawModelArray = new Array();
     drawModelNumber = 0;
     ModelInfomation = '';
+    newModelName = '';
 
+    paperAvailable = false;
     createInterface();
+    paper.visible = false;
 
     /**
     * send message to sever to get model infomation
@@ -30,35 +33,6 @@ function interfaceInit(){
         data: sign_up_message
     };
     websocket.send(json2str(sendMessage));
-
-
-    if(document.implementation && document.implementation.createDocument) {
-        componentDOM = document.implementation.createDocument('', '', null);
-        var component = componentDOM.createElement('component');
-        var from = componentDOM.createElement('from');
-        component.appendChild(from);
-        var to = componentDOM.createElement('to');
-        component.appendChild(to);
-        var parts = componentDOM.createElement('parts');
-        component.appendChild(parts);
-        componentXML = "";
-        componentXML = new XMLSerializer().serializeToString(component);
-        //console.log(componentXML); 
-    }
-
-    // if(document.implementation && document.implementation.createDocument) {
-    //     dataFlowDOM = document.implementation.createDocument('', '', null);
-    //     var dataflow = dataFlowDOM.createElement('dataflow');
-    //     var from = dataFlowDOM.createElement('from');
-    //     dataflow.appendChild(from);
-    //     var to = dataFlowDOM.createElement('to');
-    //     dataflow.appendChild(to);
-    //     var components = dataFlowDOM.createElement('components');
-    //     dataflow.appendChild(components);
-    //     dataflowXML = "";
-    //     dataflowXML = new XMLSerializer().serializeToString(dataflow);
-    //     console.log(dataflowXML); 
-    // }
 
 }
 
@@ -75,7 +49,7 @@ function createInterface(){
     graph = new joint.dia.Graph;
     paper = new joint.dia.Paper({
         el: $('#paper'),
-        gridSize: 1,
+        gridSize: 50,
         model: graph,
         defaultLink: new joint.dia.Link({
           attrs: { '.marker-target': { d: 'M 10 0 L 0 5 L 10 10 z' } }
@@ -93,7 +67,7 @@ function createInterface(){
 
     /**
     * Get the Link of Component
-    *Create the Component XML and Dataflow XML 
+    *Create the Component XML and Dataflow XML
     */
 
     graph.on('change:source change:target', function(link) {
@@ -110,24 +84,25 @@ function createInterface(){
         var obj = $(xmobj).find("part").each(function(){
           var xmlAttr = $(this).attr("id");
             if (xmlAttr == sourceId) {
-                $(this).find("outputId").each(function() {
+                $(this).find("output").each(function() {
                     if ($(this).attr("portName") == sourcePort) {
-                        $(this).text(targetId);
+                        $(this).attr("targetPortId", targetId);
                         $(this).attr("targetPortName", targetPort);
                     }
                 });
             }
             else if (xmlAttr == targetId) {
-                $(this).find("inputId").each(function() {
+                $(this).find("input").each(function() {
                     if ($(this).attr("portName") == targetPort) {
-                    $(this).text(sourceId);
+                    $(this).attr("sourcePortId",sourceId);
                     $(this).attr("sourcePortName", sourcePort);
                     }
-                }); 
+                });
             }
         });
         componentXML = new XMLSerializer().serializeToString(xmobj);
-        
+//        console.log(componentXML)
+
     });
 
 /**
@@ -160,7 +135,7 @@ function createInterface(){
 
             var obj = $(xmobj).find("parts").each(function(){
 
-                var part = componentDOM.createElement('part'); 
+                var part = componentDOM.createElement('part');
                 part.setAttribute('id', IdCount);
                 var componentId = '';
                 for(var i in drawModelArray) {
@@ -172,55 +147,30 @@ function createInterface(){
                 part.setAttribute('componentId', componentId);
 
                 for(var i=0; i<inputNumber; i++) {
-                    var inputId = componentDOM.createElement('inputId');
-                    inputId.setAttribute('portName', cell.get('inPorts')[i]);
-                    inputId.setAttribute('sourcePortName', '');
-                    part.appendChild(inputId);
+                    var input = componentDOM.createElement('input');
+                    input.setAttribute('portName', cell.get('inPorts')[i]);
+                    input.setAttribute('sourcePortName', '');
+                    input.setAttribute('sourcePortId','');
+                    input.setAttribute('value','');
+                    part.appendChild(input);
                 }
 
                 for(var i=0; i<outputNumber; i++) {
-                    var outputId = componentDOM.createElement('outputId');
-                    outputId.setAttribute('portName', cell.get('outPorts')[i]);
-                    outputId.setAttribute('targetPortName', '');
-                    part.appendChild(outputId);
+                    var output = componentDOM.createElement('output');
+                    output.setAttribute('portName', cell.get('outPorts')[i]);
+                    output.setAttribute('targetPortName', '');
+                    output.setAttribute('targetPortId','');
+                    part.appendChild(output);
                 }
 
                 $(this).append(part);
 
             });
             // xmobj.appendChild(part);
-               
+
             componentXML = new XMLSerializer().serializeToString(xmobj);
             console.log(componentXML);
 
-            // var xmobj = $.parseXML(dataflowXML);
-            // IdCount = cell.id;
-            // var inputNumber = cell.get('inPorts').length;
-            // var outputNumber = cell.get('outPorts').length;
-            // // var component ='';
-            // var obj = $(xmobj).find("components").each(function(){
-            //      var component = dataFlowDOM.createElement('component'); 
-            //      component.setAttribute('id', IdCount);
-            //      component.setAttribute('type', 'model');
-
-            //      for(var i=0; i<inputNumber; i++) {
-            //         var inputId = componentDOM.createElement('inputId');
-            //         inputId.setAttribute('portName', cell.get('inPorts')[i]);
-            //         inputId.setAttribute('sourcePortName', '');
-            //         component.appendChild(inputId);
-            //     }
-            //     for(var i=0; i<outputNumber; i++) {
-            //         var outputId = componentDOM.createElement('outputId');
-            //         outputId.setAttribute('portName', cell.get('outPorts')[i]);
-            //         // outputId.setAttribute('targetPortName', '');
-            //         component.appendChild(outputId);
-            //     }
-            //     $(this).append(component);
-
-            // });
-
-            // dataflowXML = new XMLSerializer().serializeToString(xmobj);
-            // console.log(dataflowXML);
         }
 
     });
@@ -260,26 +210,29 @@ function createInterface(){
     });
 
     paper1.on('cell:pointerdblclick' ,function(evt, x, y) {
-        var evtId = "#" + evt.id;
-        var cellId = $(evtId).attr("model-id");
-        var m = graph1.getCell(cellId);
-        var m1 = '';
 
-        for(var i in recievedModelArray) {
-            if( recievedModelArray[i].id == m.id ) {
-                m1 = recievedModelArray[i];
-                recievedModelArray[i] = m1;
-                break;
+        if(paperAvailable) {
+            var evtId = "#" + evt.id;
+            var cellId = $(evtId).attr("model-id");
+            var m = graph1.getCell(cellId);
+            var m1 = '';
+
+            for (var i in recievedModelArray) {
+                if (recievedModelArray[i].id == m.id) {
+                    m1 = recievedModelArray[i];
+                    recievedModelArray[i] = m1;
+                    break;
+                }
             }
-        }
 
-        if( m1!='') {
-            var m2 = m.clone();
-            m2.translate(100, 0);
-            var m3 = new Model(m1.componentName, m1.componentDescription, m1.inputs, m1.outputs, m1.parameters, m1.modelId, m2.id);
-            drawModelArray[drawModelNumber] = m3;
-            drawModelNumber++;
-            graph.addCell(m2);
+            if (m1 != '') {
+                var m2 = m.clone();
+                m2.translate(100, 0);
+                var m3 = new Model(m1.componentName, m1.componentDescription, m1.inputs, m1.outputs, m1.parameters, m1.modelId, m2.id);
+                drawModelArray[drawModelNumber] = m3;
+                drawModelNumber++;
+                graph.addCell(m2);
+            }
         }
     });
 
@@ -322,11 +275,11 @@ function createModel(){
         for(var i=0; i<recievedModelNumber; i++ ) {
             var inPortsArray = new Array();
             for (var j=0; j<recievedModelArray[i].inputs.length; j++) {
-                inPortsArray[j] = recievedModelArray[i].inputs[j][0].split(".")[1];
+                inPortsArray[j] = recievedModelArray[i].inputs[j][0];
             }
             var outPortsArray = new Array();
             for (var j=0; j<recievedModelArray[i].outputs.length; j++) {
-                outPortsArray[j] = recievedModelArray[i].outputs[j][0].split(".")[1];
+                outPortsArray[j] = recievedModelArray[i].outputs[j][0];
             }
             // var outPortsArray = new Array();
             // for (var j=0; j<recievedModelArray[i].outputs.length; j++) {
@@ -335,18 +288,18 @@ function createModel(){
             // console.log(recievedModelArray[i].componentName);
             // var test = ['df','sdf'];
             if(inPortsArray.length > outPortsArray.length){
-                modelHeight = 30*inPortsArray.length;
+                modelHeight = 40*inPortsArray.length;
             }
             else {
-                modelHeight = 30*outPortsArray.length;
+                modelHeight = 40*outPortsArray.length;
             }
             var m1 = new joint.shapes.devs.Model({
-                position: { x: 80, y: position_y},
-                size: { width: 80, height: modelHeight },
+                position: { x: 150, y: position_y},
+                size: { width: 60, height: modelHeight },
                 inPorts: inPortsArray,
                 outPorts: outPortsArray,
                 attrs: {
-                    '.label': { text: recievedModelArray[i].componentName, 'ref-x': .55, 'ref-y': .25 },
+                    '.label': { text: recievedModelArray[i].componentName, 'ref-x': .60, 'ref-y': .25 },
                     rect: { fill: '#fffff' },
                     '.inPorts circle': { fill: '#98BDD4', magnet: 'passive', type: 'input' },
                     '.outPorts circle': { fill: '#CCCCCC', type: 'output' },
@@ -355,7 +308,7 @@ function createModel(){
             });
             recievedModelArray[i].id = m1.id;
             graph1.addCell(m1);
-            position_y += modelHeight + 10;
+            position_y += modelHeight + 20;
         }
     }
 }
@@ -419,7 +372,68 @@ function dealRecieveModel(modelXML){
 }
 
 function newModel(){
-    
+    if(!paperAvailable) {
+        $('#newModel').modal('show');
+    }
+
+}
+
+function newModelConfirm() {
+    if(!$('#inputModelName').val()) {
+        $('#inputModelName').popover('show');
+    } else{
+        newModelName = $('#inputModelName').val();
+        $('#newModel').modal('hide');
+        $('#paper').css('background-color', '#ffffff');
+        paperAvailable = true;
+
+        if(document.implementation && document.implementation.createDocument) {
+            componentDOM = document.implementation.createDocument('', '', null);
+            var component = componentDOM.createElement('component');
+            var from = componentDOM.createElement('from');
+            component.appendChild(from);
+            var to = componentDOM.createElement('to');
+            component.appendChild(to);
+            var componentName = componentDOM.createElement('name');
+            var nameText = componentDOM.createTextNode(newModelName);
+            componentName.appendChild(nameText);
+            component.appendChild(componentName);
+            var parts = componentDOM.createElement('parts');
+            component.appendChild(parts);
+            componentXML = "";
+            componentXML = new XMLSerializer().serializeToString(component);
+            //console.log(componentXML);
+        }
+    }
+}
+
+function logOut() {
+    $('#logOutConform').modal('show');
+}
+function logOutConform(){
+    var actionStatus = 1;
+    var ssid = "null";
+    var message = "null";
+    var sendMessage = {
+        action: actionStatus,
+        sid: ssid,
+        data: message
+    };
+    websocket.send(json2str(sendMessage));
+    console.log(json2str(sendMessage));
+}
+function logOutSuccess(){
+    $('#logOutConform').modal('hide');
+    $('#logOutSuccess').modal('show');
+    var storage = window.localStorage;
+    storage.removeItem('SID');
+}
+function logOutFailed(){
+    $('#logOutConform').modal('hide');
+    $('#logOutFailed').modal('show');
+}
+function relogin(){
+    location.reload();
 }
 
 function sendXmlToServer() {
@@ -476,55 +490,123 @@ function addComponent() {
             '.port3 text': { text: 'output3' },
             '.port1': { ref: 'rect', 'ref-y': .4 },
             '.port2': { ref: 'rect', 'ref-y': .6 },
-            '.port3': { ref: 'rect', 'ref-y': .5, 'ref-dx': 0 },
+            '.port3': { ref: 'rect', 'ref-y': .5, 'ref-dx': 0 }
         }
     });
     graph.addCell(d);
     createXMLDocument();
 }
 
+
 function displayAttributes(m){
     var node = '';
     if(m instanceof joint.shapes.devs.Model){
         for(var i in drawModelArray) {
-            //console.log(recievedModelArray[i].id + " " + cellId);
             if(drawModelArray[i].id == m.id){
             node = drawModelArray[i];
             break;
             }
         }
 
-        var html = '<table class="table table-striped table-hover "><tbody>' +
-            '<tr><td class="text-center" colspan="2">'+node.componentDescription+'</td></tr>';
-
-
+        var html = '<div class="jumbotron">' +
+            '<h5>Description:</h5> ' +
+            '<p>'+ node.componentDescription +'</p></div>';
 
         if (node.inputs.length != 0){
-            html += '<tr><td class="text-center" colspan="2">Inputs</td></tr>';
+            html += '<div class="form-group"><label class="control-label">Inputs</label>';
             for (var i in node.inputs){
-                html += '<tr><td>' + node.inputs[i][0].split(".")[1] + '</td>' +
-                    '<td>'+'<input type="text" class="form-control" placeholder="' + node.inputs[i][1] + '"/>'+'</td>' +
-                    '</tr>';
+                if(!judgeInputEnable(node.id,node.inputs[i][0])) {
+
+                    html += '<div class="input-group"><span class="input-group-addon input-sm">' + node.inputs[i][0].split(".")[1]
+                        + '</span><input type="text" disabled="" class="form-control input-sm" id="'+ node.inputs[i][0].replace(".","") +'" ' +
+                        'placeholder="' + node.inputs[i][1]
+                        + '" /><span class="input-group-btn"><button class="btn btn-primary btn-sm" type="button">...</button></span></div>';
+                }
+                else{
+                    html += '<div class="input-group"><span class="input-group-addon input-sm">' + node.inputs[i][0].split(".")[1]
+                        + '</span><input type="text" class="form-control input-sm"id="'+ node.inputs[i][0].replace(".","") +'" ' +
+                        ' placeholder="' + node.inputs[i][1]
+                        + '" /><span class="input-group-btn"><button class="btn btn-primary btn-sm" type="button">...</button></span></div>';
+                }
             }
+            html += '</div>';
         }
         if (node.parameters.length != 0){
-            html += '<tr><td class="text-center" colspan="2">Parameter</td></tr>';
+
+            html += '<div class="form-group"><label class="control-label ">Parameters</label>';
             for (var i in node.parameters){
-                html += '<tr><td>' + node.parameters[i][0].split(".")[1] + '</td>' +
-                    '<td>'+'<input type="text" class="form-control" placeholder="' + node.parameters[i][1] + '"/>'+'</td>' +
-                    '</tr>';
+                html += '<div class="input-group"><span class="input-group-addon input-sm">'+node.parameters[i][0].split(".")[1]
+                + '</span><input type="text" class="form-control input-sm" id="'+ node.parameters[i][0].replace(".","") +'" placeholder="'+ node.parameters[i][1]
+                +'" ><span class="input-group-btn"><button class="btn btn-primary btn-sm" type="button">...</button></span></div>';
             }
+            html += '</div>';
         }
         if (node.outputs.length != 0){
-            html += '<tr><td class="text-center" colspan="2">Output</td></tr>';
+
+            html += '<div class="form-group"><label class="control-label">Outputs</label>';
             for (var i in node.outputs){
-                html += '<tr><td>' + node.outputs[i][0].split(".")[1] + '</td>' +
-                    '<td>'+'<input type="text" class="form-control" placeholder="' + node.outputs[i][1] + '"/>'+'</td>' +
-                    '</tr>';
+                html += '<div class="input-group"><span class="input-group-addon input-sm">'+node.outputs[i][0].split(".")[1]
+                + '</span><input type="text" class="form-control input-sm" disabled="" id="'+ node.outputs[i][0].replace(".","") +'" placeholder="'+ node.outputs[i][1]
+                +'" ><span class="input-group-btn"><button class="btn btn-primary btn-sm" type="button">...</button></span></div>';
+
             }
+            html += '</div>';
         }
-        html += '</tbody></table>'
-        html += '<button type="button" class="btn btn-default btn-lg btn-block">确定</button><button type="button" class="btn btn-default btn-lg btn-block">取消</button>';
+        html += '</div>';
+        html += '<button type="button" class="btn btn-default btn-sm btn-block" onclick="setData()">确定</button><button type="button" class="btn btn-default btn-sm btn-block">取消</button>';
         $('#attributesArea').html(html);
     }
+}
+
+function judgeInputEnable(nodeId,portName){
+    var xmobj = $.parseXML(componentXML);
+    var key = 0;
+    var obj = $(xmobj).find("part").each(function(){
+        var xmlAttr = $(this).attr("id");
+        if (xmlAttr == nodeId) {
+            $(this).find("input").each(function() {
+                if ($(this).attr("portName") == portName) {
+                    if($(this).attr("sourcePortId") == ''){
+                        key = 0;
+                    } else{
+                        key = 1;
+                    }
+                }
+            });
+        }
+    });
+    if(key == 1){
+        return false;
+    }
+    else return true;
+}
+
+function setData() {
+
+    var xmobj = $.parseXML(componentXML);
+    var node = '';
+    var obj = $(xmobj).find("part").each(function(){
+        var xmlAttr = $(this).attr("id");
+        if (xmlAttr == focusCellId) {
+            for(var i in drawModelArray) {
+                if(drawModelArray[i].id == focusCellId){
+                    node = drawModelArray[i];
+                    break;
+                }
+            }
+            $(this).find("input").each(function() {
+
+                for(var i=0;i<node.inputs.length;i++) {
+                    if ($(this).attr("portName") == node.inputs[i][0]) {
+                        var elementId = "#"+node.inputs[i][0].replace(".","");
+                        $(this).attr("value", $(elementId).val());
+                    }
+                }
+            });
+        }
+    });
+    componentXML = new XMLSerializer().serializeToString(xmobj);
+
+    console.log(componentXML);
+
 }

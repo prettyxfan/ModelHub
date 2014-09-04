@@ -201,10 +201,41 @@ public class DEPFS {
      * @throws IOException
      */
     public static void copyBinFile(File inputFile, File outputFile) throws IOException{
-
         copyBinFile(new FileInputStream(inputFile), new FileOutputStream(outputFile));
     }
 
+    /**
+     * Copy directory
+     *
+     * @param sourceDirectory
+     *              input
+     * @param targetDirectory
+     *              output
+     * @throws IOException
+     */
+
+    public static void copyDirectory(String sourceDirectory,String targetDirectory) throws IOException{
+
+        File[] file=(new File(sourceDirectory)).listFiles();
+        for (int i = 0; i < file.length; i++) {
+            if(file[i].isFile()){
+                File sourceFile = file[i];
+                if(!sourceFile.getName().startsWith(".")) {
+                    File targetFile = new File(new File(targetDirectory).getAbsolutePath() + File.separator + file[i].getName());
+                    copyBinFile(sourceFile, targetFile);
+                }
+
+            }
+
+            if(file[i].isDirectory()){
+                String sourcedir = sourceDirectory + file[i].getName();
+                String targetdir = targetDirectory + "/" + file[i].getName();
+                createDirectory(targetdir);
+                copyDirectory(sourcedir, targetdir);
+            }
+        }
+
+    }
     /**
      * Remove the spaces before and after the string
      *

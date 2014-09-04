@@ -51,8 +51,8 @@ joint.shapes.devs.Model = joint.shapes.basic.Generic.extend(_.extend({}, joint.s
                 'pointer-events': 'none'
             },
             '.label': { text: 'Model', 'ref-x': .10, 'ref-y': .10 },
-            '.inPorts text': { x: -15, dy: -8, 'text-anchor': 'end' },
-            '.outPorts text':{ x: 15, dy: -8 }
+            '.inPorts text': { x: -10, dy: -8, 'text-anchor': 'end' },
+            '.outPorts text':{ x: 10, dy: -8 }
         }
 
     }, joint.shapes.basic.Generic.prototype.defaults),

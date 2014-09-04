@@ -18,6 +18,8 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.ibex.nestedvm.util.Seekable;
 import org.prettyx.Common.*;
+import org.prettyx.DistributeServer.Modeling.Model;
+import org.prettyx.DistributeServer.Modeling.Sim;
 import org.prettyx.DistributeServer.Modeling.SimFile;
 import org.prettyx.DistributeServer.Network.DistributeServerHearken;
 import org.prettyx.DistributeServer.Settings.SettingsCenter;
@@ -79,7 +81,15 @@ public class DistributeServer {
 
         DistributeServerHearken distributeServerHearken = new DistributeServerHearken(Integer.valueOf(distributeServer.settingsCenter.getSetting("Network", "Port")));
         distributeServerHearken.checkAndStart();
+        distributeServer.test0();
 
+    }
+
+    public static void test0() {
+        SimFile simFile = new SimFile();
+        Sim sim = new Sim();
+        Model model = new Model();
+        System.out.println(simFile.toString());
     }
 
     public void test1() throws Exception {
@@ -127,7 +137,7 @@ public class DistributeServer {
     public void test5() throws DocumentException, SQLException {
         Map idToName = new ConcurrentHashMap<String, String>();
         List<String> sourceToTarget = new ArrayList<String>();
-        String data = "<component><from/><to/><parts>" +
+        String data = "<component><from/><to/><name>Test</name><parts>" +
                 "<part id='87fd1561-aed8-44ab-9389-32651b29a295' " +
                 "componentId='55e12a6e-fedf-43c5-ab0d-4a395fb499ff'>" +
                 "<inputId portName='in1' sourcePortName=''/><inputId portName='in2' sourcePortName=''/>" +
@@ -142,7 +152,7 @@ public class DistributeServer {
 
         DBOP dbop = new DBOP();
         Connection connectionToSql = dbop.getConnection();
-        PreparedStatement prep = connectionToSql.prepareStatement(  //email has been sign up
+        PreparedStatement prep = connectionToSql.prepareStatement(
                 "select owner from Models where id= ?;");
 
         for (Iterator it = parts.iterator(); it.hasNext();) {
@@ -168,26 +178,26 @@ public class DistributeServer {
         }
         prep.close();
         connectionToSql.close();
-        System.out.println(UUID.randomUUID().toString());
-        System.out.println(UUID.randomUUID().toString());
-//        for (Iterator it = parts.iterator(); it.hasNext();) {
-//            Element component = (Element) it.next();
-//            String partId = component.attributeValue("id");
-//            String partName = (String)idToName.get(partId);
-//            List outPorts = component.elements("outputId");
-//            for( Iterator ot = outPorts.iterator(); ot.hasNext();){
-//                Element outPort = (Element)ot.next();
-//                String portName = outPort.attributeValue("portName");
-//                String targetPortName = outPort.attributeValue("targetPortName");
-//                String targetModelId = outPort.getTextTrim();
-//                String targetModelName = (String) idToName.get(targetModelId);
-//                String source = partName + "." + portName;
-//                String target = targetModelName + "." + targetPortName;
-//                sourceToTarget.add(source+"+"+target);
-//            }
-//
-//        }
-//        System.out.println(sourceToTarget);
+        for (Iterator it = parts.iterator(); it.hasNext();) {
+            Element component = (Element) it.next();
+            String partId = component.attributeValue("id");
+            String partName = (String)idToName.get(partId);
+            LogUtility.logUtility().log2out("part name:" + partName);
+            List outPorts = component.elements("outputId");
+            for( Iterator ot = outPorts.iterator(); ot.hasNext();){
+                Element outPort = (Element)ot.next();
+                String portName = outPort.attributeValue("portName");
+                String targetPortName = outPort.attributeValue("targetPortName");
+                String targetModelId = outPort.getTextTrim();
+                String targetModelName = (String) idToName.get(targetModelId);
+                String source = partName + "." + portName;
+                String target = targetModelName + "." + targetPortName;
+                sourceToTarget.add(source+"+"+target);
+                System.out.println("source:" + source + " target:" + target);
+            }
+
+        }
+        System.out.println(sourceToTarget);
 
         //这里还要加入获取component 的 ID  然后得到sim文件的路径
 //        try {

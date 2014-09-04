@@ -18,15 +18,18 @@ import org.dom4j.io.SAXReader;
 import org.java_websocket.WebSocket;
 import org.prettyx.Common.*;
 import org.prettyx.DistributeServer.DistributeServer;
+import org.prettyx.DistributeServer.Modeling.Model;
+import org.prettyx.DistributeServer.Modeling.Parameter;
+import org.prettyx.DistributeServer.Modeling.Sim;
+import org.prettyx.DistributeServer.Modeling.SimFile;
+import sun.rmi.runtime.Log;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -121,41 +124,73 @@ public class ActionHandler {
      * @param connection, sid
      *
      */
-    public static void userSidTologin(WebSocket connection, String sid) throws Exception {
+    public static void userSidTologin(WebSocket connection, String sid){
+        DBOP dbop = new DBOP();
+        Connection connectionToSql = dbop.getConnection();
+        try {
+            PreparedStatement prep = connectionToSql.prepareStatement(
+                    "select count(*) as rowCount from Users where token ='" + sid + "';");
+            ResultSet resultSet = prep.executeQuery();
+
+            if (resultSet.getInt("rowCount") == 0) {
+                //用户不存在
+                LogUtility.logUtility().log2out("fail, user is not exist");
+                JSONObject jsonObject = JSONObject.fromObject("{action:'login',StatusCode:3,message:'fail'}");
+                connection.send(jsonObject.toString());
+            } else {
+                LogUtility.logUtility().log2out("log in is ok");
+                JSONObject jsonObject = JSONObject.fromObject("{action:'login',StatusCode:4,message:'ok'}");
+                connection.send(jsonObject.toString());
+
+                prep = connectionToSql.prepareStatement(
+                        "select sid  from Users where token = ?;");
+                prep.setString(1, sid);
+                resultSet = prep.executeQuery();
+                String user = resultSet.getString("sid");
+                DistributeServerHearken.currentUsers.put(connection, user);
+            }
+
+            prep.close();
+            connectionToSql.close();
+            resultSet.close();
+        }catch (Exception e){
+//            e.printStackTrace();
+        }
+
+    }
+
+    /**
+     * Action when user to log out
+     *
+     * @param connection, sid
+     *
+     */
+
+    public static void logOut(WebSocket connection) throws SQLException {
+        String userID = (String)DistributeServerHearken.currentUsers.get(connection);
+
         DBOP dbop = new DBOP();
         Connection connectionToSql = dbop.getConnection();
 
         PreparedStatement prep = connectionToSql.prepareStatement(
-                "select count(*) as rowCount from Users where token ='"+ sid +"';");
+                "select count(*) as rowCount from Users where sid ='"+ userID +"';");
+
         ResultSet resultSet = prep.executeQuery();
-
-        if (resultSet.getInt("rowCount") == 0) {
-            //用户不存在
-            LogUtility.logUtility().log2out("fail, user is not exist");
-            JSONObject jsonObject = JSONObject.fromObject("{action:'login',StatusCode:3,message:'fail'}");
+        if(resultSet.getInt("rowCount") != 0) {
+            LogUtility.logUtility().log2out("log out is ok");
+            JSONObject jsonObject = JSONObject.fromObject("{action:'logOut',StatusCode:1,message:'ok'}");
             connection.send(jsonObject.toString());
-        } else {
-            LogUtility.logUtility().log2out("log in is ok");
-            JSONObject jsonObject = JSONObject.fromObject("{action:'login',StatusCode:4,message:'ok'}");
-            connection.send(jsonObject.toString());
-
-            prep = connectionToSql.prepareStatement(
-                    "select sid  from Users where token = ?;");
-            prep.setString(1, sid);
-            resultSet = prep.executeQuery();
-            String user = resultSet.getString("sid");
-            DistributeServerHearken.currentUsers.put(connection, user);
+            DistributeServerHearken.currentUsers.remove(connection, userID);
         }
+        else {
+            LogUtility.logUtility().log2out("log out failed");
+            JSONObject jsonObject = JSONObject.fromObject("{action:'logOut',StatusCode:0,message:'failed'}");
+            connection.send(jsonObject.toString());
+        }
+        resultSet.close();
         prep.close();
         connectionToSql.close();
-        resultSet.close();
 
-    }
-    /**
-     * @TODO
-     */
-
-    public static void logOut() {
 
     }
     /**
@@ -240,25 +275,59 @@ public class ActionHandler {
      *                    data is composed of model description xml
      *
      */
-    public static void linkModel(WebSocket connection, String data) throws DocumentException, SQLException {
-        Map idToName = new ConcurrentHashMap<String, String>();
+    public static void linkModel(WebSocket connection, String data) throws DocumentException, SQLException, IOException {
+
+
+        SimFile simFile = new SimFile();
+        Sim sim = new Sim();
+        Model model = new Model();
+        Map newComponentName = new HashMap<String, String>();
+        Set components = new HashSet<String>();
+        Map parameter = new HashMap<String,String>();
+//        List<String> connections = new ArrayList<String>();
+
+        Map idToOwnerName = new ConcurrentHashMap<String, String>(); //model id -> owner name
+        Map idToModelName = new ConcurrentHashMap<String, String>(); //model id -> model name
+        Map partIdToModelId = new ConcurrentHashMap<String, String>(); // part id -> model id
+        List<String> sourceToTarget = new ArrayList<String>();
 
         Document document = DocumentHelper.parseText(data);
         Element root = document.getRootElement();
+        String componentName = root.element("name").getText();
+        String currentUserName = "";
+        LogUtility.logUtility().log2out("component name = " + componentName);
         List parts = root.element("parts").elements("part");
 
         DBOP dbop = new DBOP();
         Connection connectionToSql = dbop.getConnection();
-        PreparedStatement prep = connectionToSql.prepareStatement(
-                "select owner from Models where id= ?;");
+
+        PreparedStatement prep =connectionToSql.prepareStatement(
+                "select nickname from Users where sid= ?;"
+        );
+        prep.setString(1, (String) DistributeServerHearken.currentUsers.get(connection));
+        ResultSet resultSet = prep.executeQuery();
+        if(resultSet.next()) {
+            currentUserName = resultSet.getString("nickname");
+            LogUtility.logUtility().log2out("current user name:" + currentUserName);
+        }
+        resultSet.close();
+        prep.close();
+
+        prep = connectionToSql.prepareStatement(
+                "select owner,modelname from Models where id= ?;");
 
         for (Iterator it = parts.iterator(); it.hasNext();) {
             Element component = (Element) it.next();
-            String partId = component.attributeValue("componentId");
-            prep.setString(1, partId);
-            ResultSet resultSet = prep.executeQuery();
+            String modeId = component.attributeValue("componentId");
+            String partId = component.attributeValue("id");
+            partIdToModelId.put(partId, modeId);
+
+            prep.setString(1, modeId);
+            resultSet = prep.executeQuery();
             if(resultSet.next()){
                 String owner = resultSet.getString("owner");
+                String modelName = resultSet.getString("modelname");
+                idToModelName.put(modeId, modelName);
                 PreparedStatement preparedStatement =connectionToSql.prepareStatement(
                         "select nickname from Users where sid= ?;"
                 );
@@ -266,8 +335,8 @@ public class ActionHandler {
                 ResultSet resultSet1 = preparedStatement.executeQuery();
                 if(resultSet1.next()) {
                     String userName = resultSet1.getString("nickname");
-                    idToName.put(partId, userName);
-                    LogUtility.logUtility().log2out("partId : userName = " + partId + ":" + userName);
+                    idToOwnerName.put(modeId, userName);
+                    LogUtility.logUtility().log2out("partId : userName = " + modeId + ":" + userName);
                 }
                 resultSet1.close();
                 preparedStatement.close();
@@ -275,7 +344,106 @@ public class ActionHandler {
         }
         prep.close();
         connectionToSql.close();
+
+        if(!idToOwnerName.isEmpty()) {
+            //copy files
+            String newModelPath = DistributeServer.absolutePathOfRuntimeUsers + "/"
+                    + currentUserName + "/" + componentName;
+            DEPFS.createDirectory(newModelPath);
+            DEPFS.createDirectory(newModelPath + "/" + "build");
+
+            Iterator ita = null;
+            ita = idToOwnerName.entrySet().iterator();
+            while (ita.hasNext()) {
+                Map.Entry entry = (Map.Entry) ita.next();
+                String modelname = (String) idToModelName.get((String) entry.getKey());
+                String owername = (String) entry.getValue();
+                String sourcePath = DistributeServer.absolutePathOfRuntimeUsers + "/"
+                        + owername + "/" + modelname + "/" + "build/";
+                String targetPath = newModelPath + "/" + "build/";
+                DEPFS.copyDirectory(sourcePath, targetPath);
+            }
+
+            //create sim file
+
+            // get connected port
+            for (Iterator it = parts.iterator(); it.hasNext();) {
+                Element component = (Element) it.next();
+                String partName = (String)idToModelName.get(partIdToModelId.get(component.attributeValue("id")));
+                List outPorts = component.elements("output");
+                for( Iterator ot = outPorts.iterator(); ot.hasNext();){
+                    Element outPort = (Element)ot.next();
+                    String portName = outPort.attributeValue("portName");
+                    String targetPortName = outPort.attributeValue("targetPortName");
+                    String targetModelId = outPort.attributeValue("targetPortId");
+                    String targetModelName = (String) idToModelName.get(partIdToModelId.get(targetModelId));
+                    String source = partName + "." + portName;
+                    String target = targetModelName + "." + targetPortName;
+                    components.add(partName+"."+portName.split("\\.")[0]);
+                    components.add(targetModelName+"."+targetPortName.split("\\.")[0]);
+                    sourceToTarget.add(source + "+" + target);
+
+                }
+
+                //get parameter values
+                List inPorts = component.elements("input");
+                for( Iterator ot = inPorts.iterator(); ot.hasNext();){
+                    Element inPort = (Element)ot.next();
+                    String portName = inPort.attributeValue("portName");
+                    String portValue = inPort.attributeValue("value");
+                    if(portValue != "") {
+                        String source = partName + "." + portName;
+                        parameter.put(source, portValue);
+                    }
+
+                }
+            }
+
+            //use components to component element
+            ita = components.iterator();
+            for (int i=1;ita.hasNext();i++) {
+                String value = (String)ita.next();
+                String newName = "c" + i;
+                newComponentName.put(value, newName);
+                model.setComponent(newName, value);
+
+            }
+
+            //use sourceToTarget to connect component
+            for(int i=0; i<sourceToTarget.size();i++) {
+                String []componentInfo = sourceToTarget.get(i).split("\\+");
+                String preSourceName = componentInfo[0].split("\\.")[0] +"."+ componentInfo[0].split("\\.")[1];
+                String laterTargetName = componentInfo[1].split("\\.")[0] +"."+ componentInfo[1].split("\\.")[1];
+                model.setConnect(componentInfo[0].replace(preSourceName,(String)newComponentName.get(preSourceName)),
+                        componentInfo[1].replace(laterTargetName, (String) newComponentName.get(laterTargetName)));
+
+            }
+
+            //user parameter to set parameter value
+            if (!parameter.isEmpty()){
+                ita = parameter.entrySet().iterator();
+                while (ita.hasNext()) {
+                    Map.Entry entry = (Map.Entry) ita.next();
+                    String key = (String) entry.getKey();
+                    String []pots = key.split("\\.");
+                    String preName = key.replace(pots[0] + "." + pots[1], (String) newComponentName.get(pots[0]+"."+pots[1]));
+                    String value = "\""+(String) entry.getValue()+"\"";
+                    model.setParameter(preName, value);
+                }
+            }
+
+        }
+
+        sim.setModel(model);
+        simFile.setSim(sim);
+        simFile.setImport("import static oms3.SimBuilder.instance as OMS3");
+
+        System.out.println(simFile.toString());
+
+        JSONObject jsonObject = JSONObject.fromObject("{action:'link',StatusCode:1,message:'success'}");
+        connection.send(jsonObject.toString());
     }
+
 
     /**
      * Action when user send message to compile the models
@@ -285,19 +453,20 @@ public class ActionHandler {
      *
      */
     public static void compileModel(WebSocket connection, String data) throws DocumentException {
-        SAXReader reader =new SAXReader();
-        Document document = DocumentHelper.parseText(data);
-        Element root = document.getRootElement();
-        List components = root.elements("part");
-        for (Iterator it = components.iterator(); it.hasNext();) {
-            Element component = (Element) it.next();
-            String partId = component.attributeValue("id");
-            //do something
-        }
-        String docXmlText=document.asXML();
-        String rootXmlText=root.asXML();
-        Element memberElm=root.element("member");
-        String memberXmlText=memberElm.asXML();
+//        SAXReader reader =new SAXReader();
+//        Document document = DocumentHelper.parseText(data);
+//        Element root = document.getRootElement();
+//        List components = root.elements("part");
+//        for (Iterator it = components.iterator(); it.hasNext();) {
+//            Element component = (Element) it.next();
+//            String partId = component.attributeValue("id");
+//            //do something
+//        }
+//        String docXmlText=document.asXML();
+//        String rootXmlText=root.asXML();
+//        Element memberElm=root.element("member");
+//        String memberXmlText=memberElm.asXML();
+        LogUtility.logUtility().log2out("data:" + data);
     }
     /**
      * @TODO

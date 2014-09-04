@@ -55,6 +55,7 @@ public class XMLGenerator {
             if(resultSet1.next()) {
                 userName = resultSet1.getString("nickname");
             }
+
             if(userName != ""){
                 rootPath = DistributeServer.absolutePathOfRuntimeUsers
                         + "/" + userName + "/" + modelName + "/build/";
@@ -137,7 +138,6 @@ public class XMLGenerator {
         try {
             content = DEPFS.readFile(file);
         }catch (Exception e) {
-
         }
     }
 
@@ -161,9 +161,6 @@ public class XMLGenerator {
                 }
             }
         }
-
-
-
 
     }
 

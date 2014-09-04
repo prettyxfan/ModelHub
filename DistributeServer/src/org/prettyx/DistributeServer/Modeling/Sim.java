@@ -122,6 +122,9 @@ public class Sim {
     public void setModel(String string){
         model = new Model(string);
     }
+    public void setModel(Model model) {
+        this.model = model;
+    }
     public void setEfficiency(String string){
         efficiency = string;
     }
@@ -184,7 +187,7 @@ public class Sim {
         string += "){" + "\n";
         //build efficiency outputstrategy summary output analysis 都没写
 
-        string += model.toString();
+        string += SimFile.stdOut(model.toString());
         Iterator ita = null;
         ita = resource.iterator();
         while (ita.hasNext()) {

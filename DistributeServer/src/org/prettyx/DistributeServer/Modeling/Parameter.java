@@ -60,7 +60,7 @@ public class Parameter {
             Map.Entry entry = (Map.Entry) ita.next();
             String key = (String) entry.getKey();
             String value = (String) entry.getValue();
-            string += "\"" + key + "\" " + value + "\n";
+            string += "\t\"" + key + "\" " + value + "\n";
         }
         string += "}" + "\n";
 

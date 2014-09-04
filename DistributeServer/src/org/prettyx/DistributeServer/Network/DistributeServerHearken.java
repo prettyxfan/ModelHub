@@ -38,7 +38,7 @@ public class DistributeServerHearken extends WebSocketServer {
     public static final int COMPILE = 5;
     public static final int RUN = 6;
 
-    public static Map currentUsers = new ConcurrentHashMap<WebSocketServer, String>();
+    public static Map currentUsers = new ConcurrentHashMap<WebSocketServer, String>(); //connection -> user id
 
     public DistributeServerHearken( int port ) {
         super( new InetSocketAddress( port ) );
@@ -52,6 +52,7 @@ public class DistributeServerHearken extends WebSocketServer {
 
     @Override
     public void onClose(WebSocket connection, int code, String reason, boolean remote) {
+        currentUsers.remove(connection);
         LogUtility.logUtility().log2out("closed " + connection.getRemoteSocketAddress() + " with exit code " + code + " additional info: " + reason);
     }
 
@@ -84,13 +85,13 @@ public class DistributeServerHearken extends WebSocketServer {
                         }
                         break;
                     }
-                    case LOGOUT: ActionHandler.logOut(); break;
+                    case LOGOUT: ActionHandler.logOut(connection); break;
                     case SIGN_UP: ActionHandler.signUp(connection, data); break;
                     case GET_MODEL: {
                         // 这里之后可以添加 是得到用户自己的模型还是搜素其他人的模型
                         ActionHandler.getModel(connection);
                     } break;
-                    case LINK: ActionHandler.linkModel(connection, data);
+                    case LINK: ActionHandler.linkModel(connection, data);break;
                     case COMPILE: ActionHandler.compileModel(connection, data);break;
                     case RUN: ActionHandler.runModel(); break;
                     default: LogUtility.logUtility().log2err("action type error");

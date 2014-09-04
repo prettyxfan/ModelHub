@@ -9,7 +9,7 @@ body {
     height: 100%;
     width: 100%;
     padding: 0;
-    margin: 0
+    margin: 0;
 }
 
 #login {
@@ -32,23 +32,32 @@ body {
     margin-top: 10%;
 }
 
+#modelInterface {
+}
+
 .panel {
     height: 87%;
     overflow-x: auto; 
     overflow-y: auto;
     border-radius: 0px;
     margin-bottom: 0px;
+    border-color: #e0e0e0;
 }
 
 .panel-body {
-    padding: 3px;
+    padding-top: 0px;
+    padding-left: 1px;
+    padding-right: 1px;
 }
 
 .panel-heading {
     border-top-left-radius: 0px;
     border-top-right-radius: 0px;
+    border-bottom-color: #e0e0e0;
 }
-
+.modal {
+    /*margin-top: 100px;*/
+}
 /*.btn-group > .btn-group:first-child > .btn:last-child,*/
 /*.btn-group > .btn-group:first-child > .dropdown-toggle,*/
 /*.btn-group > .btn-group:last-child > .btn:last-child,*/
@@ -75,6 +84,7 @@ body {
     height: 50%;
     border: 1px solid transparent;
     border-color: #e0e0e0;
+    background-color: #ecf0f1;
 }
 
 #text {

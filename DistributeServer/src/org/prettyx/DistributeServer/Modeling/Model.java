@@ -11,6 +11,7 @@
 package org.prettyx.DistributeServer.Modeling;
 
 import org.prettyx.Common.DEPFS;
+import org.prettyx.Common.LogUtility;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -274,58 +275,59 @@ public class Model {
         }
         string += "){" + "\n";
         //iter while until if 都没写
+        String middle = "";
         if(!component.isEmpty()) {
-            string += "component {" + "\n";
+            middle += "components {" + "\n";
             Iterator ita = null;
             ita = component.entrySet().iterator();
             while (ita.hasNext()) {
                 Map.Entry entry = (Map.Entry) ita.next();
                 String key = (String) entry.getKey();
                 String value = (String) entry.getValue();
-                string += "\"" + key + "\" " + "\"" + value + "\"" + "\n";
+                middle += "\t\"" + key + "\" " + "\"" + value + "\"" + "\n";
             }
-            string += "}"+"\n";
+            middle += "}"+"\n";
         }
         if (!connect.isEmpty()){
-            string += "connect {" + "\n";
+            middle += "connect {" + "\n";
             Iterator ita = null;
             ita = connect.entrySet().iterator();
             while (ita.hasNext()) {
                 Map.Entry entry = (Map.Entry) ita.next();
                 String key = (String) entry.getKey();
                 String value = (String) entry.getValue();
-                string += "\"" + key + "\" " + "\"" + value + "\"" + "\n";
+                middle += "\t\"" + key + "\" " + "\"" + value + "\"" + "\n";
             }
-            string += "}"+"\n";
+            middle += "}"+"\n";
         }
         if (!feedback.isEmpty()){
-            string += "feedback {" + "\n";
+            middle += "feedback {" + "\n";
             Iterator ita = null;
             ita = feedback.entrySet().iterator();
             while (ita.hasNext()) {
                 Map.Entry entry = (Map.Entry) ita.next();
                 String key = (String) entry.getKey();
                 String value = (String) entry.getValue();
-                string += "\"" + key + "\" " + "\"" + value + "\"" + "\n";
+                middle += "\t\"" + key + "\" " + "\"" + value + "\"" + "\n";
             }
-            string += "}"+"\n";
+            middle += "}"+"\n";
         }
         if (!logging.isEmpty()){
-            string += "logging {" + "\n";
+            middle += "logging {" + "\n";
             Iterator ita = null;
             ita = logging.entrySet().iterator();
             while (ita.hasNext()) {
                 Map.Entry entry = (Map.Entry) ita.next();
                 String key = (String) entry.getKey();
                 String value = (String) entry.getValue();
-                string += "\"" + key + "\" " + "\"" + value + "\"" + "\n";
+                middle += "\t\"" + key + "\" " + "\"" + value + "\"" + "\n";
             }
-            string += "}"+"\n";
+            middle += "}"+"\n";
         }
         if(!parameter.isEmpty()) {
-            string += parameter.toString();
+            middle += parameter.toString();
         }
-        string += "}\n";
+        string += SimFile.stdOut(middle) + "}\n";
 
         return string;
     }

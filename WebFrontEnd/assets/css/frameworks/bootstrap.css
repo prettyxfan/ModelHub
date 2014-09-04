@@ -3415,6 +3415,7 @@ tbody.collapse.in {
   position: relative;
   display: table;
   border-collapse: separate;
+    padding-bottom: 3px;
 }
 .input-group[class*="col-"] {
   float: none;
@@ -3763,11 +3764,11 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   margin-bottom: 21px;
   border: 1px solid transparent;
 }
-@media (min-width: 768px) {
-  .navbar {
-    border-radius: 4px;
-  }
-}
+/*@media (min-width: 768px) {*/
+  /*.navbar {*/
+    /*border-radius: 4px;*/
+  /*}*/
+/*}*/
 @media (min-width: 768px) {
   .navbar-header {
     float: left;
@@ -4532,8 +4533,8 @@ a.list-group-item.active > .badge,
   margin-left: 3px;
 }
 .jumbotron {
-  padding: 30px;
-  margin-bottom: 30px;
+  padding: 10px;
+  margin-bottom: 10px;
   color: inherit;
   background-color: #ecf0f1;
 }
@@ -4543,7 +4544,7 @@ a.list-group-item.active > .badge,
 }
 .jumbotron p {
   margin-bottom: 15px;
-  font-size: 23px;
+  font-size: 13px;
   font-weight: 200;
 }
 .jumbotron > hr {
@@ -4557,8 +4558,8 @@ a.list-group-item.active > .badge,
 }
 @media screen and (min-width: 768px) {
   .jumbotron {
-    padding-top: 48px;
-    padding-bottom: 48px;
+    padding-top: 10px;
+    padding-bottom: 10px;
   }
   .container .jumbotron {
     padding-left: 60px;
@@ -5373,7 +5374,7 @@ button.close {
   transition: transform 0.3s ease-out;
 }
 .modal.in .modal-dialog {
-  -webkit-transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 60%, 0);
   transform: translate3d(0, 0, 0);
 }
 .modal-open .modal {

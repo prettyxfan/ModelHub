@@ -57,7 +57,7 @@ function onOpen(event) {
 }
 
 function onMessage(event) {
-    // console.log(event.data);
+    console.log(event.data);
     var message = eval('(' + event.data + ')');
     var action = message.action;
     console.log(message.action);
@@ -108,10 +108,34 @@ function onMessage(event) {
         }
 
     }
+    else if(action == 'logOut') {
+        if(message.StatusCode == 0) {
+            logOutFailed();
+        }
+        else if(message.StatusCode == 1) {
+            logOutSuccess();
+        }
+    }
     else if(action == 'get model') {
         ModelInfomation = message.message;
         console.log("get model ! " + message.message);
         createModel();
+    }
+    else if(action == 'link') {
+        if(message.StatusCode == 0) {
+
+        }
+        else if(message.StatusCode == 1) {
+//            var actionStatus = 5;
+//            var ssid = "null";
+//            var data = dataflowXML.replace(/"([^"]*)"/g, "'$1'");
+//            var sendMessage = {
+//                action: actionStatus,
+//                sid: ssid,
+//                data: data
+//            };
+//            websocket.send(json2str(sendMessage));
+        }
     }
 }
 

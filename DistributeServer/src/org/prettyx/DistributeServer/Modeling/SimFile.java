@@ -70,6 +70,10 @@ public class SimFile {
         sim = new Sim(string);
     }
 
+    public void setSim(Sim sim) {
+        this.sim = sim;
+    }
+
     public Set getImport(){
         return oms_import;
     }
@@ -92,5 +96,13 @@ public class SimFile {
         }
         string += sim.toString();
         return string;
+    }
+    public static String stdOut(String string) {
+        String []lines = string.split("\n");
+        String returnString = "";
+        for(int i=0;i<lines.length;i++) {
+            returnString += "\t" +lines[i]+"\n";
+        }
+        return returnString;
     }
 }
