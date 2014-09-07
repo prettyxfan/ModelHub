@@ -14,16 +14,14 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
 import org.java_websocket.WebSocket;
 import org.prettyx.Common.*;
 import org.prettyx.DistributeServer.DistributeServer;
 import org.prettyx.DistributeServer.Modeling.Model;
-import org.prettyx.DistributeServer.Modeling.Parameter;
 import org.prettyx.DistributeServer.Modeling.Sim;
 import org.prettyx.DistributeServer.Modeling.SimFile;
-import sun.rmi.runtime.Log;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -269,27 +267,25 @@ public class ActionHandler {
     }
 
     /**
-     * Action when user send message to link the models
+     * Action when user send message to generate the sim file
      *
      * @param connection, data
      *                    data is composed of model description xml
      *
      */
-    public static void linkModel(WebSocket connection, String data) throws DocumentException, SQLException, IOException {
-
+    public static void compileModel(WebSocket connection, String data) throws DocumentException, SQLException, IOException {
 
         SimFile simFile = new SimFile();
         Sim sim = new Sim();
         Model model = new Model();
-        Map newComponentName = new HashMap<String, String>();
+        Map newComponentName = new HashMap<String, String>(); // package.class -> new name
         Set components = new HashSet<String>();
-        Map parameter = new HashMap<String,String>();
-//        List<String> connections = new ArrayList<String>();
+        Map parameter = new HashMap<String,String>();   //class.var -> value
 
         Map idToOwnerName = new ConcurrentHashMap<String, String>(); //model id -> owner name
         Map idToModelName = new ConcurrentHashMap<String, String>(); //model id -> model name
         Map partIdToModelId = new ConcurrentHashMap<String, String>(); // part id -> model id
-        List<String> sourceToTarget = new ArrayList<String>();
+        List<String> sourceToTarget = new ArrayList<String>(); //source port name + target port name
 
         Document document = DocumentHelper.parseText(data);
         Element root = document.getRootElement();
@@ -350,7 +346,7 @@ public class ActionHandler {
             String newModelPath = DistributeServer.absolutePathOfRuntimeUsers + "/"
                     + currentUserName + "/" + componentName;
             DEPFS.createDirectory(newModelPath);
-            DEPFS.createDirectory(newModelPath + "/" + "build");
+            DEPFS.createDirectory(newModelPath + "/" + "dist");
 
             Iterator ita = null;
             ita = idToOwnerName.entrySet().iterator();
@@ -359,8 +355,8 @@ public class ActionHandler {
                 String modelname = (String) idToModelName.get((String) entry.getKey());
                 String owername = (String) entry.getValue();
                 String sourcePath = DistributeServer.absolutePathOfRuntimeUsers + "/"
-                        + owername + "/" + modelname + "/" + "build/";
-                String targetPath = newModelPath + "/" + "build/";
+                        + owername + "/" + modelname + "/" + "dist/";
+                String targetPath = newModelPath + "/" + "dist/";
                 DEPFS.copyDirectory(sourcePath, targetPath);
             }
 
@@ -391,6 +387,8 @@ public class ActionHandler {
                     Element inPort = (Element)ot.next();
                     String portName = inPort.attributeValue("portName");
                     String portValue = inPort.attributeValue("value");
+                    components.add(partName+"."+portName.split("\\.")[0]);
+
                     if(portValue != "") {
                         String source = partName + "." + portName;
                         parameter.put(source, portValue);
@@ -438,36 +436,16 @@ public class ActionHandler {
         simFile.setSim(sim);
         simFile.setImport("import static oms3.SimBuilder.instance as OMS3");
 
-        System.out.println(simFile.toString());
+        //using simFile to generate sim file
 
-        JSONObject jsonObject = JSONObject.fromObject("{action:'link',StatusCode:1,message:'success'}");
+        File simulation = new File(DistributeServer.absolutePathOfRuntimeUsers + "/"
+                + currentUserName + "/" + componentName + "/simulation.sim");
+        DEPFS.writeFile(simulation, simFile.toString());
+
+        JSONObject jsonObject = JSONObject.fromObject("{action:'compile',StatusCode:1,message:'success'}");
         connection.send(jsonObject.toString());
     }
 
-
-    /**
-     * Action when user send message to compile the models
-     *
-     * @param connection, data
-     *                    data is composed of data file and model data flow XML
-     *
-     */
-    public static void compileModel(WebSocket connection, String data) throws DocumentException {
-//        SAXReader reader =new SAXReader();
-//        Document document = DocumentHelper.parseText(data);
-//        Element root = document.getRootElement();
-//        List components = root.elements("part");
-//        for (Iterator it = components.iterator(); it.hasNext();) {
-//            Element component = (Element) it.next();
-//            String partId = component.attributeValue("id");
-//            //do something
-//        }
-//        String docXmlText=document.asXML();
-//        String rootXmlText=root.asXML();
-//        Element memberElm=root.element("member");
-//        String memberXmlText=memberElm.asXML();
-        LogUtility.logUtility().log2out("data:" + data);
-    }
     /**
      * @TODO
      */

@@ -81,7 +81,7 @@ public class DEPFS {
      *                  input
      * @return
      *      String
-     * @throws IOException
+     * @throws java.io.IOException
      */
     public static String readFile(InputStream inputStream) throws IOException {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
@@ -101,8 +101,8 @@ public class DEPFS {
      *              fileName
      * @return
      *      String
-     * @throws FileNotFoundException
-     * @throws IOException
+     * @throws java.io.FileNotFoundException
+     * @throws java.io.IOException
      */
     public static String readFile(File fileName) throws IOException{
 
@@ -117,7 +117,7 @@ public class DEPFS {
      *                  output
      * @param content
      *              content
-     * @throws IOException
+     * @throws java.io.IOException
      */
     public static void writeFile(OutputStream outputStream, String content) throws IOException {
         BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
@@ -132,8 +132,8 @@ public class DEPFS {
      *          file
      * @param content
      *              content
-     * @throws FileNotFoundException
-     * @throws IOException
+     * @throws java.io.FileNotFoundException
+     * @throws java.io.IOException
      */
     public static void writeFile(File file, String content) throws FileNotFoundException, IOException{
         writeFile(new FileOutputStream(file), content);
@@ -146,7 +146,7 @@ public class DEPFS {
      *              input
      * @param outputFile
      *              output
-     * @throws IOException
+     * @throws java.io.IOException
      */
     public static void copyFile(File inputFile, File outputFile) throws IOException {
         String content = readFile(inputFile);
@@ -160,7 +160,7 @@ public class DEPFS {
      *                  input
      * @param outputStream
      *                  output
-     * @throws IOException
+     * @throws java.io.IOException
      */
     public static void copyFile(InputStream inputStream, OutputStream outputStream) throws IOException{
         String content = readFile(inputStream);
@@ -174,7 +174,7 @@ public class DEPFS {
      *                  input
      * @param outputStream
      *                  output
-     * @throws IOException
+     * @throws java.io.IOException
      */
     public static void copyBinFile(InputStream inputStream, OutputStream outputStream) throws IOException{
 
@@ -196,7 +196,7 @@ public class DEPFS {
      *              input
      * @param outputFile
      *              output
-     * @throws IOException
+     * @throws java.io.IOException
      */
     public static void copyBinFile(File inputFile, File outputFile) throws IOException{
         copyBinFile(new FileInputStream(inputFile), new FileOutputStream(outputFile));
@@ -209,7 +209,7 @@ public class DEPFS {
      *              input
      * @param targetDirectory
      *              output
-     * @throws IOException
+     * @throws java.io.IOException
      */
 
     public static void copyDirectory(String sourceDirectory,String targetDirectory) throws IOException{

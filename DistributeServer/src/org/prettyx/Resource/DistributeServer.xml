@@ -7,6 +7,10 @@
         <LogLevel>3</LogLevel>
     </Running>
 
+    <Modeling>
+        <ClassSource>dist</ClassSource>
+    </Modeling>
+
     <Network>
         <Port>8528</Port>
     </Network>

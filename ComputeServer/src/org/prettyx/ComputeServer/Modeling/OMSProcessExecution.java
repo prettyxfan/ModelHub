@@ -1,7 +1,7 @@
 package org.prettyx.ComputeServer.Modeling;
 
 import oms3.util.ProcessExecution;
-import org.prettyx.Common.DEPF;
+import org.prettyx.Common.DEPFS;
 import org.prettyx.Common.LogUtility;
 import org.prettyx.Common.StatusCodes;
 
@@ -48,12 +48,12 @@ public class OMSProcessExecution {
     public int setUpEnvironment(String omsHome, String workDir){
 
         String[] jvmOptions = new String[0];
-        String javaHome = DEPF.javaHome();
+        String javaHome = DEPFS.javaHome();
         String javaClassPath = null;
 
         if (!new File(javaHome).exists()) {
             LogUtility.logUtility().log2err("Java Home Not Found! " + javaHome);
-            return StatusCodes.JAVA_HOME_NOT_FOUND;
+            return StatusCodes.FILE_NOT_FOUND;
         }
 
         if (!new File(omsHome).exists()) {
@@ -132,7 +132,7 @@ public class OMSProcessExecution {
     public int runProcessExecution() {
 
         if (!ready) {
-            return StatusCodes.NOT_READY;
+            return StatusCodes.FAIL;
         }
 
         task = new Thread(){

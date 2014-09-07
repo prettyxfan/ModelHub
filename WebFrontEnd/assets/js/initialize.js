@@ -24,10 +24,7 @@ window.addEventListener("load", init(), false);
 
 function onOpen(event) {
     console.log("Connection established");
-    console.log(websocket.readyState);
     var storage = window.localStorage;
-    console.log("done");
-    console.log(storage.getItem('SID'));
     var getData = storage.getItem('SID');
     if(getData == null) {
         $("#login").css("display","block"); 
@@ -60,7 +57,6 @@ function onMessage(event) {
     console.log(event.data);
     var message = eval('(' + event.data + ')');
     var action = message.action;
-    console.log(message.action);
     if(action == 'login') {
         if(message.StatusCode == 0) {
             $('#login-username-email').popover('show');
@@ -121,20 +117,12 @@ function onMessage(event) {
         console.log("get model ! " + message.message);
         createModel();
     }
-    else if(action == 'link') {
+    else if(action == 'compile') {
         if(message.StatusCode == 0) {
 
         }
         else if(message.StatusCode == 1) {
-//            var actionStatus = 5;
-//            var ssid = "null";
-//            var data = dataflowXML.replace(/"([^"]*)"/g, "'$1'");
-//            var sendMessage = {
-//                action: actionStatus,
-//                sid: ssid,
-//                data: data
-//            };
-//            websocket.send(json2str(sendMessage));
+
         }
     }
 }
@@ -146,7 +134,8 @@ function backToLogin(){
 }
 
 function onError(event) {
-    alert(event.data);
+    $('#main-frame-error').css("display","block");
+//    alert(event.data);
 }
 
 function onClose(event) {

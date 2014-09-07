@@ -77,7 +77,8 @@ public class StatusCodes {
     public static int FAIL = 1001;
     public static int Error = 1002;
     public static int FILE_NOT_FOUND = 1003;
-    public static int JAVA_HOME_NOT_FOUND = 1004;
-    public static int JAVA_VERSION_TOO_OLD = 1005;
-    public static int NOT_READY = 1006;
+
+
+    // Action Code
+
 }

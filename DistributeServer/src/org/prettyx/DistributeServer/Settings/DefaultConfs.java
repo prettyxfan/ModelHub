@@ -54,6 +54,9 @@ public class DefaultConfs {
         put("Running.ServerName", "PrettyX_Distribute");
         put("Running.LogLevel", "3");
 
+        // Modeling
+        put("Modeling.CLassSource", "dist");
+
         // Network Settings
         put("Network.Port", "8528");
     }};

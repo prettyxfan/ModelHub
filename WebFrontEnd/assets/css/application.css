@@ -12,6 +12,13 @@ body {
     margin: 0;
 }
 
+#main-frame-error {
+    background-color: #E6E6E6;
+    height: 100%;
+}
+#error-info {
+    margin-top: 20%;
+}
 #login {
     height: 100%;
 }

@@ -58,7 +58,8 @@ public class XMLGenerator {
 
             if(userName != ""){
                 rootPath = DistributeServer.absolutePathOfRuntimeUsers
-                        + "/" + userName + "/" + modelName + "/build/";
+                        + "/" + userName + "/" + modelName + "/dist/";
+
                 ClassLoaderUtils classLoaderUtils = new ClassLoaderUtils(rootPath);
                 List<Class<?>> s = classLoaderUtils.getServiceClassList();
                 for(int i=0; i<s.size(); i++){

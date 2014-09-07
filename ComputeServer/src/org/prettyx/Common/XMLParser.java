@@ -24,6 +24,8 @@ import java.util.Map;
  * provide two public static methods :parserXmlFromString & parserXmlFromFile
  * parse two kinds of xml : xml string & xml document
  *
+ * warning: This class only can parse the xml(string or file) in which
+ * has no more than one element having the same path
  */
 
 public class XMLParser {

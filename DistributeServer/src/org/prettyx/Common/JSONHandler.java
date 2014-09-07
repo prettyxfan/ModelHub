@@ -17,9 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by XieFan on 8/10/14.
- */
 public class JSONHandler {
 
     public void testArrayToJSON(){

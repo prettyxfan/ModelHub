@@ -16,7 +16,6 @@ import java.sql.Statement;
 
 /**
  * Encapsulate all of connecting operation
- *
  */
 
 public class DBOP {

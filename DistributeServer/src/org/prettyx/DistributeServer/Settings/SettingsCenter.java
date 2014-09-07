@@ -123,6 +123,7 @@ public class SettingsCenter {
             return StatusCodes.FILE_NOT_FOUND;
         }
 
+        //TODO NOT COMMON
         // Init the LogUtility
         String logLevel = (String) settingsMap.get("Running.LogLevel");
         if (logLevel != null) {
@@ -161,7 +162,7 @@ public class SettingsCenter {
     }
 
     /*
-     * Check "~/.MIMS" Directory. Create Files if not Exists
+     * Check "~/Documents/ModelHub" Directory. Create Files if not Exists
      *
      * @return SUCCESS/FAIL
      */
@@ -170,6 +171,7 @@ public class SettingsCenter {
         //TODO NOT COMMON
         // Check Files
         File configFile = new File((String)DefaultConfs.fixSettingsMap.get("Init.DistributeServerConfigFilePath"));
+        File databaseFile = new File((String)DefaultConfs.fixSettingsMap.get("Init.RuntimeDatabasePath"));
 
         // Check Directories
         File basePath = new File((String)DefaultConfs.fixSettingsMap.get("Init.BasePath"));
@@ -180,6 +182,7 @@ public class SettingsCenter {
         if (
             // Files
                 configFile.isFile() &&
+                databaseFile.isFile() &&
             // Directories
                 basePath.isDirectory() &&
                 logPath.isDirectory() &&
@@ -265,7 +268,6 @@ public class SettingsCenter {
         }
 
         //TODO NOT COMMON
-
         // Install DistributeServer DefaultConfigFile
         try {
 
@@ -283,6 +285,7 @@ public class SettingsCenter {
             return StatusCodes.FAIL;
         }
 
+        //TODO NOT COMMON
         // Install Database
         try {
             InputStream inputStream = DEPFS.getResourceStream((String)
