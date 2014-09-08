@@ -61,8 +61,7 @@ public class DistributeServer {
             WebSocketClient webSocketClient = new WebSocketClient(new URI("ws://127.0.0.1:8529")) {
                 @Override
                 public void onOpen(ServerHandshake serverHandshake) {
-                    send(JSONObject.fromObject("{action:10,sid: null,data:\"fail\"}").toString());
-                    System.out.println(JSONObject.fromObject("{action:10,sid: null,data:\"fail\"}").toString());
+                    send(JSONObject.fromObject("{action:10,sid: \"nuughll\",data:\"fail\"}").toString());
                 }
 
                 @Override

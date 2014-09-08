@@ -49,7 +49,6 @@ public class ComputeServerHearken extends WebSocketServer {
 
     protected void handleMessage(WebSocket connection, String text) {
 
-
         JSONObject jsonObject = JSONObject.fromObject(text);
 
         if(jsonObject.size() == 3){
