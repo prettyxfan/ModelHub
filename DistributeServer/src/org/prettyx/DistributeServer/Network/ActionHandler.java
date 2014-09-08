@@ -15,25 +15,26 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.java_websocket.WebSocket;
+import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.prettyx.Common.*;
 import org.prettyx.DistributeServer.DistributeServer;
 import org.prettyx.DistributeServer.Modeling.Model;
 import org.prettyx.DistributeServer.Modeling.Sim;
 import org.prettyx.DistributeServer.Modeling.SimFile;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Action Handler
  * handle the message having different action
- * action is dived into login, logou, sign up, get model, run model
+ * action is dived into login, logout, sign up, get model, run model
  *
  */
 
@@ -45,7 +46,7 @@ public class ActionHandler {
      * @param connection, data
      *
      */
-    public static void userNameOrEmailTologin(WebSocket connection, String data) throws Exception {
+    public static void userNameOrEmailToLogin(WebSocket connection, String data) throws Exception {
 
         String sid = UUID.randomUUID().toString();
         Map userInfo = XMLParser.parserXmlFromString(data);
@@ -450,7 +451,33 @@ public class ActionHandler {
      * @TODO
      */
 
-    public static void runModel() {
+    public static void runModel(WebSocket connection, String data) throws SQLException, DocumentException {
+
+
+        Document document = DocumentHelper.parseText(data);
+        Element root = document.getRootElement();
+        String componentName = root.element("name").getText();
+
+        DBOP dbop = new DBOP();
+        String currentUserName = "";
+        Connection connectionToSql = dbop.getConnection();
+
+        PreparedStatement prep =connectionToSql.prepareStatement(
+                "select nickname from Users where sid= ?;"
+        );
+        prep.setString(1, (String) DistributeServerHearken.currentUsers.get(connection));
+        ResultSet resultSet = prep.executeQuery();
+        if(resultSet.next()) {
+            currentUserName = resultSet.getString("nickname");
+            LogUtility.logUtility().log2out("current user name:" + currentUserName);
+        }
+        resultSet.close();
+        prep.close();
+
+        String path = DistributeServer.absolutePathOfRuntimeUsers +"/"+ currentUserName +"/"+ componentName;
+
+        File zipFile = new File("/tmp/" + UUID.randomUUID().toString() + ".zip");
+
 
     }
 }

@@ -54,8 +54,12 @@ public class DefaultConfs {
         put("Running.ServerName", "PrettyX_Distribute");
         put("Running.LogLevel", "3");
 
+        // Modeling
+        put("Modeling.CLassSource", "dist");
+
         // Network Settings
         put("Network.Port", "8528");
+        put("Network.ComputeServerAddress", "127.0.0.1:8529");
     }};
     protected static Map defaultSettingsMapComputeServer = new HashMap<String, String>(){{
 
@@ -66,5 +70,6 @@ public class DefaultConfs {
 
         // Network Settings
         put("Network.Port", "8529");
+        put("Network.DistributeServerAddress", "127.0.0.1:8528");
     }};
 }

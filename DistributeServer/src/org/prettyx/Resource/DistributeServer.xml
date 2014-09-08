@@ -13,6 +13,7 @@
 
     <Network>
         <Port>8528</Port>
+        <ComputeServerAddress>127.0.0.1:8529</ComputeServerAddress>
     </Network>
 
 </Configurations>

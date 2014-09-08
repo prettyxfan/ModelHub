@@ -9,6 +9,7 @@
 
     <Network>
         <Port>8529</Port>
+        <DistributeServerAddress>127.0.0.1:8528</DistributeServerAddress>
     </Network>
 
 </Configurations>

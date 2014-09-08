@@ -7,7 +7,7 @@
 // +----------------------------------------------------------------------
 // | Author: XieFan <xiefan1228@gmail.com>
 // +----------------------------------------------------------------------
-package org.prettyx.DistributeServer.Network;
+package org.prettyx.ComputeServer.Network;
 
 import net.sf.json.JSONObject;
 import org.java_websocket.WebSocket;
@@ -19,20 +19,10 @@ import org.prettyx.Common.StatusCodes;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Hearken to InComing Request.
- * Dispatch ComputeServers.
- * Send Response to WenFrontEnd
- *
- */
-public class DistributeServerHearken extends WebSocketServer {
+public class ComputeServerHearken extends WebSocketServer {
 
-    public static Map currentUsers = new ConcurrentHashMap<WebSocketServer, String>(); //connection -> user id
-
-    public DistributeServerHearken( int port ) {
+    public ComputeServerHearken(int port) {
         super( new InetSocketAddress( port ) );
         LogUtility.logUtility().log2out("Initializing WebSocket Hearken.");
     }
@@ -44,7 +34,6 @@ public class DistributeServerHearken extends WebSocketServer {
 
     @Override
     public void onClose(WebSocket connection, int code, String reason, boolean remote) {
-        currentUsers.remove(connection);
         LogUtility.logUtility().log2out("closed " + connection.getRemoteSocketAddress() + " with exit code " + code + " additional info: " + reason);
     }
 
@@ -60,7 +49,9 @@ public class DistributeServerHearken extends WebSocketServer {
 
     protected void handleMessage(WebSocket connection, String text) {
 
+
         JSONObject jsonObject = JSONObject.fromObject(text);
+
         if(jsonObject.size() == 3){
             LogUtility.logUtility().log2out(jsonObject.toString());
             int action = (Integer)jsonObject.get("action");
@@ -69,23 +60,11 @@ public class DistributeServerHearken extends WebSocketServer {
 
             try {
                 switch(action) {
-                    case Message.D_B_LOGIN: {
-                        if(sid.equals("\"null\"")) {
-                            ActionHandler.userNameOrEmailToLogin(connection, data);
-                        }else{
-                            ActionHandler.userSidTologin(connection, sid);
-                        }
+                    case Message.D_C_RUN: {
+                        ActionHandler.runModel();
+                        System.out.println(action);
                         break;
                     }
-                    case Message.D_B_LOGOUT: ActionHandler.logOut(connection); break;
-                    case Message.D_B_SIGN_UP: ActionHandler.signUp(connection, data); break;
-                    case Message.D_B_GET_MODEL: {
-                        // 这里之后可以添加 是得到用户自己的模型还是搜素其他人的模型
-                        ActionHandler.getModel(connection);
-                    } break;
-                    case Message.D_B_COMPILE: ActionHandler.compileModel(connection, data);break;
-                    case Message.D_B_RUN: ActionHandler.runModel(connection, data); break;
-                    default: LogUtility.logUtility().log2err("action type error");
                 }
             } catch (Exception e) {
                 LogUtility.logUtility().log2err(e.getMessage());
