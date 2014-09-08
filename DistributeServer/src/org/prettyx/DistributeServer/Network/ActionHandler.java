@@ -15,7 +15,9 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.java_websocket.WebSocket;
+import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
+import org.java_websocket.handshake.ServerHandshake;
 import org.prettyx.Common.*;
 import org.prettyx.DistributeServer.DistributeServer;
 import org.prettyx.DistributeServer.Modeling.Model;
@@ -23,6 +25,7 @@ import org.prettyx.DistributeServer.Modeling.Sim;
 import org.prettyx.DistributeServer.Modeling.SimFile;
 
 import java.io.*;
+import java.net.URI;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -476,8 +479,106 @@ public class ActionHandler {
 
         String path = DistributeServer.absolutePathOfRuntimeUsers +"/"+ currentUserName +"/"+ componentName;
 
-        File zipFile = new File("/tmp/" + UUID.randomUUID().toString() + ".zip");
+        final String zipFileName = "/tmp/"+ UUID.randomUUID() +".zip";
+        try {
+            File file = new File(path);
+            ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFileName));
+            DEPFS.zip(file.getPath(), file.getPath().length(), out);
+            out.closeEntry();
+            out.close();
+
+            try {
+                WebSocketClient webSocketClient = new WebSocketClient(
+                        new URI("ws://"+ DistributeServer.settingsCenter.getSetting("Network", "ComputeServerAddress"))
+                ) {
+                    @Override
+                    public void onOpen(ServerHandshake serverHandshake) {
+                        try {
+                            send(JSONObject.fromObject(
+                                    "{action:"+ Message.D_C_RUN +", sid:'', data:\""+ DEPFS.encodeBase64File(zipFileName).replace("\n","") +"\"}"
+                            ).toString());
+                            DEPFS.removeFile(zipFileName);
+                        } catch (Exception e){
+                            LogUtility.logUtility().log2err(e.getMessage());
+                        }
+                    }
+
+                    @Override
+                    public void onMessage(String s) {
+                        System.out.println(s);
+                        // TODO Process Returned Data
+                    }
+
+                    @Override
+                    public void onClose(int i, String s, boolean b) {
+
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+
+                    }
+                };
+                webSocketClient.connect();
+            } catch (Exception e){
+                LogUtility.logUtility().log2err(e.getMessage());
+            }
+
+        } catch (Exception e) {
+            LogUtility.logUtility().log2err(e.getMessage());
+        }
+    }
 
 
+    public static void runModelTest() {
+
+        String path = "/Users/PJW/Desktop/ABC";
+        final String zipFileName = "/tmp/"+ UUID.randomUUID() +".zip";
+        try {
+            File file = new File(path);
+            ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFileName));
+            DEPFS.zip(file.getPath(), file.getPath().length(), out);
+            out.closeEntry();
+            out.close();
+
+            try {
+                WebSocketClient webSocketClient = new WebSocketClient(
+                        new URI("ws://"+ DistributeServer.settingsCenter.getSetting("Network", "ComputeServerAddress"))
+                ) {
+                    @Override
+                    public void onOpen(ServerHandshake serverHandshake) {
+                        try {
+                            send(JSONObject.fromObject(
+                                    "{action:"+ Message.D_C_RUN +", sid:'', data:\""+ DEPFS.encodeBase64File(zipFileName).replace("\n","") +"\"}"
+                            ).toString());
+                            DEPFS.removeFile(zipFileName);
+                        } catch (Exception e){
+                            LogUtility.logUtility().log2err(e.getMessage());
+                        }
+                    }
+
+                    @Override
+                    public void onMessage(String s) {
+                        System.out.println(s);
+                    }
+
+                    @Override
+                    public void onClose(int i, String s, boolean b) {
+
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+
+                    }
+                };
+                webSocketClient.connect();
+            } catch (Exception e){
+                LogUtility.logUtility().log2err(e.getMessage());
+            }
+
+        } catch (Exception e) {
+            LogUtility.logUtility().log2err(e.getMessage());
+        }
     }
 }

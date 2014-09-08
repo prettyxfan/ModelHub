@@ -9,24 +9,14 @@
 // +----------------------------------------------------------------------
 package org.prettyx.ComputeServer.Network;
 
-import net.sf.json.JSONObject;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
+
 import org.java_websocket.WebSocket;
 import org.prettyx.Common.DEPFS;
 import org.prettyx.Common.LogUtility;
-import org.prettyx.Common.XMLParser;
+import org.prettyx.ComputeServer.Modeling.OMSProcessExecution;
 
-import java.io.File;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Scanner;
+import java.util.UUID;
 
 /**
  * Action Handler
@@ -37,21 +27,37 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ActionHandler {
 
-    public static void runModel(){
+    public static void runModel(WebSocket connection, String data){
 
-//        OMSProcessExecution omsProcessExecution = new OMSProcessExecution();
-//        omsProcessExecution.setUpEnvironment("/Users/XieFan/Documents/ModelHub/Runtime/OMS3", "/Users/XieFan/Documents/ModelHub/Runtime/Users/PengJingwen/Test");
-//        omsProcessExecution.runProcessExecution();
-//
-//        Scanner scanner = new Scanner(System.in);
-//        while (true) {
-//            byte b = scanner.nextByte();
-//            if (b == 1) {
-//                System.out.println(omsProcessExecution.getProcessOutput());
-//            } else if (b == 0) {
-//                System.exit(0);
-//            }
-//        }
+        String outputPath = "/tmp/" + UUID.randomUUID() + "/";
+        String outputFile = "/tmp/" + UUID.randomUUID() + ".zip";
 
+        try {
+
+            DEPFS.decoderBase64File(data, outputFile);
+            DEPFS.unzip(outputFile, outputPath);
+            DEPFS.removeFile(outputFile);
+
+            OMSProcessExecution omsProcessExecution = new OMSProcessExecution();
+            omsProcessExecution.setUpEnvironment(DEPFS.userHome() + "/Documents/ModelHub/Runtime/OMS3", outputPath);
+            omsProcessExecution.runProcessExecution();
+
+            while (true) {
+                if (omsProcessExecution.finished()) {
+                    break;
+                } else {
+                    Thread.sleep(50);
+                }
+            }
+
+            System.out.print(omsProcessExecution.getProcessOutput());
+
+            // TODO Return Data
+
+//            DEPFS.removeDirectoryAllFiles(outputPath);
+
+        } catch (Exception e) {
+            LogUtility.logUtility().log2out(e.getMessage());
+        }
     }
 }

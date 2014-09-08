@@ -31,9 +31,14 @@ public class OMSProcessExecution {
 
     private Thread task;
     private boolean ready = false;
+    private boolean finished = false;
     private StringBuffer processOutputBuffer;
 
     private ProcessExecution processExecution;
+
+    public boolean finished(){
+        return this.finished;
+    }
 
     /**
      * Setup Simulation Running Environment
@@ -107,6 +112,7 @@ public class OMSProcessExecution {
         });
 
         ready = true;
+        finished = false;
 
         return StatusCodes.SUCCESS;
     }
@@ -144,6 +150,8 @@ public class OMSProcessExecution {
                 } catch (IOException e) {
                     LogUtility.logUtility().log2err("Run ProcessExecution Error! " + e.getMessage());
                 }
+
+                finished = true;
             }
         };
         task.start();

@@ -60,8 +60,7 @@ public class ComputeServerHearken extends WebSocketServer {
             try {
                 switch(action) {
                     case Message.D_C_RUN: {
-                        ActionHandler.runModel();
-                        System.out.println(action);
+                        ActionHandler.runModel(connection, data);
                         break;
                     }
                 }

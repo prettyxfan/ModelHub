@@ -10,8 +10,15 @@
 package org.prettyx.Common;
 
 
+import sun.misc.BASE64Decoder;
+import sun.misc.BASE64Encoder;
+
 import java.io.*;
 import java.net.URL;
+import java.util.Enumeration;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Utility to Common Directories & Environment & Path & FileIO & String
@@ -131,12 +138,34 @@ public class DEPFS {
      * @param file
      *          file
      * @param content
-     *              content
+     *          content
      * @throws FileNotFoundException
      * @throws IOException
      */
     public static void writeFile(File file, String content) throws FileNotFoundException, IOException{
         writeFile(new FileOutputStream(file), content);
+    }
+
+
+    /**
+     * Write File From File
+     *
+     * @param in
+     *          InputStream
+     * @param out
+     *          OutputStream
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    public static void writeFile(InputStream in, OutputStream out) throws IOException {
+        byte[] buffer = new byte[1024];
+        int len;
+
+        while ((len = in.read(buffer)) >= 0)
+        out.write(buffer, 0, len);
+
+        in.close();
+        out.close();
     }
 
     /**
@@ -286,5 +315,172 @@ public class DEPFS {
         if (file.isDirectory()) {
             file.delete();
         }
+    }
+
+    public static void removeDirectoryAllFiles(String path) {
+        File f = new File(path);
+        if(f.exists()) {
+            File[] files = f.listFiles();
+            if(files != null) {
+                for(File file : files)
+                    if(file.isDirectory()) {
+                        removeDirectoryAllFiles(file.getPath());
+                        file.delete();
+                    }
+                    else if(file.isFile()) {
+                        file.delete();
+                    }
+            }
+            f.delete();
+        }
+    }
+
+
+    /**
+     * Remove Directory
+     *
+     * @param path
+     */
+
+    public static void removeFile(String path){
+
+        File file = new File(path);
+        if (!file.isDirectory()) {
+            file.delete();
+        }
+    }
+
+    /**
+     * zip directory to file
+     * @param path
+     *      file path
+     * @param baseIndex
+     *      base file path
+     * @param out
+     *      output zip file
+     * @throws IOException
+     */
+    public static void zip(String path, int baseIndex, ZipOutputStream out) throws IOException{
+
+        File file = new File(path);
+        File[] files;
+        if(file.isDirectory()){
+            files = file.listFiles();
+        }else{
+            files = new File[1];
+            files[0] = file;
+        }
+
+        for(File f:files){
+            if(f.isDirectory()){
+
+                String pathname = f.getPath().substring(baseIndex+1);
+
+                out.putNextEntry(new ZipEntry(pathname + "/"));
+
+                zip(f.getPath(), baseIndex, out);
+            }else{
+
+                String pathname = f.getPath().substring(baseIndex+1);
+
+                out.putNextEntry(new ZipEntry(pathname));
+
+                BufferedInputStream in = new BufferedInputStream(
+                        new FileInputStream(f));
+                int c;
+                while((c=in.read()) != -1){
+                    out.write(c);
+                }
+                in.close();
+            }
+        }
+    }
+
+    /**
+     * unzip file
+     * @param zipFile
+     *          zip file path
+     * @param outputPath
+     *          output directory
+     * @throws IOException
+     */
+    static public void unzip(String zipFile, String outputPath) throws IOException {
+
+        int BUFFER = 2048;
+        File file = new File(zipFile);
+
+        ZipFile zip = new ZipFile(file);
+
+        String newPath = outputPath;
+
+        new File(newPath).mkdir();
+        Enumeration zipFileEntries = zip.entries();
+
+        // Process each entry
+        while (zipFileEntries.hasMoreElements()){
+
+            // grab a zip file entry
+            ZipEntry entry = (ZipEntry) zipFileEntries.nextElement();
+            String currentEntry = entry.getName();
+            File destFile = new File(newPath, currentEntry);
+            //destFile = new File(newPath, destFile.getName());
+            File destinationParent = destFile.getParentFile();
+
+            // create the parent directory structure if needed
+            destinationParent.mkdirs();
+
+            if (!entry.isDirectory()){
+
+                BufferedInputStream is = new BufferedInputStream(zip
+                        .getInputStream(entry));
+                int currentByte;
+                // establish buffer for writing file
+                byte data[] = new byte[BUFFER];
+
+                // write the current file to disk
+                FileOutputStream fos = new FileOutputStream(destFile);
+                BufferedOutputStream dest = new BufferedOutputStream(fos,BUFFER);
+
+                // read and write until last byte is encountered
+                while ((currentByte = is.read(data, 0, BUFFER)) != -1) {
+                    dest.write(data, 0, currentByte);
+                }
+                dest.flush();
+                dest.close();
+                is.close();
+            }
+
+        }
+    }
+
+    /**
+     * @param path
+     *          filePath
+     * @return  *
+     * @throws Exception
+     */
+    public static String encodeBase64File(String path) throws Exception {
+        File file = new File(path);
+        FileInputStream inputFile = new FileInputStream(file);
+        byte[] buffer = new byte[(int) file.length()];
+        inputFile.read(buffer);
+        inputFile.close();
+        return new BASE64Encoder().encode(buffer);
+
+    }
+
+    /**
+     * @param base64Code
+     *          code
+     * @param targetPath
+     *          file path
+     * @throws Exception
+     */
+    public static void decoderBase64File(String base64Code, String targetPath) throws Exception {
+        byte[] buffer = new BASE64Decoder().decodeBuffer(base64Code);
+        FileOutputStream out = new FileOutputStream(targetPath);
+        out.write(buffer);
+        out.close();
+
     }
 }
