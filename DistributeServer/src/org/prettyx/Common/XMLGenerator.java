@@ -23,6 +23,7 @@ import java.util.*;
 public class XMLGenerator {
 
     public static String ComponentsXML(String userId) throws SQLException, ClassNotFoundException {
+//        System.out.println(userId);
         String xml = "";
         String component = "";
         Map<String, String> input = new HashMap<String, String>();
@@ -46,6 +47,8 @@ public class XMLGenerator {
             output.clear();
 
             modelName = resultSet.getString("modelname");
+            System.out.println(modelName);
+
             modelDescription = resultSet.getString("description");
             modelId = resultSet.getString("id");
             PreparedStatement preparedStatement = connectionToSql.prepareStatement(
@@ -71,7 +74,8 @@ public class XMLGenerator {
                             String fieldType = field.getType().toString();
                             String []typeSplite = fieldType.split("\\.");
                             fieldType = typeSplite[typeSplite.length-1];
-                            String fieldName = cla.getSimpleName() + "." + field.getName();
+                            String fieldName = cla.getName() + "." + field.getName();
+//                            System.out.println(cla.getName());
                             if(Annotations.isIn(field))
                                 input.put(fieldName,fieldType);
                             else if(Annotations.isOut(field))
@@ -92,6 +96,7 @@ public class XMLGenerator {
         prep.close();
 
         xml = "<components>" + component + "</components>";
+        System.out.println(xml);
 
         return xml;
     }

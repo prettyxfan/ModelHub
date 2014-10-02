@@ -16,7 +16,6 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.java_websocket.handshake.ServerHandshake;
 import org.prettyx.Common.*;
 import org.prettyx.DistributeServer.DistributeServer;
@@ -290,6 +289,7 @@ public class ActionHandler {
         Map idToModelName = new ConcurrentHashMap<String, String>(); //model id -> model name
         Map partIdToModelId = new ConcurrentHashMap<String, String>(); // part id -> model id
         List<String> sourceToTarget = new ArrayList<String>(); //source port name + target port name
+        List<SimFile> simFiles = new ArrayList<SimFile>(); //collect all the sim files which the new component use
 
         Document document = DocumentHelper.parseText(data);
         Element root = document.getRootElement();
@@ -351,6 +351,8 @@ public class ActionHandler {
                     + currentUserName + "/" + componentName;
             DEPFS.createDirectory(newModelPath);
             DEPFS.createDirectory(newModelPath + "/" + "dist");
+            DEPFS.createDirectory(newModelPath + "/" + "input");
+            DEPFS.createDirectory(newModelPath + "/" + "output");
 
             Iterator ita = null;
             ita = idToOwnerName.entrySet().iterator();
@@ -362,92 +364,156 @@ public class ActionHandler {
                         + owername + "/" + modelname + "/" + "dist/";
                 String targetPath = newModelPath + "/" + "dist/";
                 DEPFS.copyDirectory(sourcePath, targetPath);
+                File oldSimFile = new File(DistributeServer.absolutePathOfRuntimeUsers + "/"
+                        + owername + "/" + modelname + "/" + "simulation.sim");
+                if (oldSimFile.exists()) {
+                    simFiles.add(new SimFile(DEPFS.readFile(oldSimFile)));
+                }
             }
 
             //create sim file
 
-            // get connected port
-            for (Iterator it = parts.iterator(); it.hasNext();) {
-                Element component = (Element) it.next();
-                String partName = (String)idToModelName.get(partIdToModelId.get(component.attributeValue("id")));
-                List outPorts = component.elements("output");
-                for( Iterator ot = outPorts.iterator(); ot.hasNext();){
-                    Element outPort = (Element)ot.next();
-                    String portName = outPort.attributeValue("portName");
-                    String targetPortName = outPort.attributeValue("targetPortName");
-                    String targetModelId = outPort.attributeValue("targetPortId");
-                    String targetModelName = (String) idToModelName.get(partIdToModelId.get(targetModelId));
-                    String source = partName + "." + portName;
-                    String target = targetModelName + "." + targetPortName;
-                    components.add(partName+"."+portName.split("\\.")[0]);
-                    components.add(targetModelName+"."+targetPortName.split("\\.")[0]);
-                    sourceToTarget.add(source + "+" + target);
+            //only single model to run
+            if (parts.size() == 1 && simFiles.size() == 1) {
+                simFile = simFiles.get(0);
+                simFile = simFiles.get(0);
+                for (Iterator it = parts.iterator(); it.hasNext(); ) {
+                    Element component = (Element) it.next();
+                    String partName = (String) idToModelName.get(partIdToModelId.get(component.attributeValue("id")));
 
+                    //get parameter values
+                    List inPorts = component.elements("input");
+                    for (Iterator ot = inPorts.iterator(); ot.hasNext(); ) {
+                        Element inPort = (Element) ot.next();
+                        String portName = inPort.attributeValue("portName");
+                        String portValue = inPort.attributeValue("value");
+                        String inputFileName = inPort.attributeValue("fileName");
+
+//                        components.add(partName + "." + portName.split("\\.")[0]);
+                        if (portValue != "") {
+
+                            if (inputFileName != "") {
+                                File inputFile = new File(newModelPath + "/" + "input" + "/" + inputFileName);
+                                DEPFS.writeFile(inputFile, portValue);
+                                String source = partName + "." + portName;
+                                parameter.put(source, "\"$oms_prj/input/" + inputFileName + "\"");
+
+                            } else {
+                                String source = partName + "." + portName;
+                                parameter.put(source, portValue);
+                            }
+                            String originalComponentName = portName.substring(0, portName.lastIndexOf("."));
+                            String originalComponentKey = simFile.getSim().getModel().getComponentKey(originalComponentName);
+                            if (originalComponentKey != null) {
+                                String originalComponentName1 = originalComponentKey
+                                        + portName.substring(portName.lastIndexOf(".") + 1, portName.length());
+                            simFile.getSim().getModel().setParameter(originalComponentName1, (String) parameter.get(partName + "." + portName));
+//                                System.out.println(simFile.toString());
+                            }
+
+                        }
+                    }
                 }
+                //using simFile to generate sim file
 
-                //get parameter values
-                List inPorts = component.elements("input");
-                for( Iterator ot = inPorts.iterator(); ot.hasNext();){
-                    Element inPort = (Element)ot.next();
-                    String portName = inPort.attributeValue("portName");
-                    String portValue = inPort.attributeValue("value");
-                    components.add(partName+"."+portName.split("\\.")[0]);
+                File simulation = new File(DistributeServer.absolutePathOfRuntimeUsers + "/"
+                        + currentUserName + "/" + componentName + "/simulation.sim");
+                DEPFS.writeFile(simulation, simFile.toString());
+                runModel(connection,data);
 
-                    if(portValue != "") {
+            }
+            else {
+                // get connected port
+                for (Iterator it = parts.iterator(); it.hasNext(); ) {
+                    Element component = (Element) it.next();
+                    String partName = (String) idToModelName.get(partIdToModelId.get(component.attributeValue("id")));
+                    List outPorts = component.elements("output");
+                    for (Iterator ot = outPorts.iterator(); ot.hasNext(); ) {
+                        Element outPort = (Element) ot.next();
+                        String portName = outPort.attributeValue("portName");
+                        String targetPortName = outPort.attributeValue("targetPortName");
+                        String targetModelId = outPort.attributeValue("targetPortId");
+                        String targetModelName = (String) idToModelName.get(partIdToModelId.get(targetModelId));
                         String source = partName + "." + portName;
-                        parameter.put(source, portValue);
+                        String target = targetModelName + "." + targetPortName;
+                        components.add(partName + "." + portName.split("\\.")[0]);
+                        components.add(targetModelName + "." + targetPortName.split("\\.")[0]);
+                        sourceToTarget.add(source + "+" + target);
+
                     }
 
+                    //get parameter values
+                    List inPorts = component.elements("input");
+                    for (Iterator ot = inPorts.iterator(); ot.hasNext(); ) {
+                        Element inPort = (Element) ot.next();
+                        String portName = inPort.attributeValue("portName");
+                        String portValue = inPort.attributeValue("value");
+                        String inputFileName = inPort.attributeValue("fileName");
+                        components.add(partName + "." + portName.split("\\.")[0]);
+
+                        if (inputFileName != "") {
+                            File inputFile = new File(newModelPath + "/" + "input" + "/" + inputFileName);
+                            DEPFS.writeFile(inputFile, portValue);
+                            String source = partName + "." + portName;
+                            parameter.put(source, "$oms_prj/input/" + portValue);
+
+                        } else if (portValue != "") {
+                            String source = partName + "." + portName;
+                            parameter.put(source, portValue);
+                        }
+
+                    }
                 }
-            }
 
-            //use components to component element
-            ita = components.iterator();
-            for (int i=1;ita.hasNext();i++) {
-                String value = (String)ita.next();
-                String newName = "c" + i;
-                newComponentName.put(value, newName);
-                model.setComponent(newName, value);
+                //use components to component element
+                ita = components.iterator();
+                for (int i = 1; ita.hasNext(); i++) {
+                    String value = (String) ita.next();
+                    String newName = "c" + i;
+                    newComponentName.put(value, newName);
+                    model.setComponent(newName, value);
 
-            }
-
-            //use sourceToTarget to connect component
-            for(int i=0; i<sourceToTarget.size();i++) {
-                String []componentInfo = sourceToTarget.get(i).split("\\+");
-                String preSourceName = componentInfo[0].split("\\.")[0] +"."+ componentInfo[0].split("\\.")[1];
-                String laterTargetName = componentInfo[1].split("\\.")[0] +"."+ componentInfo[1].split("\\.")[1];
-                model.setConnect(componentInfo[0].replace(preSourceName,(String)newComponentName.get(preSourceName)),
-                        componentInfo[1].replace(laterTargetName, (String) newComponentName.get(laterTargetName)));
-
-            }
-
-            //user parameter to set parameter value
-            if (!parameter.isEmpty()){
-                ita = parameter.entrySet().iterator();
-                while (ita.hasNext()) {
-                    Map.Entry entry = (Map.Entry) ita.next();
-                    String key = (String) entry.getKey();
-                    String []pots = key.split("\\.");
-                    String preName = key.replace(pots[0] + "." + pots[1], (String) newComponentName.get(pots[0]+"."+pots[1]));
-                    String value = "\""+(String) entry.getValue()+"\"";
-                    model.setParameter(preName, value);
                 }
-            }
 
+                //use sourceToTarget to connect component
+                for (int i = 0; i < sourceToTarget.size(); i++) {
+                    String[] componentInfo = sourceToTarget.get(i).split("\\+");
+                    String preSourceName = componentInfo[0].split("\\.")[0] + "." + componentInfo[0].split("\\.")[1];
+                    String laterTargetName = componentInfo[1].split("\\.")[0] + "." + componentInfo[1].split("\\.")[1];
+                    model.setConnect(componentInfo[0].replace(preSourceName, (String) newComponentName.get(preSourceName)),
+                            componentInfo[1].replace(laterTargetName, (String) newComponentName.get(laterTargetName)));
+
+                }
+
+                //user parameter to set parameter value
+                if (!parameter.isEmpty()) {
+                    ita = parameter.entrySet().iterator();
+                    while (ita.hasNext()) {
+                        Map.Entry entry = (Map.Entry) ita.next();
+                        String key = (String) entry.getKey();
+                        String[] pots = key.split("\\.");
+                        String preName = key.replace(pots[0] + "." + pots[1], (String) newComponentName.get(pots[0] + "." + pots[1]));
+                        String value = "\"" + (String) entry.getValue() + "\"";
+                        model.setParameter(preName, value);
+                    }
+                }
+
+
+                sim.setModel(model);
+                simFile.setSim(sim);
+                simFile.setImport("import static oms3.SimBuilder.instance as OMS3");
+
+                //using simFile to generate sim file
+
+                File simulation = new File(DistributeServer.absolutePathOfRuntimeUsers + "/"
+                        + currentUserName + "/" + componentName + "/simulation.sim");
+                DEPFS.writeFile(simulation, simFile.toString());
+                runModel(connection,data);
+
+//                JSONObject jsonObject = JSONObject.fromObject("{action:'compile',StatusCode:1,message:'success'}");
+//                connection.send(jsonObject.toString());
+            }
         }
-
-        sim.setModel(model);
-        simFile.setSim(sim);
-        simFile.setImport("import static oms3.SimBuilder.instance as OMS3");
-
-        //using simFile to generate sim file
-
-        File simulation = new File(DistributeServer.absolutePathOfRuntimeUsers + "/"
-                + currentUserName + "/" + componentName + "/simulation.sim");
-        DEPFS.writeFile(simulation, simFile.toString());
-
-        JSONObject jsonObject = JSONObject.fromObject("{action:'compile',StatusCode:1,message:'success'}");
-        connection.send(jsonObject.toString());
     }
 
     /**

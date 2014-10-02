@@ -13,7 +13,10 @@ import net.sf.json.JSONObject;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.prettyx.Common.*;
+import org.prettyx.DistributeServer.Modeling.Sim;
+import org.prettyx.DistributeServer.Modeling.SimFile;
 import org.prettyx.DistributeServer.Network.ActionHandler;
+import org.prettyx.DistributeServer.Network.DistributeServerHearken;
 import org.prettyx.DistributeServer.Settings.SettingsCenter;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
@@ -21,6 +24,7 @@ import sun.misc.BASE64Encoder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.util.UUID;
 import java.util.zip.ZipOutputStream;
@@ -57,14 +61,21 @@ public class DistributeServer {
         DistributeServer distributeServer = new DistributeServer();
         distributeServer.initialize();
 //
-//        DistributeServerHearken distributeServerHearken = new DistributeServerHearken(Integer.valueOf(distributeServer.settingsCenter.getSetting("Network", "Port")));
-//        distributeServerHearken.checkAndStart();
+        DistributeServerHearken distributeServerHearken = new DistributeServerHearken(Integer.valueOf(distributeServer.settingsCenter.getSetting("Network", "Port")));
+        distributeServerHearken.checkAndStart();
 
-        test0();
+//        test0();
+//        test1();
     }
 
     public static void test0() {
         ActionHandler.runModelTest();
+    }
+    public static void test1() throws IOException {
+        File simfile1 = new File("/Users/XieFan/Documents/ModelHub/Runtime/Users/PengJingwen/Thornthwaite/simulation.sim");
+
+        SimFile simFile = new SimFile(DEPFS.readFile(simfile1));
+        System.out.println(simFile.toString());
     }
 
 

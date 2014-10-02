@@ -10,6 +10,7 @@
 
 package org.prettyx.DistributeServer.Modeling;
 
+import org.apache.commons.collections.map.ListOrderedMap;
 import org.prettyx.Common.DEPFS;
 
 import java.util.HashMap;
@@ -24,16 +25,44 @@ import java.util.regex.Pattern;
  */
 
 public class Model {
-    private String name = "";
+    private String modelParameterName = "";
+    private String modelParameterValue = "";
     private String iter = "";
     private String Sim_while = "";
     private String Sim_until = "";
     private String Sim_if = "";
-    private Map component = new HashMap();
-    private Map connect = new HashMap();
-    private Map feedback = new HashMap();
-    private Map logging = new HashMap();
+    private Map component = new ListOrderedMap();
+    private Map connect = new ListOrderedMap();
+    private Map feedback = new ListOrderedMap();
+    private Map logging = new ListOrderedMap();
     private Parameter parameter = new Parameter();
+
+    public String getComponentKey(String value) {
+        Iterator ita = null;
+        ita = component.entrySet().iterator();
+        while (ita.hasNext()) {
+            Map.Entry entry = (Map.Entry) ita.next();
+            String key = (String) entry.getKey();
+            String data = (String) entry.getValue();
+            if(data.equals(value)){
+                return key;
+            }
+        }
+        return null;
+    }
+    public String getConnectKey(String value) {
+        Iterator ita = null;
+        ita = connect.entrySet().iterator();
+        while (ita.hasNext()) {
+            Map.Entry entry = (Map.Entry) ita.next();
+            String key = (String) entry.getKey();
+            String data = (String) entry.getValue();
+            if(data.equals(value)){
+                return key;
+            }
+        }
+        return null;
+    }
 
     /**
      * default constructor with none input parameter
@@ -57,22 +86,24 @@ public class Model {
                 Pattern pattern=Pattern.compile("\\(.*?\\)");
                 Matcher matcher = pattern.matcher(line);
                 while(matcher.find()) {
-                    String name = matcher.group();
+                    String name = "";
                     if(matcher.group() != "") {
                         int start = matcher.start();
                         int end = matcher.end();
                         name = line.substring(start + 1, end - 1);
                         pattern = Pattern.compile(":");
                         String[] name1 = pattern.split(name);
-                        if (name1[0].trim().equals("classname")) {
-                            setClassname(DEPFS.removeSpace(name1[1].replace("\"", "")));
+                        if (name1.length != 1) {
+                            setModelParameter(DEPFS.removeSpace(name1[0]),DEPFS.removeSpace(name1[1].replace("\"", "")));
                         }
                     }
                 }
                 continue;
             }
             else if(line.contains("components")){
+
                 while (i<content.length){
+//                    System.out.println(line);
                     if(line.contains("}")) break;
                     line = line.split("//")[0];
                     if(line.trim() != ""){
@@ -82,6 +113,11 @@ public class Model {
                         if(r.length >= 4){
                             String object = DEPFS.removeSpace(r[1]);
                             String name = DEPFS.removeSpace(r[3]);
+                            setComponent(object, name);
+                        }
+                        else if(r.length >= 2){
+                            String object = DEPFS.removeSpace(r[0]);
+                            String name = DEPFS.removeSpace(r[1]);
                             setComponent(object, name);
                         }
                     }
@@ -94,6 +130,7 @@ public class Model {
             }
             else if(line.contains("connect")){
                 while (i<content.length){
+//                    System.out.println(line);
                     if(line.contains("}")) break;
                     line = line.split("//")[0];
                     if(line.trim() != ""){
@@ -115,6 +152,8 @@ public class Model {
             }
             else if(line.contains("feedback")){
                 while (i<content.length){
+//                    System.out.println(line);
+
                     if(line.contains("}")) break;
                     line = line.split("//")[0];
                     if(line.trim() != ""){
@@ -133,50 +172,60 @@ public class Model {
                 continue;
 
             }
-            else if(line.contains("parameter")){
-                parameter = new Parameter();
-                Pattern pattern=Pattern.compile("\\(.*?\\)");
-                Matcher matcher = pattern.matcher(line);
-                while(matcher.find()) {
-                    String name = matcher.group();
-                    if(matcher.group() != "") {
-                        int start = matcher.start();
-                        int end = matcher.end();
-                        name = line.substring(start + 1, end - 1);
-                        pattern = Pattern.compile(":");
-                        String[] filePath = pattern.split(name);
-                        if (filePath[0].trim().equals("file")) {
-                            parameter.setParameterFile(DEPFS.removeSpace(filePath[1].replace("\"","")));
-                        }
-                    }
-                }
-                i++;
-                line = content[i];
-                while (i<content.length){
-                    if(line.contains("}")) break;
-                    line = line.split("//")[0];
-                    if(line.trim() != ""){
-                        pattern = Pattern.compile("\"");
-                        String []r = pattern.split(line);
-                        if(r.length >= 4){
-                            String name = DEPFS.removeSpace(r[1]);
-                            String value = "\"" + DEPFS.removeSpace(r[3]) + "\"";
-                            setParameter(name, value);
-                        }
-                        else if(r.length == 3){
-                            String name = DEPFS.removeSpace(r[1]);
-                            String value = DEPFS.removeSpace(r[2]);
-                            setParameter(name, value);
-                        }
-                    }
-                    i++;
-                    line = content[i];
-
-                }
-                continue;
-            }
+//            else if(line.contains("parameter")){
+////                System.out.println(line);
+//
+//                parameter = new Parameter();
+//                Pattern pattern=Pattern.compile("\\(.*?\\)");
+//                Matcher matcher = pattern.matcher(line);
+//                while(matcher.find()) {
+//
+//                    String name = matcher.group();
+//                    if(matcher.group() != "") {
+//                        int start = matcher.start();
+//                        int end = matcher.end();
+//                        name = line.substring(start + 1, end - 1);
+//                        pattern = Pattern.compile(":");
+//                        String[] filePath = pattern.split(name);
+//                        if (filePath[0].trim().equals("file")) {
+//                            parameter.setParameterFile(DEPFS.removeSpace(filePath[1].replace("\"","")));
+//                        }
+//                    }
+//                }
+//                i++;
+//                line = content[i];
+////                System.out.println(line);
+//                while (i<content.length){
+////                    System.out.println(line);
+//
+//                    if(line.contains("}")) break;
+//                    line = line.split("//")[0];
+//                    if(line.trim() != ""){
+//                        pattern = Pattern.compile("\"");
+//                        String []r = pattern.split(line);
+//                        if(r.length >= 4){
+//                            String name = DEPFS.removeSpace(r[1]);
+//                            String value = "\"" + DEPFS.removeSpace(r[3]) + "\"";
+//                            setParameter(name, value);
+//
+//                        }
+//                        else if(r.length == 3){
+//                            String name = DEPFS.removeSpace(r[1]);
+//                            String value = DEPFS.removeSpace(r[2]);
+//                            setParameter(name, value);
+//
+//                        }
+//                    }
+//                    i++;
+//                    line = content[i];
+//
+//                }
+//                continue;
+//            }
             else if(line.contains("logging")){
                 while (i<content.length){
+//                    System.out.println(line);
+
                     line = line.split("//")[0];
                     if(line.trim() != ""){
                         Pattern pattern=Pattern.compile("\"");
@@ -200,10 +249,11 @@ public class Model {
 
     /**
      * those set functions art to set all of the private fields
-     * @param string
+     * @param name, value
      */
-    public void setClassname(String string){
-        name = string;
+    public void setModelParameter(String name, String value){
+        modelParameterName = name;
+        modelParameterValue = value;
     }
     public void setIter(String string){
         iter = string;
@@ -237,8 +287,11 @@ public class Model {
      * those get functions are to get all of the private fields
      * @return
      */
-    public String getClassName(){
-        return name;
+    public String getModelParameterName(){
+        return modelParameterName;
+    }
+    public String getModelParameterValue() {
+        return modelParameterValue;
     }
     public String getIter(){
         return iter;
@@ -269,8 +322,8 @@ public class Model {
     }
     public String toString(){
         String string = "model(";
-        if(name != ""){
-            string += "name:" + "\"" + name + "\"";
+        if(modelParameterValue != ""){
+            string += modelParameterName+":" + "\"" + modelParameterValue + "\"";
         }
         string += "){" + "\n";
         //iter while until if 都没写
@@ -283,7 +336,9 @@ public class Model {
                 Map.Entry entry = (Map.Entry) ita.next();
                 String key = (String) entry.getKey();
                 String value = (String) entry.getValue();
-                middle += "\t\"" + key + "\" " + "\"" + value + "\"" + "\n";
+                middle += "\t\"" + key + "\"\t" + "\"" + value + "\"" + "\n";
+//                System.out.println(key + "\" " + "\"" + value + "\"");
+
             }
             middle += "}"+"\n";
         }
@@ -295,7 +350,9 @@ public class Model {
                 Map.Entry entry = (Map.Entry) ita.next();
                 String key = (String) entry.getKey();
                 String value = (String) entry.getValue();
-                middle += "\t\"" + key + "\" " + "\"" + value + "\"" + "\n";
+                middle += "\t\"" + key + "\"\t" + "\"" + value + "\"" + "\n";
+//                System.out.println(key + "\" " + "\"" + value + "\"");
+
             }
             middle += "}"+"\n";
         }
@@ -307,7 +364,7 @@ public class Model {
                 Map.Entry entry = (Map.Entry) ita.next();
                 String key = (String) entry.getKey();
                 String value = (String) entry.getValue();
-                middle += "\t\"" + key + "\" " + "\"" + value + "\"" + "\n";
+                middle += "\t\"" + key + "\"\t" + "\"" + value + "\"" + "\n";
             }
             middle += "}"+"\n";
         }
@@ -319,12 +376,13 @@ public class Model {
                 Map.Entry entry = (Map.Entry) ita.next();
                 String key = (String) entry.getKey();
                 String value = (String) entry.getValue();
-                middle += "\t\"" + key + "\" " + "\"" + value + "\"" + "\n";
+                middle += "\t\"" + key + "\"\t" + "\"" + value + "\"" + "\n";
             }
             middle += "}"+"\n";
         }
         if(!parameter.isEmpty()) {
             middle += parameter.toString();
+//            System.out.println(parameter.toString());
         }
         string += SimFile.stdOut(middle) + "}\n";
 

@@ -11,6 +11,8 @@ package org.prettyx.DistributeServer.Modeling;
 
 import org.prettyx.Common.DEPFS;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -35,19 +37,34 @@ public class SimFile {
      * @param string
      */
     public SimFile(String string){
+
         String [] content = string.split("\n");
         for(int i= 0; i<content.length; i++){
             String line = content[i];
+
+            if(line.trim().startsWith("*") || line.trim().startsWith("/*") || line.trim().startsWith("//")) continue;
             if(line.contains("import")){    //simfile 中设置 import
                 setImport(DEPFS.removeSpace(line));
                 continue;
             }
 
-            if(line.contains("sim")){
+            if(line.contains("OMS3.sim")){
 
                 String simContent = "";
                 while (i<content.length){
-                    simContent += content[i] + "\n";
+
+                    if(content[i].trim().startsWith("*") || content[i].trim().startsWith("/*") || content[i].trim().startsWith("//")) {
+                        i++;
+                        continue;
+                    }
+
+                    int end = content[i].indexOf("//");
+                    if(content[i].indexOf("//")!=-1){
+                        simContent += content[i].substring(0, end) + "\n";
+                    }else {
+                        simContent += content[i] + "\n";
+                    }
+
                     i++;
                 }
 
@@ -95,6 +112,7 @@ public class SimFile {
             string +=  value + "\n";
         }
         string += sim.toString();
+//        string += "work";
         return string;
     }
     public static String stdOut(String string) {

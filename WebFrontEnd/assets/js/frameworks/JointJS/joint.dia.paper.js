@@ -7,8 +7,8 @@ joint.dia.Paper = Backbone.View.extend({
     options: {
 
         width: 800,
-        height: 600,
-        gridSize: 50,
+        height: 10000,
+        gridSize: 5,
         perpendicularLinks: false,
         elementView: joint.dia.ElementView,
         linkView: joint.dia.LinkView,

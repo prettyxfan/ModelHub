@@ -9,6 +9,7 @@
 // +----------------------------------------------------------------------
 package org.prettyx.DistributeServer.Modeling;
 
+import org.apache.commons.collections.set.ListOrderedSet;
 import org.prettyx.Common.DEPFS;
 
 import java.util.HashSet;
@@ -26,18 +27,18 @@ public class Sim {
     private String build = "";
     private Model model;
     private String efficiency = "";
-    private Set resource = new HashSet();
+    private Set resource = new ListOrderedSet();
     private String outputstrategy = "";
-    private String summary = "";
+    private Set summary = new ListOrderedSet();
     private String output = "";
-    private Analysis analysis = null;
+    private String analysis = null;
 
     /**
      * default constructor with none input parameter
      */
     public Sim(){
         model = new Model();
-        analysis = new Analysis();
+//        analysis = new Analysis();
     }
 
     /**
@@ -45,6 +46,7 @@ public class Sim {
      * @param simContent
      */
     public Sim(String simContent){
+//        System.out.println(simContent);
         String [] content = simContent.split("\n");
         for(int i = 0; i<content.length; i++){
             String line = content[i];
@@ -72,6 +74,21 @@ public class Sim {
                 String []r = pattern.split(line);
                 if(r[0].trim().equals("resource")){
                     setResource(DEPFS.removeSpace(r[1]));
+                }
+                continue;
+            }
+            else if(line.contains("outputstrategy")){
+                Pattern pattern=Pattern.compile("\\(.*?\\)");
+                Matcher matcher = pattern.matcher(line);
+                while(matcher.find()) {
+                    String name = matcher.group();
+                    if(matcher.group() != "") {
+                        int start = matcher.start();
+                        int end = matcher.end();
+                        name = line.substring(start + 1, end - 1);
+//                        System.out.println(name);
+                        outputstrategy = name;
+                    }
                 }
                 continue;
             }
@@ -106,6 +123,67 @@ public class Sim {
 
                 setModel(modelContent);
             }
+            else if(line.contains("efficiency")){
+                Pattern pattern=Pattern.compile("\\(.*?\\)");
+                Matcher matcher = pattern.matcher(line);
+                while(matcher.find()) {
+                    String name = matcher.group();
+                    if(matcher.group() != "") {
+                        int start = matcher.start();
+                        int end = matcher.end();
+                        name = line.substring(start + 1, end - 1);
+//                        System.out.println(name);
+                        efficiency = name;
+                    }
+                }
+                continue;
+            }
+
+            else if(line.contains("summary")){
+                Pattern pattern=Pattern.compile("\\(.*?\\)");
+                Matcher matcher = pattern.matcher(line);
+                while(matcher.find()) {
+                    String name = matcher.group();
+                    if(matcher.group() != "") {
+                        int start = matcher.start();
+                        int end = matcher.end();
+                        name = line.substring(start + 1, end - 1);
+//                        System.out.println(name);
+                        summary.add(name);
+                    }
+                }
+                continue;
+            }
+            else if(line.contains("analysis")){
+                String analysisContent = "";
+                int start = i;
+                int end = 0;
+                int count = 0;
+                boolean found = false;
+                while (i<content.length && !found){
+                    line = content[i];
+                    for(int j=0; j<line.length(); j++){
+                        if(line.charAt(j) == '{'){
+                            count++;
+                        }
+                        else if(line.charAt(j) == '}'){
+                            count--;
+                            if(count == 0){
+                                found = true;
+                                end = i;
+                                break;
+                            }
+                        }
+                    }
+                    i++;
+                }
+                while(start <= end){
+                    analysisContent += content[start] + "\n";
+                    start++;
+                }
+                analysis = analysisContent;
+
+            }
         }
     }
 
@@ -135,7 +213,7 @@ public class Sim {
         outputstrategy = string;
     }
     public void setSummary(String string){
-        summary = string;
+        summary.add(string);
     }
     public void setOutput(String string){
         output = string;
@@ -168,34 +246,54 @@ public class Sim {
     public String getOutputstrategy(){
         return outputstrategy;
     }
-    public String getSummary(){
+    public Set getSummary(){
         return summary;
     }
     public String getOutput(){
         return output;
     }
-    public Analysis getAnalysis(){
+    public String getAnalysis(){
         return  analysis;
     }
 
 
     public String toString(){
-        String string = "sim(";
+
+        String string = "OMS3.sim(";
         if(name != ""){
             string += "name:" + "\"" + name + "\"";
         }
         string += "){" + "\n";
         //build efficiency outputstrategy summary output analysis 都没写
 
-        string += SimFile.stdOut(model.toString());
-        Iterator ita = null;
-        ita = resource.iterator();
-        while (ita.hasNext()) {
-            String value = (String)ita.next();
-            string += "resource " + "\"" + value + "\"" + "\n";
+        if(outputstrategy!=""){
+            string += "\toutputstrategy("+outputstrategy+")\n";
         }
-        string += "}\n";
+        string += SimFile.stdOut(model.toString());
+        if(!resource.isEmpty()) {
+            Iterator ita = null;
+            ita = resource.iterator();
+            while (ita.hasNext()) {
+                String value = (String) ita.next();
+                string += "resource " + "\"" + value + "\"" + "\n";
+            }
+        }
+        if(efficiency!=""){
+            string += "\tefficiency("+efficiency+")\n";
+        }
+        if(!summary.isEmpty()) {
+            Iterator ita = null;
+            ita = summary.iterator();
+            while (ita.hasNext()) {
+                String value = (String) ita.next();
+                string += "\tsummary(" + value + ")\n";
+            }
+        }
+        if(analysis!=null) {
+            string += analysis;
+        }
 
+        string += "}\n";
         return string;
     }
 }

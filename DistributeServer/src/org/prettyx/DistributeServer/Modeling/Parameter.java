@@ -9,6 +9,8 @@
 // +----------------------------------------------------------------------
 package org.prettyx.DistributeServer.Modeling;
 
+import org.apache.commons.collections.map.ListOrderedMap;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -19,7 +21,7 @@ import java.util.Map;
  */
 public class Parameter {
     private String parameterFile = "";
-    private Map parameterConent = new HashMap();
+    private Map parameterConent = new ListOrderedMap();
 
     /**
      * those set functions art to set all of the private fields
@@ -45,22 +47,38 @@ public class Parameter {
         return parameterConent;
     }
 
+    public String getParameterConentKey(String value) {
+        Iterator ita = null;
+        ita = parameterConent.entrySet().iterator();
+        while (ita.hasNext()) {
+            Map.Entry entry = (Map.Entry) ita.next();
+            String key = (String) entry.getKey();
+            String data = (String) entry.getValue();
+            if(data.equals(value)){
+                return key;
+            }
+        }
+        return null;
+    }
+
     public Boolean isEmpty(){
         return parameterConent.isEmpty();
     }
     public String toString(){
-        String string = "parameter(";
+        String string = "parameter";
         if(parameterFile != ""){
-            string += "file:" + "\"" + parameterFile + "\"";
+            string += "(file:" + "\"" + parameterFile + "\")";
         }
-        string += "){" + "\n";
+        string += " {" + "\n";
         Iterator ita = null;
         ita = parameterConent.entrySet().iterator();
         while (ita.hasNext()) {
             Map.Entry entry = (Map.Entry) ita.next();
             String key = (String) entry.getKey();
             String value = (String) entry.getValue();
-            string += "\t\"" + key + "\" " + value + "\n";
+
+            string += "\t\"" + key + "\"\t" + value + "\n";
+//            System.out.println("\t\"" + key + "\" " + value + "\n");
         }
         string += "}" + "\n";
 
