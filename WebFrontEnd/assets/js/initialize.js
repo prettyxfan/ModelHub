@@ -125,6 +125,15 @@ function onMessage(event) {
 
         }
     }
+    else if(action == 'run') {
+        if(message.StartState == 0){
+
+        }
+        else if(message.StartState == 1){
+            console.log(message.message);
+            $("#console").html = message.message;
+        }
+    }
 }
 
 function backToLogin(){

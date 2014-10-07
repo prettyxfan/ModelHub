@@ -376,7 +376,6 @@ public class ActionHandler {
             //only single model to run
             if (parts.size() == 1 && simFiles.size() == 1) {
                 simFile = simFiles.get(0);
-                simFile = simFiles.get(0);
                 for (Iterator it = parts.iterator(); it.hasNext(); ) {
                     Element component = (Element) it.next();
                     String partName = (String) idToModelName.get(partIdToModelId.get(component.attributeValue("id")));
@@ -394,7 +393,7 @@ public class ActionHandler {
 
                             if (inputFileName != "") {
                                 File inputFile = new File(newModelPath + "/" + "input" + "/" + inputFileName);
-                                DEPFS.writeFile(inputFile, portValue);
+                                DEPFS.writeFile(inputFile, portValue.replace("<br>","\n"));
                                 String source = partName + "." + portName;
                                 parameter.put(source, "\"$oms_prj/input/" + inputFileName + "\"");
 
@@ -405,10 +404,10 @@ public class ActionHandler {
                             String originalComponentName = portName.substring(0, portName.lastIndexOf("."));
                             String originalComponentKey = simFile.getSim().getModel().getComponentKey(originalComponentName);
                             if (originalComponentKey != null) {
-                                String originalComponentName1 = originalComponentKey
+                                String originalComponentName1 = originalComponentKey + "."
                                         + portName.substring(portName.lastIndexOf(".") + 1, portName.length());
                             simFile.getSim().getModel().setParameter(originalComponentName1, (String) parameter.get(partName + "." + portName));
-//                                System.out.println(simFile.toString());
+                                System.out.println(originalComponentName1);
                             }
 
                         }
@@ -520,7 +519,7 @@ public class ActionHandler {
      * @TODO
      */
 
-    public static void runModel(WebSocket connection, String data) throws SQLException, DocumentException {
+    public static void runModel( final WebSocket connection, String data) throws SQLException, DocumentException {
 
 
         Document document = DocumentHelper.parseText(data);
@@ -571,8 +570,11 @@ public class ActionHandler {
 
                     @Override
                     public void onMessage(String s) {
-                        System.out.println(s);
                         // TODO Process Returned Data
+                        JSONObject jsonObject = JSONObject.fromObject("{action:'run',StatusCode:1,message:'"+s+"'}");
+                        connection.send(jsonObject.toString());
+                        System.out.println(jsonObject.toString());
+
                     }
 
                     @Override

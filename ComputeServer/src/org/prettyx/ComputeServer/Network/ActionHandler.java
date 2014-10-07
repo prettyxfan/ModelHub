@@ -51,6 +51,7 @@ public class ActionHandler {
             }
 
             System.out.print(omsProcessExecution.getProcessOutput());
+            connection.send(omsProcessExecution.getProcessOutput());
 
             // TODO Return Data
 

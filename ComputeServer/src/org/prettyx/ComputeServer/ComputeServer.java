@@ -1,13 +1,16 @@
 package org.prettyx.ComputeServer;
 
 
+import org.java_websocket.WebSocket;
 import org.prettyx.Common.DEPFS;
+import org.prettyx.Common.LogUtility;
 import org.prettyx.Common.StatusCodes;
 import org.prettyx.ComputeServer.Modeling.OMSProcessExecution;
 import org.prettyx.ComputeServer.Network.ComputeServerHearken;
 import org.prettyx.ComputeServer.Settings.SettingsCenter;
 
 import java.util.Scanner;
+import java.util.UUID;
 
 public class ComputeServer {
 
@@ -41,11 +44,36 @@ public class ComputeServer {
         ComputeServerHearken computeServerHearken = new ComputeServerHearken(Integer.valueOf(computeServer.settingsCenter.getSetting("Network", "Port")));
         computeServerHearken.checkAndStart();
 
-        computeServer.test();
+//        computeServer.test();
     }
 
     private void test(){
 
+            String outputPath = "/Users/XieFan/Documents/ModelHub/Runtime/Users/PengJingwen/Thornthwaite";
+            try {
 
-    }
+                OMSProcessExecution omsProcessExecution = new OMSProcessExecution();
+                omsProcessExecution.setUpEnvironment(DEPFS.userHome() + "/Documents/ModelHub/Runtime/OMS3", outputPath);
+                omsProcessExecution.runProcessExecution();
+
+                while (true) {
+                    if (omsProcessExecution.finished()) {
+                        break;
+                    } else {
+                        Thread.sleep(50);
+                    }
+                }
+
+                System.out.print(omsProcessExecution.getProcessOutput());
+
+                // TODO Return Data
+
+//            DEPFS.removeDirectoryAllFiles(outputPath);
+
+            } catch (Exception e) {
+                LogUtility.logUtility().log2out(e.getMessage());
+            }
+        }
+
+
 }

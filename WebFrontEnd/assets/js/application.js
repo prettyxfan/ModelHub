@@ -105,9 +105,9 @@ function createInterface(){
 
     });
 
-/**
-* To Get the Pointer Focus Cell
-*/
+    /**
+    * To Get the Pointer Focus Cell
+    */
 
     paper.on('cell:pointerdown' ,function(evt, x, y) {
 
@@ -186,29 +186,6 @@ function createInterface(){
         model: graph1
     });
 
-    /**
-    * To Show the Simple Introduction of the Model
-    */
-
-    paper1.on('cell:pointerdown', function(evt, x, y){
-
-        var evtId = "#" + evt.id;
-        var id = $(evtId).attr("model-id");
-        var m = graph1.getCell(id);
-
-        if( m instanceof joint.shapes.devs.Model ){
-            for(var i in recievedModelArray) {
-                //console.log(recievedModelArray[i].id + " " + cellId);
-                if(recievedModelArray[i].id == id){
-                  $('#content').html(recievedModelArray[i].componentDescription);
-                }
-            }
-        }
-        else {
-            $('#content').html('');
-        }
-
-    });
 
     paper1.on('cell:pointerdblclick' ,function(evt, x, y) {
 
@@ -310,7 +287,7 @@ function createModel(){
             recievedModelArray[i].id = m1.id;
             graph1.addCell(m1);
             position_y += modelHeight + 20;
-            console.log(position_y);
+//            console.log(position_y);
         }
     }
 }
@@ -334,7 +311,6 @@ function dealRecieveModel(modelXML){
         var parameterNumber = 0;
 
         var componentName = $(this).find("componentName").text();
-        // document.write(componentName);
         var componentDescription = $(this).find("componentDescription").text();
         $(this).find("inputName").each(function(){
             var inputName = $(this).text();
@@ -412,6 +388,7 @@ function newModelConfirm() {
 function logOut() {
     $('#logOutConform').modal('show');
 }
+
 function logOutConform(){
     var actionStatus = 1;
     var ssid = "null";
@@ -482,25 +459,10 @@ function deleteComponent() {
 
 }
 
-function addComponent() {
-    var d = new ElementWithPorts({
-        position: { x: 150, y: 150 },
-        size: { width: 80, height: 80 },
-        attrs: {
-            '.port1 text': { text: 'input1' },
-            '.port2 text': { text: 'input2' },
-            '.port3 text': { text: 'output3' },
-            '.port1': { ref: 'rect', 'ref-y': .4 },
-            '.port2': { ref: 'rect', 'ref-y': .6 },
-            '.port3': { ref: 'rect', 'ref-y': .5, 'ref-dx': 0 }
-        }
-    });
-    graph.addCell(d);
-    createXMLDocument();
-}
-
-
 function displayAttributes(m){
+    //name 为 input（or output or parameter） 的portName的最后一个单词
+    //id 为 input（or output or parameter） 的portName（去除所有的点）
+
     var node = '';
     if(m instanceof joint.shapes.devs.Model){
         for(var i in drawModelArray) {
@@ -515,52 +477,63 @@ function displayAttributes(m){
             '<p>'+ node.componentDescription +'</p></div>';
 
         if (node.inputs.length != 0){
-            html += '<div class="form-group"><label class="control-label">Inputs</label>';
+            html += '<div class="col-lg-12"><h4 class="list-group-item-heading">Inputs</h4></div>';
             for (var i in node.inputs){
                 if(!judgeInputEnable(node.id,node.inputs[i][0])) {
 
-                    html += '<div class="input-group"><span class="input-group-addon input-sm">'
-                        + node.inputs[i][0].substring(node.inputs[i][0].lastIndexOf(".")+1, node.inputs[i][0].length)
-                        + '</span><input type="text" disabled="" class="form-control input-sm" id="'+ node.inputs[i][0].replace(/\./g,"") +'" ' +
-                        'placeholder="' + node.inputs[i][1]
-                        + '" /><span class="input-group-btn"><button class="btn btn-primary btn-sm" type="button" disabled>...</button></span></div>';
+                    html += '<div class="form-group">'
+                        + '<label class="control-label" for="inputSmall">'
+                        + node.inputs[i][0]
+                        +'</label>'
+                        +'<div class="input-group">'
+                        + '<input type="text" disabled="" class="form-control input-sm" id="'+ node.inputs[i][0].replace(/\./g,"") +'" ' +
+                        'placeholder="' + node.inputs[i][1] + '" value="' + showExistValue(node.id,node.inputs[i][0]) +'"/>' +
+                        '<span class="input-group-btn">' +
+                        '<button class="btn btn-primary btn-sm" type="button" disabled>...</button>'
+                        +'</div></div>';
                 }
                 else{
-                    html += '<div class="input-group"><span class="input-group-addon input-sm">'
-                        + node.inputs[i][0].substring(node.inputs[i][0].lastIndexOf(".")+1, node.inputs[i][0].length)
-                        + '</span><input type="text" class="form-control input-sm"id="'+ node.inputs[i][0].replace(/\./g,"") +'" ' +
-                        ' placeholder="' + node.inputs[i][1]
+                    html += '<div class="form-group">'
+                        + '<span for="inputSmall">'
+                        + node.inputs[i][0]
+                        +'</span>'
+                        +'<div class="input-group">'
+                        +'<input type="text" class="form-control input-sm"id="'+ node.inputs[i][0].replace(/\./g,"") +'" ' +
+                        ' placeholder="' + node.inputs[i][1] + '" value="' + showExistValue(node.id,node.inputs[i][0])
                         + '" /><span class="input-group-btn"><button class="btn btn-primary btn-sm" type="button" onclick="createInputDialog(\''
-                        +node.inputs[i][0].replace(/\./g,"")+"dialog"+'\')">...</button></span></div>';
+                        +node.inputs[i][0].replace(/\./g,"")+"dialog"+'\')">...</button>' +
+                        '</div></div>';
                 }
             }
-            html += '</div>';
         }
-        if (node.parameters.length != 0){
-
-            html += '<div class="form-group"><label class="control-label ">Parameters</label>';
-            for (var i in node.parameters){
-                html += '<div class="input-group"><span class="input-group-addon input-sm">'
-                    +node.parameters[i][0].substring(node.parameters[i][0].lastIndexOf(".")+1, node.parameters[i][0].length)
-                + '</span><input type="text" class="form-control input-sm" id="'
-                    + node.parameters[i][0].replace(/\./g,"") +'" placeholder="'+ node.parameters[i][1]
-                +'" ><span class="input-group-btn"><button class="btn btn-primary btn-sm" type="button" onclick="createInputDialog(\''
-                    +node.parameters[i][0].replace(/\./g,"")+"dialog"+'\')">...</button></span></div>';
-            }
-            html += '</div>';
-        }
-        if (node.outputs.length != 0){
-
-            html += '<div class="form-group"><label class="control-label">Outputs</label>';
-            for (var i in node.outputs){
-                html += '<div class="input-group"><span class="input-group-addon input-sm">'
-                    +node.outputs[i][0].substring(node.outputs[i][0].lastIndexOf(".")+1, node.outputs[i][0].length)
-                + '</span><input type="text" class="form-control input-sm" disabled="" id="'+ node.outputs[i][0].replace(/\./g,"") +'" placeholder="'+ node.outputs[i][1]
-                +'" ><span class="input-group-btn"><button class="btn btn-primary btn-sm" type="button">...</button></span></div>';
-
-            }
-            html += '</div>';
-        }
+//        if (node.parameters.length != 0){
+//
+//            html += '<div class="col-lg-12"><h4 class="list-group-item-heading">Parameters</h4></div>';
+//            for (var i in node.parameters){
+//                html += '<div class="form-group">'
+//                    + '<span for="inputSmall">'
+//                    + node.parameters[i][0]
+//                    +'</span>'
+//                    +'<div class="input-group">'
+//                    +'<input type="text" class="form-control input-sm"id="'+ node.parameters[i][0].replace(/\./g,"") +'" ' +
+//                    ' placeholder="' + node.parameters[i][1] + '" value="' + showExistValue(node.id,node.parameters[i][0])
+//                    + '" /><span class="input-group-btn"><button class="btn btn-primary btn-sm" type="button" onclick="createInputDialog(\''
+//                    +node.parameters[i][0].replace(/\./g,"")+"dialog"+'\')">...</button>' +
+//                    '</div></div>';
+//            }
+//        }
+//        if (node.outputs.length != 0){
+//
+//            html += '<div class="form-group"><label class="label label-primary">Outputs</label>';
+//            for (var i in node.outputs){
+//                html += '<div class="input-group"><span class="input-group-addon input-sm">'
+//                    +node.outputs[i][0].substring(node.outputs[i][0].lastIndexOf(".")+1, node.outputs[i][0].length)
+//                + '</span><input type="text" class="form-control input-sm" disabled="" id="'+ node.outputs[i][0].replace(/\./g,"") +'" placeholder="'+ node.outputs[i][1]
+//                +'" ><span class="input-group-btn"><button class="btn btn-primary btn-sm" type="button">...</button></span></div>';
+//
+//            }
+//            html += '</div>';
+//        }
         html += '</div>';
         html += '<button type="button" class="btn btn-default btn-sm btn-block" onclick="setSingleData()">确定</button><button type="button" class="btn btn-default btn-sm btn-block">取消</button>';
         $('#attributesArea').html(html);
@@ -590,6 +563,23 @@ function judgeInputEnable(nodeId,portName){
     else return true;
 }
 
+function showExistValue(nodeId,portName){
+
+    var xmobj = $.parseXML(componentXML);
+    var value = '';
+    var obj = $(xmobj).find("part").each(function(){
+        var xmlAttr = $(this).attr("id");
+        if (xmlAttr == nodeId) {
+            $(this).find("input").each(function() {
+                if ($(this).attr("portName") == portName) {
+                    value = $(this).attr("value");
+                }
+            });
+        }
+    });
+    return value;
+}
+
 function setSingleData() {
 
     var xmobj = $.parseXML(componentXML);
@@ -608,8 +598,9 @@ function setSingleData() {
                 for(var i=0;i<node.inputs.length;i++) {
                     if ($(this).attr("portName") == node.inputs[i][0]) {
                         var elementId = "#"+node.inputs[i][0].replace(/\./g,"");
-                        if( $(elementId).val() != "") {
+                        if($(this).attr("fileName") == "") {
                             $(this).attr("value", $(elementId).val());
+                            console.log("value" + $(elementId).val())
                         }
                     }
                 }
@@ -623,7 +614,6 @@ function setSingleData() {
 }
 
 function createInputDialog(dialogId){
-//    alert("done");
     var fileName = "";
     var fileData = "";
     var baseId = dialogId.substring(0,dialogId.length-6);
@@ -643,13 +633,16 @@ function createInputDialog(dialogId){
                     var elementId = "#" + baseId + "Text";
                     console.log(elementId);
                     console.log($(elementId).val());
-                    fileData = $(this).attr("value").replace(/\r\n/gi, "<br/>");
                     fileName = $(this).attr("fileName");
+                    if(fileName != ""){
+                        fileData = $(this).attr("value").replace(/\<br\>/g, "\n");
+                    }
                 }
             });
         }
     });
 
+    console.log("content = " + fileData);
     var dialogHtml = '' +
         '<div class="modal fade" id="'+dialogId+'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">' +
         '<div class="modal-dialog">' +
@@ -687,8 +680,6 @@ function createInputDialog(dialogId){
     $("#"+baseId+"FileName").val(fileName);
     $("#"+baseId+"Text").val(fileData);
     $('#'+dialogId).modal("show");
-
-
 }
 
 function setMultipleData(dialogId){
@@ -711,13 +702,13 @@ function setMultipleData(dialogId){
                 }
             }
             $(this).find("input").each(function() {
-                console.log($(this).attr("portName").replace(/\./g,"")+"dialog");
-                console.log(dialogId);
+//                console.log($(this).attr("portName").replace(/\./g,"")+"dialog");
+//                console.log(dialogId);
                 if ($(this).attr("portName").replace(/\./g,"")+"dialog" == dialogId) {
                     var elementId = "#" + baseId + "Text";
-                    console.log(elementId);
-                    console.log($(elementId).val());
-                    $(this).attr("value", $(elementId).val());
+//                    console.log(elementId);
+//                    console.log($(elementId).val());
+                    $(this).attr("value", $(elementId).val().replace(/\n/g, "<br>"));
                     $(this).attr("fileName",fileName);
                 }
             });

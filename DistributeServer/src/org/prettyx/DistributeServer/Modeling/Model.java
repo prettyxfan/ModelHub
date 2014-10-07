@@ -32,7 +32,7 @@ public class Model {
     private String Sim_until = "";
     private String Sim_if = "";
     private Map component = new ListOrderedMap();
-    private Map connect = new ListOrderedMap();
+    private Connect connect = new Connect();
     private Map feedback = new ListOrderedMap();
     private Map logging = new ListOrderedMap();
     private Parameter parameter = new Parameter();
@@ -40,19 +40,6 @@ public class Model {
     public String getComponentKey(String value) {
         Iterator ita = null;
         ita = component.entrySet().iterator();
-        while (ita.hasNext()) {
-            Map.Entry entry = (Map.Entry) ita.next();
-            String key = (String) entry.getKey();
-            String data = (String) entry.getValue();
-            if(data.equals(value)){
-                return key;
-            }
-        }
-        return null;
-    }
-    public String getConnectKey(String value) {
-        Iterator ita = null;
-        ita = connect.entrySet().iterator();
         while (ita.hasNext()) {
             Map.Entry entry = (Map.Entry) ita.next();
             String key = (String) entry.getKey();
@@ -308,9 +295,9 @@ public class Model {
     public Map getComponent(){
         return component;
     }
-    public Map getConnect(){
-        return connect;
-    }
+//    public Map getConnect(){
+//        return connect;
+//    }
     public Map getFeedback(){
         return feedback;
     }
@@ -337,24 +324,12 @@ public class Model {
                 String key = (String) entry.getKey();
                 String value = (String) entry.getValue();
                 middle += "\t\"" + key + "\"\t" + "\"" + value + "\"" + "\n";
-//                System.out.println(key + "\" " + "\"" + value + "\"");
 
             }
             middle += "}"+"\n";
         }
         if (!connect.isEmpty()){
-            middle += "connect {" + "\n";
-            Iterator ita = null;
-            ita = connect.entrySet().iterator();
-            while (ita.hasNext()) {
-                Map.Entry entry = (Map.Entry) ita.next();
-                String key = (String) entry.getKey();
-                String value = (String) entry.getValue();
-                middle += "\t\"" + key + "\"\t" + "\"" + value + "\"" + "\n";
-//                System.out.println(key + "\" " + "\"" + value + "\"");
-
-            }
-            middle += "}"+"\n";
+            middle += connect.toString();
         }
         if (!feedback.isEmpty()){
             middle += "feedback {" + "\n";
