@@ -54,7 +54,7 @@ function onOpen(event) {
 }
 
 function onMessage(event) {
-    console.log(event.data);
+//    console.log(event.data);
     var message = eval('(' + event.data + ')');
     var action = message.action;
     if(action == 'login') {
@@ -126,12 +126,14 @@ function onMessage(event) {
         }
     }
     else if(action == 'run') {
-        if(message.StartState == 0){
+        if(message.StatusCode == 0){
 
         }
-        else if(message.StartState == 1){
+        else if(message.StatusCode == 1){
             console.log(message.message);
-            $("#console").html = message.message;
+            var span = document.createElement('span');
+            span.innerHTML = message.message + "<br/>";
+            $("#console").append(span);
         }
     }
 }

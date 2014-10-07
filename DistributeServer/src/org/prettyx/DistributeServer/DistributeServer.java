@@ -63,6 +63,7 @@ public class DistributeServer {
 //
         DistributeServerHearken distributeServerHearken = new DistributeServerHearken(Integer.valueOf(distributeServer.settingsCenter.getSetting("Network", "Port")));
         distributeServerHearken.checkAndStart();
+//        ActionHandler.runModelTest();
 
 //        test0();
 //        test1();

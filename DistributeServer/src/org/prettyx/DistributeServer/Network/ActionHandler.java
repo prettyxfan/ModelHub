@@ -571,10 +571,14 @@ public class ActionHandler {
                     @Override
                     public void onMessage(String s) {
                         // TODO Process Returned Data
-                        JSONObject jsonObject = JSONObject.fromObject("{action:'run',StatusCode:1,message:'"+s+"'}");
-                        connection.send(jsonObject.toString());
-                        System.out.println(jsonObject.toString());
 
+                        String []str = s.split("\\n");
+                        for(int i=0;i<str.length;i++) {
+                            JSONObject jsonObject = JSONObject.fromObject("{action:'run',StatusCode:1,message:'" + str[i].replace("'","\"") + "'}");
+                            System.out.println(jsonObject.toString());
+                            connection.send(jsonObject.toString());
+
+                        }
                     }
 
                     @Override
@@ -600,7 +604,7 @@ public class ActionHandler {
 
     public static void runModelTest() {
 
-        String path = "/Users/PJW/Desktop/ABC";
+        String path = "/Users/XieFan/Documents/ModelHub/Runtime/Users/PengJingwen/Test";
         final String zipFileName = "/tmp/"+ UUID.randomUUID() +".zip";
         try {
             File file = new File(path);
@@ -627,7 +631,13 @@ public class ActionHandler {
 
                     @Override
                     public void onMessage(String s) {
-                        System.out.println(s);
+
+                        String []str = s.split("\\n");
+                        for(int i=0;i<str.length;i++) {
+                            JSONObject jsonObject = JSONObject.fromObject("{action:'run',StatusCode:1,message:'" + str[i].replace("'","\"") + "'}");
+                            System.out.println(jsonObject.toString());
+
+                        }
                     }
 
                     @Override

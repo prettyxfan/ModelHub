@@ -11,6 +11,8 @@ import org.prettyx.ComputeServer.Settings.SettingsCenter;
 
 import java.util.Scanner;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ComputeServer {
 
@@ -44,7 +46,7 @@ public class ComputeServer {
         ComputeServerHearken computeServerHearken = new ComputeServerHearken(Integer.valueOf(computeServer.settingsCenter.getSetting("Network", "Port")));
         computeServerHearken.checkAndStart();
 
-//        computeServer.test();
+        computeServer.test();
     }
 
     private void test(){
@@ -63,6 +65,16 @@ public class ComputeServer {
                         Thread.sleep(50);
                     }
                 }
+//                String []result = omsProcessExecution.getProcessOutput().split("\\n");
+//                for(String str:result) {
+//                    Pattern pattern = Pattern.compile("^([0-9]{2}/[0-9]{2}.*)");
+//                    Matcher matcher = pattern.matcher(str);
+//                    boolean re= matcher.matches();
+//
+//                    if(!re){
+//                        System.out.println(str);
+//                    }
+//                }
 
                 System.out.print(omsProcessExecution.getProcessOutput());
 

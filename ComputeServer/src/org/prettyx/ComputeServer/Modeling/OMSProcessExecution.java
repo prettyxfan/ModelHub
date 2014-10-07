@@ -91,7 +91,7 @@ public class OMSProcessExecution {
                 jvmOptions,
                 separator + "-Doms3.work=" + workDir + separator,
                 "-cp", separator + jars(new File(omsHome), workDir, javaClassPath) + separator, "oms3.CLI",
-                "-l", "ALL",
+                "-l", "OFF",
                 "-r",
                 separator + new File(workDir + "/simulation.sim") + separator
         );

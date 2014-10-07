@@ -205,7 +205,8 @@ function createInterface(){
 
             if (m1 != '') {
                 var m2 = m.clone();
-                m2.translate(100, 0);
+                m2.position(200,30);
+//                m2.translate(100, 0);
                 var m3 = new Model(m1.componentName, m1.componentDescription, m1.inputs, m1.outputs, m1.parameters, m1.modelId, m2.id);
                 drawModelArray[drawModelNumber] = m3;
                 drawModelNumber++;
