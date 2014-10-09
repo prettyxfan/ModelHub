@@ -354,14 +354,99 @@
                     <ul class="nav nav-tabs">
                         <li class="active"><a href="#console" data-toggle="tab">Console</a></li>
                         <li><a href="#message" data-toggle="tab">Message</a></li>
-                        <li><a href="#analysis" data-toggle="tab">Analysis</a></li>
+                        <li><a href="#analysis" data-toggle="tab">Analysis</a>
+
+                            <div class="modal fade" id="canvasDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog canvas">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" onclick="">
+                                                <span aria-hidden="true">&times;</span>
+                                                <span class="sr-only">Close</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <canvas id="analysisCanvas" width="1300px" height="400px"></canvas>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <!--<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>-->
+                                            <!--<button type="button" class="btn btn-primary">Finish</button>-->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
                     </ul>
 
                     <!-- Tab panes -->
                     <div class="tab-content">
                         <div class="tab-pane active" id="console"></div>
                         <div class="tab-pane" id="message"></div>
-                        <div class="tab-pane" id="analysis"></div>
+                        <div class="tab-pane" id="analysis">
+                            <form class="form-horizontal">
+                                <fieldset>
+                                    <br/>
+                                        <div class="col-md-6">
+                                            <label for="table" class="col-md-2 control-label">table</label>
+                                            <div class="col-md-10">
+                                                <select class="form-control" id="table">
+                                                    <option></option>
+                                                </select>
+                                                <br>
+                                            </div>
+
+                                            <label class="col-lg-2 control-label">Chart</label>
+                                            <div class="col-lg-10">
+                                                <div class="radio">
+                                                    <label>
+                                                        <input type="radio" id="lineRadio" checked="">
+                                                        Line
+                                                    </label>
+                                                </div>
+                                                <div class="radio">
+                                                    <label>
+                                                        <input type="radio" id="barRadio">
+                                                        Bar
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <div class="col-md-offset-6">
+                                                    <button type="button" class="btn btn-default" onclick="displayLineChart()">displayLineChart</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="x" class="col-md-2 control-label">x</label>
+                                            <div class="col-md-10">
+                                                <select class="form-control" id="x">
+                                                    <option></option>
+                                                </select>
+                                                <br>
+                                            </div>
+
+                                            <label for="y1" class="col-md-2 control-label">y1</label>
+                                            <div class="col-md-10">
+                                                <select class="form-control" id="y1">
+                                                    <option></option>
+                                                </select>
+                                                <br>
+                                            </div>
+
+                                            <label for="y2" class="col-md-2 control-label">y2</label>
+                                            <div class="col-md-10">
+                                                <select class="form-control" id="y2">
+                                                    <option></option>
+                                                </select>
+                                                <br>
+                                            </div>
+
+                                        </div>
+                                </fieldset>
+                            </form>
+
+                        </div>
                     </div>
                 </div>
             </div>
@@ -401,6 +486,8 @@
     <script src="./assets/js/frameworks/JointJS/joint.shapes.uml.js"></script>
     <script src="./assets/js/frameworks/JointJS/joint.shapes.devs.min.js"></script>
     <script src="./assets/js/frameworks/JointJS/joint.shapes.devs.js"></script>
+    <script src="./assets/js/frameworks/Chart.js"></script>
+    <script src="./assets/js/chartGraphic.js"></script>
     <script src="./assets/js/initialize.js"></script>
     <script src="./assets/js/application.js"></script>
 

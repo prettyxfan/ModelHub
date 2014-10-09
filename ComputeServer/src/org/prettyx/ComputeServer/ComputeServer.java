@@ -9,6 +9,7 @@ import org.prettyx.ComputeServer.Modeling.OMSProcessExecution;
 import org.prettyx.ComputeServer.Network.ComputeServerHearken;
 import org.prettyx.ComputeServer.Settings.SettingsCenter;
 
+import java.io.File;
 import java.util.Scanner;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -46,7 +47,7 @@ public class ComputeServer {
         ComputeServerHearken computeServerHearken = new ComputeServerHearken(Integer.valueOf(computeServer.settingsCenter.getSetting("Network", "Port")));
         computeServerHearken.checkAndStart();
 
-        computeServer.test();
+//        computeServer.test();
     }
 
     private void test(){
@@ -76,7 +77,8 @@ public class ComputeServer {
 //                    }
 //                }
 
-                System.out.print(omsProcessExecution.getProcessOutput());
+//                System.out.print(omsProcessExecution.getProcessOutput());
+
 
                 // TODO Return Data
 

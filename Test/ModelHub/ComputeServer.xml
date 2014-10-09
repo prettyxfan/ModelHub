@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<Configurations>
+
+    <Running>
+        <Kind>ComputeServer</Kind>
+        <ServerName>PrettyX_Compute</ServerName>
+        <LogLevel>3</LogLevel>
+    </Running>
+
+    <Network>
+        <Port>8529</Port>
+    </Network>
+
+</Configurations>

@@ -1,0 +1,42 @@
+/*
+ * $Id:$
+ * 
+ * Copyright 2007-2011, Olaf David, Colorado State University
+ *
+ * This file is part of the Object Modeling System OMS.
+ *
+ * OMS is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * OMS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with OMS.  If not, see <http://www.gnu.org/licenses/>.
+ */
+import static oms3.SimBuilder.instance as OMS3
+
+OMS3.sim {
+    // need to specify the jar files as a simulation resource.
+    // this way you can name an @Name alias for a component.
+    resource "$oms_prj/dist/*.jar"
+
+    model {
+       parameter {
+           'c.message' "Greet the World  ..."
+       }
+
+       components {
+
+           // the component has the @Name("Greetings") annotation,
+           // the name can be used as an alias for the full qualified class
+           // name. be careful with this feature. It is hard to track, which
+           // class is being use. This feature is targeted for IDEs mainly.
+           'c' 'Greetings'
+       }
+    }
+}

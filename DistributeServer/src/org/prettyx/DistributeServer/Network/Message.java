@@ -21,5 +21,7 @@ public class Message {
 
     // Distribute - Compute
     public static final int D_C_RUN = 10;
+    public static final int D_C_RESULT = 11;
+    public static final int D_C_ANALYSIS = 12;
 
 }

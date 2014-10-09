@@ -50,7 +50,14 @@ body {
     margin-bottom: 0px;
     border-color: #e0e0e0;
 }
+.modal-dialog.canvas {
+    height: 100%;
+    width: 90%;
 
+}
+.modal-body {
+    overflow: scroll;
+}
 .panel-body {
     padding-top: 0px;
     padding-left: 1px;

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<Configurations>
+
+    <Running>
+        <Kind>DistributeServer</Kind>
+        <ServerName>PrettyX_Distribute</ServerName>
+        <LogLevel>3</LogLevel>
+    </Running>
+
+    <Modeling>
+        <ClassSource>dist</ClassSource>
+    </Modeling>
+
+    <Network>
+        <Port>8528</Port>
+    </Network>
+
+</Configurations>

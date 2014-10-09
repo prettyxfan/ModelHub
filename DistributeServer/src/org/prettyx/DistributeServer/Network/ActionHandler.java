@@ -571,12 +571,29 @@ public class ActionHandler {
                     @Override
                     public void onMessage(String s) {
                         // TODO Process Returned Data
+                        JSONObject jsonObject = JSONObject.fromObject(s);
+                        if(jsonObject.size() == 2){
+                            LogUtility.logUtility().log2out(jsonObject.toString());
+                            int action = (Integer)jsonObject.get("action");
+                            String data = (String)jsonObject.get("data");
 
-                        String []str = s.split("\\n");
-                        for(int i=0;i<str.length;i++) {
-                            JSONObject jsonObject = JSONObject.fromObject("{action:'run',StatusCode:1,message:'" + str[i].replace("'","\"") + "'}");
-                            System.out.println(jsonObject.toString());
-                            connection.send(jsonObject.toString());
+                            try {
+                                switch(action) {
+                                    case Message.D_C_RESULT:{
+                                        jsonObject = JSONObject.fromObject("{action:'run',StatusCode:1,message:'" + data + "'}");
+                                        System.out.println(jsonObject.toString());
+                                        connection.send(jsonObject.toString());
+                                    }
+                                    case Message.D_C_ANALYSIS:{
+                                        jsonObject = JSONObject.fromObject("{action:'analysis',StatusCode:1,message:'" + data + "'}");
+                                        System.out.println(jsonObject.toString());
+                                        connection.send(jsonObject.toString());
+                                    }
+                                    default: LogUtility.logUtility().log2err("action type error:" + s );
+                                }
+                            } catch (Exception e) {
+                                LogUtility.logUtility().log2err(e.getMessage());
+                            }
 
                         }
                     }

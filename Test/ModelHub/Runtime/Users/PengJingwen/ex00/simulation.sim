@@ -1,0 +1,23 @@
+import static oms3.SimBuilder.instance as OMS3
+
+/*
+ * Classic 'Hello World'..
+ * passing in a string message to an '@In' field of a component;  
+ * the component just prints out the message.
+ */
+OMS3.sim {
+
+    resource "$oms_prj/dist/*.jar"
+    
+    model() {
+        components {
+            // "componentname" -> "component class"
+           "c" "ex00.Component"
+        }
+        
+        parameter {
+            // "componentname.@In_fieldname" -> object
+             "c.message" "Hello World  ..."
+        }
+    }
+}

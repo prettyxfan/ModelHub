@@ -1,0 +1,54 @@
+import static oms3.SimBuilder.instance as OMS3
+OMS3.sim(){
+	outputstrategy(dir: "$oms_prj/output", scheme:NUMBERED)
+	model(while:"climate.moreData"){
+		components {
+			"climate"	"tw.Climate"
+			"daylen"	"tw.Daylen"
+			"et"	"tw.HamonET"
+			"out"	"tw.Output"
+			"runoff"	"tw.Runoff"
+			"snow"	"tw.Snow"
+			"soil"	"tw.SoilMoisture"
+		}
+		connect {
+			"climate.temp"	"soil.temp"
+			"climate.temp"	"et.temp"
+			"climate.temp"	"snow.temp"
+			"climate.precip"	"soil.precip"
+			"climate.precip"	"snow.precip"
+			"climate.time"	"daylen.time"
+			"climate.time"	"et.time"
+			"climate.time"	"out.time"
+			"daylen.daylen"	"et.daylen"
+			"daylen.daylen"	"out.daylen"
+			"soil.surfaceRunoff"	"out.surfaceRunoff"
+			"soil.surfaceRunoff"	"runoff.surfaceRunoff"
+			"soil.soilMoistStor"	"out.soilMoistStor"
+			"soil.actET"	"out.actET"
+			"et.potET"	"soil.potET"
+			"et.potET"	"snow.potET"
+			"et.potET"	"out.potET"
+			"snow.snowStorage"	"out.snowStorage"
+			"snow.snowMelt"	"runoff.snowMelt"
+			"runoff.runoff"	"out.runoff"
+		}
+		parameter {
+			"daylen.latitude"	35
+			"climate.climateInput"	"$oms_prj/input/climate.csv"
+			"soil.soilMoistStorCap"	200
+			"runoff.runoffFactor"	0.5
+			"out.outFile"	"output.csv"
+		}
+	}
+	efficiency(obs:"precip", sim:"runoff", precip:"precip", methods:NS+ABSDIF+PMCC+TRMSE+ROCE)
+	summary(time:"time", var:"runoff", moments:COUNT+MEAN+MIN+LAG1+Q3, period:YEARLY)
+	summary(time:"time", var:"snowStorage", moments:MEAN+MIN, period:YEARLY)
+    analysis(title:"Model output") {
+        timeseries(title:"TW Monthly waterbalance", view: COMBINED) {  
+            x(file:"%last/output.csv", table:"tw", column:"date")
+            y(file:"%last/output.csv", table:"tw", column:"runoff")
+            y(file:"%last/output.csv", table:"tw", column:"daylen")
+        }
+    }
+}
