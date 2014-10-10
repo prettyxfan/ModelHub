@@ -249,7 +249,7 @@
                                         <span class="glyphicon glyphicon-import"></span></button>
                                 </div>
                                 <div class="btn-group">
-                                    <button type="button" class="btn btn-primary" data-toggle="tooltip" data-placement="bottom" title="Export">
+                                    <button type="button" class="btn btn-primary" data-toggle="tooltip" data-placement="bottom" title="Export" onclick="exportModel()">
                                         <span class="glyphicon glyphicon-export"></span></button>
                                 </div>
                                 <div class="btn-group">
@@ -399,13 +399,11 @@
                                             <div class="col-lg-10">
                                                 <div class="radio">
                                                     <label>
-                                                        <input type="radio" id="lineRadio" checked="">
+                                                        <input type="radio" name = "chart" id="lineRadio" checked="" value="Line">
                                                         Line
                                                     </label>
-                                                </div>
-                                                <div class="radio">
                                                     <label>
-                                                        <input type="radio" id="barRadio">
+                                                        <input type="radio" name = "chart" id="barRadio" value="Bar">
                                                         Bar
                                                     </label>
                                                 </div>
@@ -413,7 +411,7 @@
 
                                             <div class="form-group">
                                                 <div class="col-md-offset-6">
-                                                    <button type="button" class="btn btn-default" onclick="displayLineChart()">displayLineChart</button>
+                                                    <button type="button" class="btn btn-default" onclick="displayChart()">displayLineChart</button>
                                                 </div>
                                             </div>
                                         </div>

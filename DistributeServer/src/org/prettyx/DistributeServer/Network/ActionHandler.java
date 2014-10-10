@@ -433,11 +433,15 @@ public class ActionHandler {
                         String targetPortName = outPort.attributeValue("targetPortName");
                         String targetModelId = outPort.attributeValue("targetPortId");
                         String targetModelName = (String) idToModelName.get(partIdToModelId.get(targetModelId));
-                        String source = partName + "." + portName;
-                        String target = targetModelName + "." + targetPortName;
-                        components.add(partName + "." + portName.split("\\.")[0]);
-                        components.add(targetModelName + "." + targetPortName.split("\\.")[0]);
+                        String source = portName;
+                        String target = targetPortName;
+                        components.add(portName.split("\\.")[0] + "." + portName.split("\\.")[1]);
+                        components.add(targetPortName.split("\\.")[0] + "." + targetPortName.split("\\.")[1]);
                         sourceToTarget.add(source + "+" + target);
+
+//                        System.out.println("partName + \".\" + portName.split(\"\\\\.\")[0]"+portName.split("\\.")[0] + "." + portName.split("\\.")[1]);
+//                        System.out.println("targetModelName + \".\" + targetPortName.split(\"\\\\.\")[0]" + targetPortName.split("\\.")[0] + "." + targetPortName.split("\\.")[1]);
+//                        System.out.println("source + \"+\" + target"+source + "+" + target);
 
                     }
 
@@ -448,16 +452,16 @@ public class ActionHandler {
                         String portName = inPort.attributeValue("portName");
                         String portValue = inPort.attributeValue("value");
                         String inputFileName = inPort.attributeValue("fileName");
-                        components.add(partName + "." + portName.split("\\.")[0]);
+                        components.add(portName.split("\\.")[0] + "." + portName.split("\\.")[1]);
 
                         if (inputFileName != "") {
                             File inputFile = new File(newModelPath + "/" + "input" + "/" + inputFileName);
                             DEPFS.writeFile(inputFile, portValue);
-                            String source = partName + "." + portName;
+                            String source = portName;
                             parameter.put(source, "$oms_prj/input/" + portValue);
 
                         } else if (portValue != "") {
-                            String source = partName + "." + portName;
+                            String source = portName;
                             parameter.put(source, portValue);
                         }
 
@@ -471,6 +475,7 @@ public class ActionHandler {
                     String newName = "c" + i;
                     newComponentName.put(value, newName);
                     model.setComponent(newName, value);
+//                    System.out.println("newName, value" + newName + value);
 
                 }
 
@@ -481,7 +486,10 @@ public class ActionHandler {
                     String laterTargetName = componentInfo[1].split("\\.")[0] + "." + componentInfo[1].split("\\.")[1];
                     model.setConnect(componentInfo[0].replace(preSourceName, (String) newComponentName.get(preSourceName)),
                             componentInfo[1].replace(laterTargetName, (String) newComponentName.get(laterTargetName)));
-
+//                    System.out.println("componentInfo[0].replace(preSourceName, (String) newComponentName.get(preSourceName)),\n" +
+//                            "                            componentInfo[1].replace(laterTargetName, (String) newComponentName.get(laterTargetName))"
+//                    +componentInfo[0].replace(preSourceName ,(String) newComponentName.get(preSourceName))+
+//                            componentInfo[1].replace(laterTargetName, (String) newComponentName.get(laterTargetName)));
                 }
 
                 //user parameter to set parameter value
@@ -507,6 +515,7 @@ public class ActionHandler {
                 File simulation = new File(DistributeServer.absolutePathOfRuntimeUsers + "/"
                         + currentUserName + "/" + componentName + "/simulation.sim");
                 DEPFS.writeFile(simulation, simFile.toString());
+                System.out.println(simFile.toString());
                 runModel(connection,data);
 
 //                JSONObject jsonObject = JSONObject.fromObject("{action:'compile',StatusCode:1,message:'success'}");
@@ -618,6 +627,35 @@ public class ActionHandler {
         }
     }
 
+    public static void exportModel(WebSocket connection, String data) throws Exception {
+
+        String userID = (String)DistributeServerHearken.currentUsers.get(connection);
+        String sid = UUID.randomUUID().toString();
+        Map userInfo = XMLParser.parserXmlFromString(data);
+        String newModelName = (String)userInfo.get("/message/modelName");
+        String newModelDescription = (String)userInfo.get("/message/description");
+        LogUtility.logUtility().log2out("newModelName: "+newModelName+" newModelDescription: "+newModelDescription);
+
+        DBOP dbop = new DBOP();
+        Connection connectionToSql = dbop.getConnection();
+
+        LogUtility.logUtility().log2out("model export is ok");
+
+        PreparedStatement prep = connectionToSql.prepareStatement("insert into Models values(?,?,null,?,?) ;");
+        prep.setString(1, sid);
+        prep.setString(2, newModelName);
+        prep.setString(3, newModelDescription);
+        prep.setString(4, userID);
+
+
+        prep.executeUpdate();
+        JSONObject jsonObject = JSONObject.fromObject("{action:'export',StatusCode:1,message:'success'}");
+        connection.send(jsonObject.toString());
+
+
+        prep.close();
+        connectionToSql.close();
+    }
 
     public static void runModelTest() {
 

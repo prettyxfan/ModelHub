@@ -85,6 +85,7 @@ public class DistributeServerHearken extends WebSocketServer {
                     } break;
                     case Message.D_B_COMPILE: ActionHandler.compileModel(connection, data);break;
                     case Message.D_B_RUN: ActionHandler.runModel(connection, data); break;
+                    case Message.D_B_EXPORT: ActionHandler.exportModel(connection, data); break;
                     default: LogUtility.logUtility().log2err("action type error");
                 }
             } catch (Exception e) {

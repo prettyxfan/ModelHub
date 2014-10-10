@@ -16,6 +16,7 @@ function interfaceInit(){
     drawModelNumber = 0;
     ModelInfomation = '';
     newModelName = '';
+    newModelDescription = '';
 
     paperAvailable = false;
     createInterface();
@@ -86,16 +87,44 @@ function createInterface(){
             if (xmlAttr == sourceId) {
                 $(this).find("output").each(function() {
                     if ($(this).attr("portName") == sourcePort) {
-                        $(this).attr("targetPortId", targetId);
-                        $(this).attr("targetPortName", targetPort);
+                        if(targetId != undefined) {
+                            if($(this).attr("targetPortId")!="") {
+                                var a = $(this).attr("targetPortId") + "#" + targetId;
+                                $(this).attr("targetPortId", a);
+                            } else{
+                                $(this).attr("targetPortId",targetId);
+                            }
+                        }
+                        if(targetPort != undefined) {
+                            if($(this).attr("targetPortName")!="") {
+                                var b = $(this).attr("targetPortName") + "#" + targetPort;
+                                $(this).attr("targetPortName", b);
+                            } else{
+                                $(this).attr("targetPortName",targetPort);
+                            }
+                        }
                     }
                 });
             }
             else if (xmlAttr == targetId) {
                 $(this).find("input").each(function() {
                     if ($(this).attr("portName") == targetPort) {
-                    $(this).attr("sourcePortId",sourceId);
-                    $(this).attr("sourcePortName", sourcePort);
+                        if(sourceId != undefined) {
+                            if($(this).attr("sourcePortId")!="") {
+                                var a = $(this).attr("sourcePortId") + "#" + sourceId;
+                                $(this).attr("sourcePortId", a);
+                            } else{
+                                $(this).attr("sourcePortId", sourceId);
+                            }
+                        }
+                        if(sourcePort != undefined) {
+                            if($(this).attr("sourcePortName")!="") {
+                                var b = $(this).attr("sourcePortName") + "#" + sourcePort;
+                                $(this).attr("sourcePortName", b);
+                            } else{
+                                $(this).attr("sourcePortName",sourcePort);
+                            }
+                        }
                     }
                 });
             }
@@ -353,6 +382,12 @@ function dealRecieveModel(modelXML){
 function newModel(){
     if(!paperAvailable) {
         $('#newModel').modal('show');
+    } else{
+        clearComponent();
+        $('#attributesArea').html("");
+        $("#console").html("");
+
+
     }
 
 }
@@ -362,6 +397,7 @@ function newModelConfirm() {
         $('#inputModelName').popover('show');
     } else{
         newModelName = $('#inputModelName').val();
+        newModelDescription = $("#textArea").val();
         $('#newModel').modal('hide');
         $('#paper').css('background-color', '#ffffff');
         paperAvailable = true;
@@ -720,4 +756,17 @@ function setMultipleData(dialogId){
     $('#'+dialogId).modal("hide");
 //    $('#'+dialogId).remove();
 
+}
+
+function exportModel(){
+    var actionStatus = 6;
+    var ssid = "null";
+    var exportMessage = "<message><modelName>"+newModelName+"</modelName><description>"+newModelDescription+"</description></message>"
+    var sendMessage = {
+        action:actionStatus ,
+        sid : ssid,
+        data:exportMessage
+    };
+    console.log(json2str(sendMessage));
+    websocket.send(json2str(sendMessage));
 }

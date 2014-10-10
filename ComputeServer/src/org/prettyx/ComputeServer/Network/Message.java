@@ -18,6 +18,8 @@ public class Message {
     public static final int D_B_GET_MODEL = 3;
     public static final int D_B_COMPILE = 4;
     public static final int D_B_RUN = 5;
+    public static final int D_B_EXPORT = 6;
+
 
     // Distribute - Compute
     public static final int D_C_RUN = 10;

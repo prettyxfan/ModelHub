@@ -75,7 +75,7 @@ public class XMLGenerator {
                             String []typeSplite = fieldType.split("\\.");
                             fieldType = typeSplite[typeSplite.length-1];
                             String fieldName = cla.getName() + "." + field.getName();
-//                            System.out.println(cla.getName());
+                            System.out.println(cla.getName());
                             if(Annotations.isIn(field))
                                 input.put(fieldName,fieldType);
                             else if(Annotations.isOut(field))
